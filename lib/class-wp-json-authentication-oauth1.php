@@ -322,14 +322,22 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	 * @param string $key Token ID
 	 * @return string|WP_Error Verification code on success, error otherwise
 	 */
-	public function authorize_request_token( $key ) {
+	public function authorize_request_token( $key, $user = null ) {
 		$token = $this->get_request_token( $key );
 		if ( is_wp_error( $token ) ) {
 			return $token;
 		}
 
+		if ( empty( $user ) ) {
+			$user = get_current_user_id();
+		}
+		elseif ( is_a( $user, 'WP_User' ) ) {
+			$user = $user->ID;
+		}
+
 		$token['authorized'] = true;
 		$token['verifier'] = wp_generate_password( self::VERIFIER_LENGTH, false );
+		$token['user'] = $user;
 		$token = apply_filters( 'oauth_request_token_authorized_data', $token );
 		update_option( 'oauth1_request_' . $key, $token );
 		return $token['verifier'];
