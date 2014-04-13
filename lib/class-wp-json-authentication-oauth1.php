@@ -249,12 +249,19 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	 * Retrieve a request token's data
 	 *
 	 * @param string $key Token ID
-	 * @return array|null Request token data on success, null otherwise
+	 * @return array|WP_Error Request token data on success, error otherwise
 	 */
 	public function get_request_token( $key ) {
 		$data = get_option( 'oauth1_request_' . $key, null );
+
 		if ( empty( $data ) ) {
-			return null;
+			return new WP_Error( 'json_oauth_invalid_token', __( 'Invalid token' ), array( 'status' => 400 ) );
+		}
+
+		// Check expiration
+		if ( $data['expiration'] < time() ) {
+			$this->remove_request_token( $key );
+			return new WP_Error( 'oauth1_expired_token', __( 'OAuth request token has expired' ), array( 'status' => 401 ) );
 		}
 
 		return $data;
@@ -323,16 +330,9 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	 * @return WP_Error|array OAuth token data on success, error otherwise
 	 */
 	public function generate_access_token( $oauth_consumer_key, $oauth_token ) {
-
 		$token = $this->get_request_token( $oauth_token );
 		if ( is_wp_error( $token ) ) {
 			return $token;
-		}
-
-		// Check expiration
-		if ( $token['expiration'] < time() ) {
-			$this->remove_request_token( $oauth_token );
-			return new WP_Error( 'oauth1_expired_token', __( 'OAuth request token has expired' ), array( 'status' => 401 ) );
 		}
 
 		// Check verification
