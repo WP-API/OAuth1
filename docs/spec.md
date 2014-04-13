@@ -189,6 +189,7 @@ ability to perform any action the user has the capability to perform, including
 any future capabilities they may be granted. This scope SHOULD be used
 sparingly, as it presents a large attack surface.
 
+### Available Scopes
 The following scopes are available:
 
 * `read`: Ability to read any public site data, or private data that the user
