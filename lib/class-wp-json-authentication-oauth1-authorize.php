@@ -57,10 +57,10 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 		}
 
 		// Set up fields
-		$token_key = $_REQUEST['oauth_token'];
+		$token_key = wp_unslash( $_REQUEST['oauth_token'] );
 		$scope = '*';
 		if ( ! empty( $_REQUEST['wp_scope'] ) ) {
-			$scope = $_REQUEST['wp_scope'];
+			$scope = wp_unslash( $_REQUEST['wp_scope'] );
 		}
 
 		$authenticator = new WP_JSON_Authentication_OAuth1();
