@@ -87,11 +87,7 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 						return $verifier;
 					}
 
-					$error = $this->handle_callback_redirect( $verifier );
-					if ( is_wp_error( $error ) ) {
-						return $error;
-					}
-					return null;
+					return $this->handle_callback_redirect( $verifier );
 
 				case 'cancel':
 					exit;
