@@ -52,4 +52,4 @@ endif;
 </p>
 
 <?php
-login_footer('user_login');
+login_footer();
