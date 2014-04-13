@@ -15,7 +15,7 @@ $url = site_url( 'wp-login.php?action=oauth1_authorize', 'login_post' );
 	<h2><?php echo esc_html( sprintf( __('Connect %1$s'), $consumer->post_title ) ) ?></h2>
 	<p><?php
 		printf(
-			__( 'Howdy %1$s, "%2$s" would like to connect to %3$s.' ),
+			__( 'Howdy <strong>%1$s</strong>, "%2$s" would like to connect to %3$s.' ),
 			$current_user->user_login,
 			$consumer->post_title,
 			get_bloginfo( 'name' )
