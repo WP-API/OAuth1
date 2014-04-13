@@ -165,7 +165,9 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 
 		switch ( $route ) {
 			case 'authorize':
-				wp_safe_redirect( site_url( 'wp-login.php?action=oauth1_authorize', 'login_post' ) );
+				$url = site_url( 'wp-login.php?action=oauth1_authorize', 'login_post' );
+				$url .= '&' . $_SERVER['QUERY_STRING'];
+				wp_safe_redirect( $url );
 				exit;
 
 			case 'request':
