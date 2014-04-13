@@ -9,7 +9,7 @@ class WP_JSON_Authentication_Authorize {
 	public function render_page() {
 		// Check required fields
 		if ( empty( $_REQUEST['oauth_token'] ) ) {
-			$error = new WP_Error( 'json_oauth_missing_param', sprintf( __( 'Missing parameter %s' ), 'oauth_token' ), array( 'status' => 400 ) );
+			$error = new WP_Error( 'json_oauth1_missing_param', sprintf( __( 'Missing parameter %s' ), 'oauth_token' ), array( 'status' => 400 ) );
 			$this->display_error( $error );
 			exit;
 		}
