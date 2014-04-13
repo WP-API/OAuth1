@@ -70,6 +70,10 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 			return $this->token;
 		}
 
+		if ( $this->token['authorized'] === true ) {
+			return $this->handle_callback_redirect( $this->token['verifier'] );
+		}
+
 		// Fetch consumer
 		$this->consumer = $consumer = get_post( $this->token['consumer'] );
 
