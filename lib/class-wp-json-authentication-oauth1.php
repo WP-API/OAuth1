@@ -11,6 +11,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	const CONSUMER_SECRET_LENGTH = 48;
 	const TOKEN_KEY_LENGTH = 24;
 	const TOKEN_SECRET_LENGTH = 48;
+	const VERIFIER_LENGTH = 24;
 
 	/**
 	 * Authentication type
@@ -319,7 +320,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	 *
 	 * Enables the request token to be used to generate an access token
 	 * @param string $key Token ID
-	 * @return bool|WP_Error True on success, error otherwise
+	 * @return string|WP_Error Verification code on success, error otherwise
 	 */
 	public function authorize_request_token( $key ) {
 		$token = $this->get_request_token( $key );
@@ -328,9 +329,10 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		}
 
 		$token['authorized'] = true;
+		$token['verifier'] = wp_generate_password( self::VERIFIER_LENGTH, false );
 		$token = apply_filters( 'oauth_request_token_authorized_data', $token );
 		update_option( 'oauth1_request_' . $key, $token );
-		return true;
+		return $token['verifier'];
 	}
 
 	/**
