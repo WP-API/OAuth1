@@ -109,9 +109,6 @@ class WP_JSON_Authentication_Authorize {
 	 */
 	public function display_error( WP_Error $error ) {
 		login_header( __( 'Error' ), '', $error );
-?>
-
-<?php
 		login_footer();
 	}
 }
