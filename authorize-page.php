@@ -23,7 +23,7 @@ class WP_JSON_Authentication_Authorize {
 
 		$authenticator = new WP_JSON_Authentication_OAuth1();
 		$errors = array();
-		$token = $authenticator->get_consumer( $_REQUEST['oauth_token'] );
+		$token = $authenticator->get_request_token( $_REQUEST['oauth_token'] );
 		if ( is_wp_error( $token ) ) {
 			$this->display_error( $token );
 			exit;
