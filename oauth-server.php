@@ -95,11 +95,17 @@ function json_oauth_api_routes( $data ) {
 }
 add_filter( 'json_index', 'json_oauth_api_routes' );
 
+/**
+ * Register the authorization page
+ *
+ * Alas, login_init is too late to register pages, as the action is already
+ * sanitized before this.
+ */
 function json_oauth_load_authorize_page() {
 	$authorizer = new WP_JSON_Authentication_Authorize();
 	$authorizer->register_hooks();
 }
-add_action( 'login_init', 'json_oauth_load_authorize_page' );
+add_action( 'init', 'json_oauth_load_authorize_page' );
 
 /**
  * Register routes and flush the rewrite rules on activation.
