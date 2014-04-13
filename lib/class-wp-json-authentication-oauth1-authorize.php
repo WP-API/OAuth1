@@ -135,7 +135,7 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 		if ( empty( $this->token['callback'] ) ) {
 			// No callback registered, display verification code to the user
 			login_header( __( 'Access Token' ) );
-			echo '<p>' . sprintf( __( 'Your access token is <code>%s</code>' ), $verifier ) . '</p>';
+			echo '<p>' . sprintf( __( 'Your verification token is <code>%s</code>' ), $verifier ) . '</p>';
 			login_footer();
 
 			return null;
