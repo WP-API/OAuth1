@@ -67,7 +67,16 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 
 			switch ( $_POST['wp-submit'] ) {
 				case 'authorize':
-					$authenticator->authorize_request_token( $this->token['key'] );
+					$verifier = $authenticator->authorize_request_token( $this->token['key'] );
+					if ( is_wp_error( $verifier ) ) {
+						$this->display_error( $error );
+						exit;
+					}
+
+					$error = $this->handle_callback_redirect( $verifier );
+					if ( is_wp_error( $error ) ) {
+						$this->display_error( $error );
+					}
 					exit;
 
 				case 'cancel':
@@ -100,6 +109,47 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 		echo '<input type="hidden" name="consumer" value="' . absint( $this->consumer->ID ) . '" />';
 		echo '<input type="hidden" name="oauth_token" value="' . esc_attr( $this->token['key'] ) . '" />';
 		wp_nonce_field( 'json_oauth1_authorize' );
+	}
+
+	/**
+	 * Handle redirecting the user after authorization
+	 *
+	 * @param string $verifier Verification code
+	 * @return null|WP_Error Null on success, error otherwise
+	 */
+	public function handle_callback_redirect( $verifier ) {
+		$callback = $this->token['callback'];
+		if ( $callback === 'oob' || empty( $callback ) ) {
+			return apply_filters( 'json_oauth1_handle_callback', null, $this->token );
+		}
+
+		if ( empty( $callback ) ) {
+			// No callback registered, display verification code to the user
+			login_header( __( 'Access Token' ) );
+			echo '<p>' . sprintf( __( 'Your access token is <code>%s</code>' ), $verifier ) . '</p>';
+			login_footer();
+
+			return null;
+		}
+
+		// Ensure the URL is safe to access
+		$callback = wp_http_validate_url( $callback );
+		if ( empty( $callback ) ) {
+			return new WP_Error( 'json_oauth1_invalid_callback', __( 'The callback URL is invalid' ), array( 'status' => 400 ) );
+		}
+
+		$args = array(
+			'oauth_token' => $this->token['key'],
+			'oauth_verifier' => $verifier,
+			'wp_scope' => '*',
+		);
+		$args = apply_filters( 'json_oauth1_callback_args', $args, $token );
+		$args = urlencode_deep( $args );
+		$callback = add_query_arg( $args, $callback );
+
+		wp_redirect( $callback );
+
+		return null;
 	}
 
 	/**
