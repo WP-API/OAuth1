@@ -7,14 +7,18 @@ class WP_JSON_Authentication_Authorize {
 	}
 
 	public function render_page() {
-		$required = array(
-			'oauth_token',
-			'wp_scope'
-		);
-		foreach ( $required as $required_var ) {
-			if ( empty( $_REQUEST[ $required_var ] ) ) {
-				break;
-			}
+		// Check required fields
+		if ( empty( $_REQUEST['oauth_token'] ) ) {
+			$error = new WP_Error( 'json_oauth_missing_param', sprintf( __( 'Missing parameter %s' ), 'oauth_token' ), array( 'status' => 400 ) );
+			$this->display_error( $error );
+			exit;
+		}
+
+		// Set up fields
+		$token = $_REQUEST['oauth_token'];
+		$scope = '*';
+		if ( ! empty( $_REQUEST['wp_scope'] ) ) {
+			$scope = $_REQUEST['wp_scope'];
 		}
 
 		$authenticator = new WP_JSON_Authentication_OAuth1();
@@ -46,5 +50,13 @@ class WP_JSON_Authentication_Authorize {
 	public function page_fields( $consumer ) {
 		echo '<input type="hidden" name="consumer" value="' . absint( $consumer->ID ) . '" />';
 		wp_nonce_field( 'oauth1_authorize' );
+	}
+
+	public function display_error( WP_Error $error ) {
+		login_header( __( 'Error' ), '', $error );
+?>
+
+<?php
+		login_footer();
 	}
 }
