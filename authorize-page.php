@@ -35,7 +35,8 @@ class WP_JSON_Authentication_Authorize {
 		if ( ! empty( $_POST['wp-submit'] ) ) {
 			check_admin_referer( 'json_oauth1_authorize' );
 
-			$token->authorize( $scope );
+			$authenticator->authorize_request_token( $_REQUEST['oauth_token'] );
+			exit;
 		}
 
 		$file = locate_template( 'oauth1-authorize.php' );
