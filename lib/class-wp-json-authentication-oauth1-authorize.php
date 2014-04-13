@@ -27,21 +27,33 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 	 * Register required actions and filters
 	 */
 	public function register_hooks() {
-		add_action( 'login_form_oauth1_authorize', array( $this, 'render_page' ) );
+		add_action( 'login_form_oauth1_authorize', array( $this, 'handle_request' ) );
 		add_action( 'oauth1_authorize_form', array( $this, 'page_fields' ) );
+	}
+
+	/**
+	 * Handle request to authorization page
+	 *
+	 * Handles response from {@see render_page}, then exits to avoid output from
+	 * default wp-login handlers.
+	 */
+	public function handle_request() {
+		$response = $this->render_page();
+		if ( is_wp_error( $response ) ) {
+			$this->display_error( $response );
+		}
+		exit;
 	}
 
 	/**
 	 * Render authorization page
 	 *
-	 * Callback for login form hook. Must exit.
+	 * @return null|WP_Error Null on success, error otherwise
 	 */
 	public function render_page() {
 		// Check required fields
 		if ( empty( $_REQUEST['oauth_token'] ) ) {
-			$error = new WP_Error( 'json_oauth1_missing_param', sprintf( __( 'Missing parameter %s' ), 'oauth_token' ), array( 'status' => 400 ) );
-			$this->display_error( $error );
-			exit;
+			return new WP_Error( 'json_oauth1_missing_param', sprintf( __( 'Missing parameter %s' ), 'oauth_token' ), array( 'status' => 400 ) );
 		}
 
 		// Set up fields
@@ -55,8 +67,7 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 		$errors = array();
 		$this->token = $authenticator->get_request_token( $token_key );
 		if ( is_wp_error( $this->token ) ) {
-			$this->display_error( $this->token );
-			exit;
+			return $this->token;
 		}
 
 		// Fetch consumer
@@ -69,23 +80,20 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 				case 'authorize':
 					$verifier = $authenticator->authorize_request_token( $this->token['key'] );
 					if ( is_wp_error( $verifier ) ) {
-						$this->display_error( $error );
-						exit;
+						return $verifier;
 					}
 
 					$error = $this->handle_callback_redirect( $verifier );
 					if ( is_wp_error( $error ) ) {
-						$this->display_error( $error );
+						return $error;
 					}
-					exit;
+					return null;
 
 				case 'cancel':
 					exit;
 
 				default:
-					$error = new WP_Error( 'json_oauth1_invalid_action', __( 'Invalid authorization action' ), array( 'status' => 400 ) );
-					$this->display_error( $error );
-					exit;
+					return new WP_Error( 'json_oauth1_invalid_action', __( 'Invalid authorization action' ), array( 'status' => 400 ) );
 			}
 		}
 
@@ -95,8 +103,6 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 		}
 
 		include $file;
-
-		exit;
 	}
 
 	/**
