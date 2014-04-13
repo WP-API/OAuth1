@@ -303,6 +303,9 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 			'consumer'   => $consumer->ID,
 			'authorized' => false,
 			'expiration' => time() + 24 * HOUR_IN_SECONDS,
+			'callback'   => null,
+			'verifier'   => null,
+			'user'       => null,
 		);
 		$data = apply_filters( 'json_oauth1_request_token_data', $data );
 		add_option( 'oauth1_request_' . $key, $data, null, 'no' );
