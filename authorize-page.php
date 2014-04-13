@@ -8,7 +8,7 @@
  * @subpackage JSON API
  */
 
-class WP_JSON_Authentication_Authorize {
+class WP_JSON_Authentication_OAuth1_Authorize {
 	/**
 	 * Request token for the current authorization request
 	 *

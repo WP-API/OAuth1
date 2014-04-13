@@ -102,7 +102,7 @@ add_filter( 'json_index', 'json_oauth_api_routes' );
  * sanitized before this.
  */
 function json_oauth_load_authorize_page() {
-	$authorizer = new WP_JSON_Authentication_Authorize();
+	$authorizer = new WP_JSON_Authentication_OAuth1_Authorize();
 	$authorizer->register_hooks();
 }
 add_action( 'init', 'json_oauth_load_authorize_page' );
