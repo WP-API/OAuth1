@@ -65,8 +65,19 @@ class WP_JSON_Authentication_Authorize {
 		if ( ! empty( $_POST['wp-submit'] ) ) {
 			check_admin_referer( 'json_oauth1_authorize' );
 
-			$authenticator->authorize_request_token( $_REQUEST['oauth_token'] );
-			exit;
+			switch ( $_POST['wp-submit'] ) {
+				case 'authorize':
+					$authenticator->authorize_request_token( $this->token['key'] );
+					exit;
+
+				case 'cancel':
+					exit;
+
+				default:
+					$error = new WP_Error( 'json_oauth1_invalid_action', __( 'Invalid authorization action' ), array( 'status' => 400 ) );
+					$this->display_error( $error );
+					exit;
+			}
 		}
 
 		$file = locate_template( 'oauth1-authorize.php' );
