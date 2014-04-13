@@ -309,6 +309,25 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		return $data;
 	}
 
+	/**
+	 * Authorize a request token
+	 *
+	 * Enables the request token to be used to generate an access token
+	 * @param string $key Token ID
+	 * @return bool|WP_Error True on success, error otherwise
+	 */
+	public function authorize_request_token( $key ) {
+		$token = $this->get_request_token( $key );
+		if ( is_wp_error( $token ) ) {
+			return $token;
+		}
+
+		$token['authorized'] = true;
+		$token = apply_filters( 'oauth_request_token_authorized_data', $token );
+		update_option( 'oauth1_request_' . $key, $token );
+		return true;
+	}
+
 	public function remove_request_token( $key ) {
 		delete_option( 'oauth1_request_' . $key );
 	}
