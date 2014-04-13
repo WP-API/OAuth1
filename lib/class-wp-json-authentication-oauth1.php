@@ -158,6 +158,15 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		return $user;
 	}
 
+	/**
+	 * Serve an OAuth request
+	 *
+	 * Either returns data to be served, or redirects and exits. Non-reentrant
+	 * for the `authorize` route.
+	 *
+	 * @param string $route Type of request; `authorize`, `request` or `access`
+	 * @return mixed Response data (typically WP_Error or an array). May exit.
+	 */
 	public function dispatch( $route ) {
 		// if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
 		// 	return new WP_Error( 'oauth1_invalid_method', __( 'Invalid request method for OAuth endpoint' ), array( 'status' => 405 ) );
@@ -270,12 +279,8 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	/**
 	 * Generate a new request token
 	 *
-	 * @param string $oauth_consumer_key
-	 * @param string $oauth_signature
-	 * @param string $oauth_signature_method
-	 * @param string $oauth_nonce
-	 * @param int $oauth_timestamp
-	 * @return array
+	 * @param array $params Request parameters, from {@see get_parameters}
+	 * @return array|WP_Error Array of token data on success, error otherwise
 	 */
 	public function generate_request_token( $params ) {
 		$consumer = $this->get_consumer( $params['oauth_consumer_key'] );
@@ -328,10 +333,21 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		return true;
 	}
 
+	/**
+	 * Delete a request token
+	 *
+	 * @param string $key Token ID
+	 */
 	public function remove_request_token( $key ) {
 		delete_option( 'oauth1_request_' . $key );
 	}
 
+	/**
+	 * Retrieve an access token's data
+	 *
+	 * @param string $oauth_token Token ID
+	 * @return array|null Token data on success, null otherwise
+	 */
 	public function get_access_token( $oauth_token ) {
 		$data = get_option( 'oauth1_access_' . $oauth_token, null );
 		if ( empty( $data ) ) {

@@ -1,11 +1,41 @@
 <?php
+/**
+ * Authorization page handler
+ *
+ * Takes care of UI and related elements for the authorization step of OAuth.
+ *
+ * @package WordPress
+ * @subpackage JSON API
+ */
 
 class WP_JSON_Authentication_Authorize {
+	/**
+	 * Request token for the current authorization request
+	 *
+	 * @var array
+	 */
+	protected $token;
+
+	/**
+	 * Consumer post object for the current authorization request
+	 *
+	 * @var WP_Post
+	 */
+	protected $consumer;
+
+	/**
+	 * Register required actions and filters
+	 */
 	public function register_hooks() {
 		add_action( 'login_form_oauth1_authorize', array( $this, 'render_page' ) );
 		add_action( 'oauth1_authorize_form', array( $this, 'page_fields' ) );
 	}
 
+	/**
+	 * Render authorization page
+	 *
+	 * Callback for login form hook. Must exit.
+	 */
 	public function render_page() {
 		// Check required fields
 		if ( empty( $_REQUEST['oauth_token'] ) ) {
@@ -49,11 +79,22 @@ class WP_JSON_Authentication_Authorize {
 		exit;
 	}
 
-	public function page_fields( $consumer ) {
+	/**
+	 * Output required hidden fields
+	 *
+	 * Outputs the required hidden fields for the authorization page, including
+	 * nonce field.
+	 */
+	public function page_fields() {
 		echo '<input type="hidden" name="consumer" value="' . absint( $consumer->ID ) . '" />';
 		wp_nonce_field( 'json_oauth1_authorize' );
 	}
 
+	/**
+	 * Display an error using login page wrapper
+	 *
+	 * @param WP_Error $error Error object
+	 */
 	public function display_error( WP_Error $error ) {
 		login_header( __( 'Error' ), '', $error );
 ?>
