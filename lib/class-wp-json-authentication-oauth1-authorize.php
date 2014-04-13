@@ -128,12 +128,11 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 	 * @return null|WP_Error Null on success, error otherwise
 	 */
 	public function handle_callback_redirect( $verifier ) {
-		$callback = $this->token['callback'];
-		if ( $callback === 'oob' || empty( $callback ) ) {
+		if ( ! empty( $this->token['callback'] ) && $this->token['callback'] === 'oob' ) {
 			return apply_filters( 'json_oauth1_handle_callback', null, $this->token );
 		}
 
-		if ( empty( $callback ) ) {
+		if ( empty( $this->token['callback'] ) ) {
 			// No callback registered, display verification code to the user
 			login_header( __( 'Access Token' ) );
 			echo '<p>' . sprintf( __( 'Your access token is <code>%s</code>' ), $verifier ) . '</p>';
@@ -141,6 +140,8 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 
 			return null;
 		}
+
+		$callback = $this->token['callback'];
 
 		// Ensure the URL is safe to access
 		$callback = wp_http_validate_url( $callback );
