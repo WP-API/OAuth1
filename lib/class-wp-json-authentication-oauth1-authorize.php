@@ -82,7 +82,7 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 
 		$file = locate_template( 'oauth1-authorize.php' );
 		if ( empty( $file ) ) {
-			$file = dirname( __FILE__ ) . '/theme/oauth1-authorize.php';
+			$file = dirname( dirname( __FILE__ ) ) . '/theme/oauth1-authorize.php';
 		}
 
 		include $file;

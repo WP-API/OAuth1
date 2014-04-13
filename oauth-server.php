@@ -6,7 +6,7 @@
 
 include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication.php' );
 include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication-oauth1.php' );
-include_once( dirname( __FILE__ ) . '/authorize-page.php' );
+include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication-oauth1-authorize.php' );
 
 /**
  * Register our rewrite rules for the API
