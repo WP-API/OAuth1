@@ -355,7 +355,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		}
 
 		// Check verification
-		if ( ! $token['authorized'] ) {
+		if ( $token['authorized'] !== true ) {
 			return new WP_Error( 'oauth1_unauthorized_token', __( 'OAuth token has not been authorized' ), array( 'status' => 401 ) );
 		}
 
