@@ -33,7 +33,7 @@ class WP_JSON_Authentication_Authorize {
 		$consumer = get_post( $token['consumer'] );
 
 		if ( ! empty( $_POST['wp-submit'] ) ) {
-			check_admin_referer( $_POST['wp-submit'] );
+			check_admin_referer( 'json_oauth1_authorize' );
 
 			$token->authorize( $scope );
 		}
@@ -50,7 +50,7 @@ class WP_JSON_Authentication_Authorize {
 
 	public function page_fields( $consumer ) {
 		echo '<input type="hidden" name="consumer" value="' . absint( $consumer->ID ) . '" />';
-		wp_nonce_field( 'oauth1_authorize' );
+		wp_nonce_field( 'json_oauth1_authorize' );
 	}
 
 	public function display_error( WP_Error $error ) {
