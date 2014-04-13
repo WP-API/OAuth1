@@ -29,7 +29,8 @@ class WP_JSON_Authentication_Authorize {
 			exit;
 		}
 
-		$consumer = get_post(5);
+		// Fetch consumer
+		$consumer = get_post( $token['consumer'] );
 
 		if ( ! empty( $_POST['wp-submit'] ) ) {
 			check_admin_referer( $_POST['wp-submit'] );
