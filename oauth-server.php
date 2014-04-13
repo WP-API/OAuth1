@@ -86,9 +86,9 @@ function json_oauth_api_routes( $data ) {
 	}
 
 	$data['authentication']['oauth1'] = array(
-		'request' => home_url( 'oauth/request' ),
-		'authorize' => home_url( 'oauth/authorize' ),
-		'access' => home_url( 'oauth/access' ),
+		'request' => home_url( 'oauth1/request' ),
+		'authorize' => home_url( 'oauth1/authorize' ),
+		'access' => home_url( 'oauth1/access' ),
 		'version' => '0.1',
 	);
 	return $data;

@@ -88,7 +88,7 @@ This request follows the [Temporary Credentials][oauth-request] section of
 [RFC5948][].
 
 ### Request
-The client sends a HTTP POST request to `/oauth/request` (the "Temporary
+The client sends a HTTP POST request to `/oauth1/request` (the "Temporary
 Credential Request endpoint"). This URL is also available via the API
 Description object as the `request` property, and clients SHOULD use the URL
 from the API Description object instead of hardcoding the URL.
@@ -118,7 +118,7 @@ This request follows the [Resource Owner Authorization][oauth-authorize] section
 of [RFC5849][], with additions.
 
 ### Request
-The client sends the user to `/oauth/authorize` (the "Resource Owner
+The client sends the user to `/oauth1/authorize` (the "Resource Owner
 Authorization endpoint"). This URL is also available via the API Description
 object as the `authorize` property, and clients SHOULD use the URL from the API
 Description object instead of hardcoding the URL.
@@ -153,7 +153,7 @@ This request follows the [Token Credentials][oauth-access] section of
 [RFC5849][].
 
 ### Request
-The client sends the user to `/oauth/access` (the "Token Request" endpoint).
+The client sends the user to `/oauth1/access` (the "Token Request" endpoint).
 This URL is also available via the API Description object as the "access"
 property, and clients SHOULD use the URL from the API Description object instead
 of hardcoding the URL.
