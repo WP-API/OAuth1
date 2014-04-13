@@ -45,7 +45,7 @@ class WP_JSON_Authentication_Authorize {
 		}
 
 		// Set up fields
-		$token = $_REQUEST['oauth_token'];
+		$token_key = $_REQUEST['oauth_token'];
 		$scope = '*';
 		if ( ! empty( $_REQUEST['wp_scope'] ) ) {
 			$scope = $_REQUEST['wp_scope'];
@@ -53,14 +53,14 @@ class WP_JSON_Authentication_Authorize {
 
 		$authenticator = new WP_JSON_Authentication_OAuth1();
 		$errors = array();
-		$token = $authenticator->get_request_token( $_REQUEST['oauth_token'] );
-		if ( is_wp_error( $token ) ) {
-			$this->display_error( $token );
+		$this->token = $authenticator->get_request_token( $token_key );
+		if ( is_wp_error( $this->token ) ) {
+			$this->display_error( $this->token );
 			exit;
 		}
 
 		// Fetch consumer
-		$consumer = get_post( $token['consumer'] );
+		$this->consumer = $consumer = get_post( $this->token['consumer'] );
 
 		if ( ! empty( $_POST['wp-submit'] ) ) {
 			check_admin_referer( 'json_oauth1_authorize' );
@@ -86,7 +86,8 @@ class WP_JSON_Authentication_Authorize {
 	 * nonce field.
 	 */
 	public function page_fields() {
-		echo '<input type="hidden" name="consumer" value="' . absint( $consumer->ID ) . '" />';
+		echo '<input type="hidden" name="consumer" value="' . absint( $this->consumer->ID ) . '" />';
+		echo '<input type="hidden" name="oauth_token" value="' . esc_attr( $this->token['key'] ) . '" />';
 		wp_nonce_field( 'json_oauth1_authorize' );
 	}
 
