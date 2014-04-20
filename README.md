@@ -16,10 +16,10 @@ Want to test out the OAuth API and work on it? Here's how you can set up your ow
 testing environment in a few easy steps:
 
 1. Install [Vagrant](http://vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/).
-2. Clone [Chassis](https://github.com/sennza/Chassis):
+2. Clone [Chassis](https://github.com/Chassis/Chassis):
 
    ```bash
-   git clone --recursive git@github.com:sennza/Chassis.git api-tester
+   git clone --recursive git@github.com:Chassis/Chassis.git api-tester
    vagrant plugin install vagrant-hostsupdater
    ```
 
