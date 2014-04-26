@@ -126,7 +126,7 @@ function json_oauth_server_activation( $network_wide ) {
 
 	} else {
 
-		oauth_server_register_rewrites();
+		json_oauth_server_register_rewrites();
 		flush_rewrite_rules();
 	}
 }
