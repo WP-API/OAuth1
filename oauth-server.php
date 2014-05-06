@@ -41,6 +41,21 @@ function json_oauth_server_setup_authentication() {
 add_action( 'init', 'json_oauth_server_setup_authentication' );
 
 /**
+ * Register the authorization page
+ *
+ * Alas, login_init is too late to register pages, as the action is already
+ * sanitized before this.
+ */
+function json_oauth_load() {
+	global $wp_json_authentication_oauth1;
+
+	$wp_json_authentication_oauth1 = new WP_JSON_Authentication_OAuth1();
+	add_filter( 'determine_current_user', array( $wp_json_authentication_oauth1, 'authenticate' ) );
+	add_filter( 'json_authentication_errors', array( $wp_json_authentication_oauth1, 'get_authentication_errors' ) );
+}
+add_action( 'plugins_loaded', 'json_oauth_load' );
+
+/**
  * Load the JSON API
  */
 function json_oauth_server_loaded() {
