@@ -22,6 +22,12 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	protected $type = 'oauth1';
 
 	/**
+	 * Errors that occurred during authentication
+	 * @var WP_Error|null|boolean True if succeeded, WP_Error if errored, null if not OAuth
+	 */
+	protected $auth_status = null;
+
+	/**
 	 * Parse the Authorization header into parameters
 	 *
 	 * @param string $header Authorization header value (not including "Authorization: " prefix)
@@ -134,33 +140,48 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 
 		$params = $this->get_parameters();
 		if ( ! is_array( $params ) ) {
-			return $params;
+			$this->auth_status = $params;
+			return null;
 		}
 
 		// Fetch user by token key
 		$token = $this->get_access_token( $params['oauth_token'] );
 		if ( is_wp_error( $token ) ) {
-			return $token;
+			$this->auth_status = $token;
+			return null;
 		}
 
 		$result = $this->check_token( $token, $params['oauth_consumer_key'] );
 		if ( is_wp_error( $result ) ) {
-			return $result;
+			$this->auth_status = $result;
+			return null;
 		}
 		list( $consumer, $user ) = $result;
 
 		// Perform OAuth validation
 		$error = $this->check_oauth_signature( $user, $params, $token );
 		if ( is_wp_error( $error ) ) {
-			return $error;
+			$this->auth_status = $error;
+			return null;
 		}
 
 		$error = $this->check_oauth_timestamp_and_nonce( $user, $params['oauth_timestamp'], $params['oauth_nonce'] );
 		if ( is_wp_error( $error ) ) {
-			return $error;
+			$this->auth_status = $error;
+			return null;
 		}
 
+		$this->auth_status = true;
 		return $user;
+	}
+
+	/**
+	 * Report authentication errors to the JSON API
+	 *
+	 * @return WP_Error|boolean|null {@see WP_JSON_Server::check_authentication}
+	 */
+	public function get_authentication_errors() {
+		return $this->auth_status;
 	}
 
 	/**
