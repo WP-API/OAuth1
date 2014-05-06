@@ -8,6 +8,12 @@ include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication.php' );
 include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication-oauth1.php' );
 include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication-oauth1-authorize.php' );
 
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication-oauth1-cli.php' );
+
+	WP_CLI::add_command( 'oauth1', 'WP_JSON_Authentication_OAuth1_CLI' );
+}
+
 /**
  * Register our rewrite rules for the API
  */
