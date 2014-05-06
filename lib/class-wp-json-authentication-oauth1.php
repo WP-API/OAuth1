@@ -46,7 +46,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 
 	}
 
-	public function get_parameters( $require_token = true ) {
+	public function get_parameters( $require_token = true, $extra = array() ) {
 		$params = array_merge( $_GET, $_POST );
 		$params = wp_unslash( $params );
 
@@ -72,6 +72,10 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 
 		if ( $require_token ) {
 			$param_names[] = 'oauth_token';
+		}
+
+		if ( ! empty( $extra ) ) {
+			$param_names = array_merge( $param_names, (array) $extra );
 		}
 
 		$errors = array();
@@ -193,7 +197,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 				return $this->generate_request_token( $params );
 
 			case 'access':
-				$params = $this->get_parameters();
+				$params = $this->get_parameters( true, array( 'oauth_verifier' ) );
 
 				if ( is_wp_error( $params ) ) {
 					return $params;
@@ -204,7 +208,8 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 
 				return $this->generate_access_token(
 					$params['oauth_consumer_key'],
-					$params['oauth_token']
+					$params['oauth_token'],
+					$params['oauth_verifier']
 				);
 
 			default:
@@ -377,7 +382,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	 * @param string $oauth_token Request token key
 	 * @return WP_Error|array OAuth token data on success, error otherwise
 	 */
-	public function generate_access_token( $oauth_consumer_key, $oauth_token ) {
+	public function generate_access_token( $oauth_consumer_key, $oauth_token, $oauth_verifier ) {
 		$token = $this->get_request_token( $oauth_token );
 		if ( is_wp_error( $token ) ) {
 			return $token;
@@ -386,6 +391,10 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		// Check verification
 		if ( $token['authorized'] !== true ) {
 			return new WP_Error( 'json_oauth1_unauthorized_token', __( 'OAuth token has not been authorized' ), array( 'status' => 401 ) );
+		}
+
+		if ( $oauth_verifier !== $token['verifier'] ) {
+			return new WP_Error( 'json_oauth1_invalid_verifier', __( 'OAuth verifier does not match' ), array( 'status' => 400 ) );
 		}
 
 		$consumer = $this->get_consumer( $oauth_consumer_key );
