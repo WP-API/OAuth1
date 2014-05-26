@@ -67,8 +67,8 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		if ( ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
 			$header = wp_unslash( $_SERVER['HTTP_AUTHORIZATION'] );
 
-			// Trim leading 'Authorization:'
-			$header = trim( substr( $header, 14 ) );
+			// Trim leading spaces
+			$header = trim( $header );
 
 			$header_params = $this->parse_header( $header );
 			if ( ! empty( $header_params ) ) {
