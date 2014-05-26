@@ -28,6 +28,14 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	protected $auth_status = null;
 
 	/**
+	 * Should we attempt to run?
+	 *
+	 * Stops infinite recursion in certain circumstances.
+	 * @var boolean
+	 */
+	protected $should_attempt = true;
+
+	/**
 	 * Parse the Authorization header into parameters
 	 *
 	 * @param string $header Authorization header value (not including "Authorization: " prefix)
@@ -129,7 +137,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	 * @return WP_User|null|WP_Error Authenticated user on success, null if no OAuth data supplied, error otherwise
 	 */
 	public function authenticate( $user ) {
-		if ( ! empty( $user ) ) {
+		if ( ! empty( $user ) || ! $this->should_attempt ) {
 			return $user;
 		}
 
