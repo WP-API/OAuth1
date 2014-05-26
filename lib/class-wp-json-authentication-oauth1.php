@@ -167,7 +167,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		list( $consumer, $user ) = $result;
 
 		// Perform OAuth validation
-		$error = $this->check_oauth_signature( $user, $params, $token );
+		$error = $this->check_oauth_signature( $consumer, $params, $token );
 		if ( is_wp_error( $error ) ) {
 			$this->auth_status = $error;
 			return null;
@@ -180,7 +180,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		}
 
 		$this->auth_status = true;
-		return $user;
+		return $user->ID;
 	}
 
 	/**
@@ -518,10 +518,11 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		}
 		$query_string = implode( '%26', $query_params ); // join with ampersand
 
+		$token = (array) $token;
 		$string_to_sign = $http_method . '&' . $base_request_uri . '&' . $query_string;
 		$key_parts = array(
 			$consumer->secret,
-			( $token ? $token->secret : '' )
+			( $token ? $token['secret'] : '' )
 		);
 		$key = implode( '&', $key_parts );
 
