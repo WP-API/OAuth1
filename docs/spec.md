@@ -283,7 +283,7 @@ Any permissions requested that are not available to the current user will cause
 an error to be returned to the client. Note that for permissions like `edit`,
 users without the `upload_files` capability (e.g.) will **not** cause an error,
 as the permission encompasses other capabilities. A user without the `edit_*`
-capability **will* cause an error, however.
+capability **will** cause an error, however.
 
 [RFC5849]: http://tools.ietf.org/html/rfc5849
 [oauth-request]: http://tools.ietf.org/html/rfc5849#section-2.1
