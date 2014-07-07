@@ -62,6 +62,27 @@ function json_oauth_load() {
 add_action( 'init', 'json_oauth_load' );
 
 /**
+ * Force reauthentication after we've registered our handler
+ *
+ * We could have checked authentication before OAuth was loaded. If so, let's
+ * try and reauthenticate now that OAuth is loaded.
+ */
+function json_oauth_force_reauthentication() {
+	if ( is_user_logged_in() ) {
+		// Another handler has already worked successfully, no need to
+		// reauthenticate.
+
+		return;
+	}
+
+	// Force reauthentication
+	global $current_user;
+	$current_user = null;
+	get_currentuserinfo();
+}
+add_action( 'init', 'json_oauth_force_reauthentication', 100 );
+
+/**
  * Load the JSON API
  */
 function json_oauth_server_loaded() {
