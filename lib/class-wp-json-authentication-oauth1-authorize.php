@@ -75,6 +75,13 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 			return $this->token;
 		}
 
+		if ( ! empty( $_REQUEST['oauth_callback'] ) ) {
+			$resp = $authenticator->set_request_token_callback( $this->token['key'], $_REQUEST['oauth_callback'] );
+			if ( is_wp_error( $resp ) ) {
+				return $resp;
+			}
+		}
+
 		if ( $this->token['authorized'] === true ) {
 			return $this->handle_callback_redirect( $this->token['verifier'] );
 		}
