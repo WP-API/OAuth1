@@ -357,6 +357,21 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		return $data;
 	}
 
+	public function set_request_token_callback( $key, $callback ) {
+		$token = $this->get_request_token( $key );
+		if ( is_wp_error( $token ) ) {
+			return $token;
+		}
+
+		if ( esc_url_raw( $callback ) !== $callback ) {
+			return new WP_Error( 'json_oauth1_invalid_callback', __( 'Callback URL is invalid' ) );
+		}
+
+		$token['callback'] = $callback;
+		update_option( 'oauth1_request_' . $key, $token );
+		return $token['verifier'];
+	}
+
 	/**
 	 * Authorize a request token
 	 *
