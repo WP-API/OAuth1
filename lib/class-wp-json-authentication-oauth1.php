@@ -186,9 +186,14 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	/**
 	 * Report authentication errors to the JSON API
 	 *
+	 * @param WP_Error|mixed $result Error from another authentication handler, null if we should handle it, or another value if not
 	 * @return WP_Error|boolean|null {@see WP_JSON_Server::check_authentication}
 	 */
-	public function get_authentication_errors() {
+	public function get_authentication_errors( $value ) {
+		if ( $value !== null ) {
+			return $value;
+		}
+
 		return $this->auth_status;
 	}
 
