@@ -377,6 +377,10 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 			$user = $user->ID;
 		}
 
+		if ( empty( $user ) ) {
+			return new WP_Error( 'json_oauth1_invalid_user', __( 'Invalid user specified for access token' ) );
+		}
+
 		$token['authorized'] = true;
 		$token['verifier'] = wp_generate_password( self::VERIFIER_LENGTH, false );
 		$token['user'] = $user;
