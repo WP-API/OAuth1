@@ -34,17 +34,211 @@ function json_oauth_server_register_rewrites() {
 function json_oauth_server_setup_authentication() {
 	register_post_type( 'json_consumer', array(
 		'labels' => array(
-			'name' => __( 'Consumer' ),
-			'singular_name' => __( 'Consumers' ),
+			'name' => __( 'API Clients' ),
+			'singular_name' => __( 'API Clients' ),
+	        'add_new' => _x( 'Add New' ),
+	        'add_new_item' => _x( 'Add New Client' ),
+	        'edit_item' => _x( 'Edit Client' ),
+	        'new_item' => _x( 'New Client' ),
+	        'view_item' => _x( 'View Client' ),
+	        'search_items' => _x( 'Search Clients' ),
+	        'not_found' => _x( 'No clients found' ),
+	        'not_found_in_trash' => _x( 'No clients found in Trash' )
 		),
-		'public' => false,
+		'public' => true,
+		'exclude_from_search' => true,
+		'publicly_queryable' => false,
+		'show_in_nav_menus' => false,
+		'show_in_admin_bar' => false,
 		'hierarchical' => false,
 		'rewrite' => false,
 		'delete_with_user' => true,
 		'query_var' => false,
+		'can_export' => false,
+		'menu_icon' => 'dashicons-admin-network',
+		'menu_position' => 80,
+		'supports' => array('title'),
+		'register_meta_box_cb' => 'json_key_secret_metabox'
 	) );
 }
 add_action( 'init', 'json_oauth_server_setup_authentication' );
+
+
+/**
+ * json_above_the_title function.
+ * 
+ * @access public
+ * @return void
+ */
+function json_text_above_the_title_editor() {
+ 	_e('<p>Enter a client name and publish. A key and secret will be generated for you.</p>');
+}
+add_action( 'edit_form_top', 'json_text_above_the_title_editor' );
+
+
+/**
+ * smallenvelop_enter_title_here_filter function.
+ * 
+ * @access public
+ * @param mixed $label
+ * @param mixed $post
+ * @return void
+ */
+function json_enter_title_here_filter( $label, $post ){
+
+    if( $post->post_type == 'json_consumer' )
+        $label= __( 'Enter Client Name Here', 'oauth' );
+
+    return $label;
+}
+add_filter( 'enter_title_here', 'json_enter_title_here_filter', 2, 2 );
+
+
+
+function json_remove_permalink_from_title( $return ) {
+    $return = '';
+    return $return;
+}
+add_filter( 'get_sample_permalink_html', 'json_remove_permalink_from_title' );
+
+
+
+function json_custom_publish_box() {
+
+	if ( 'json_consumer' == get_post_type() ) {
+	
+	    if( !is_admin() )
+	        return;
+	
+	    $style = '';
+	    $style .= '<style type="text/css">';
+	    $style .= '#edit-slug-box, #minor-publishing-actions, #visibility, .num-revisions, .curtime';
+	    $style .= '{display: none; }';
+	    $style .= '</style>';
+	
+	    echo $style;
+	}
+}
+add_action( 'admin_head', 'json_custom_publish_box' );
+
+
+/**
+ * json_remove_list_row_actions function.
+ * 
+ * @access public
+ * @param mixed $actions
+ * @param mixed $post
+ * @return void
+ */
+function json_remove_list_row_actions( $actions, $post ) {
+    unset( $actions['inline hide-if-no-js'] );
+    unset( $actions['view'] );
+
+    return $actions;
+}
+add_filter( 'page_row_actions', 'json_remove_list_row_actions', 10, 2 );
+add_filter( 'post_row_actions', 'json_remove_list_row_actions', 10, 2 );
+
+
+/**
+ * json_key_secret_metabox function.
+ * 
+ * @access public
+ * @param mixed $post
+ * @return void
+ */
+function json_key_secret_metabox( $post ){
+
+    if( $post->post_type == 'json_consumer' ) {
+    
+		add_meta_box(
+			'api-client',
+			__( 'API Keys', 'oauth' ),
+			'json_key_secret_metabox_callback',
+			'json_consumer'
+		);
+	    
+    }
+}
+
+
+/**
+ * json_key_secret_metabox_callback function.
+ * 
+ * @access public
+ * @param mixed $post
+ * @return void
+ */
+function json_key_secret_metabox_callback( $post ){
+	
+	$secret = get_post_meta( $post->ID, 'secret', true );
+	$key = get_post_meta( $post->ID, 'key', true );
+
+	if ( $key ) {
+	    echo '<ul>';
+	        echo '<li> key:     ' . $key . '</li>';
+	        echo '<li> secret:  ' . $secret . '</li></br>';
+	    echo '</ul>';
+	    echo 'Renew Keys? <input type="checkbox" id="renewkey" name="renewkey">';
+	} else {
+		echo 'Keys are created when client is published.';
+	}
+
+}
+
+
+/**
+ * json_create_key_secret function.
+ * 
+ * @access public
+ * @param mixed $post_id
+ * @return void
+ */
+function json_create_key_secret( $post_id ) {
+
+
+	// If this is an autosave, our form has not been submitted, so we don't want to do anything.
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+
+	// Check the user's permissions.
+	if ( isset( $_POST['json_consumer'] ) && 'page' == $_POST['json_consumer'] ) {
+
+		if ( ! current_user_can( 'edit_page', $post_id ) ) {
+			return;
+		}
+
+	} else {
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+	}
+	
+	// check if keys exist or to renew them
+	$renew = false;
+	$keytrue = $key = get_post_meta( $post_id, 'key' );
+	
+	if( $keytrue ) {
+		$renew = true;
+	}
+	
+	if( isset( $_REQUEST['renewkey'] ) ) {
+		$renew = true;
+	}
+
+	if( $renew ) {
+		$key = wp_generate_password( 12, false );
+		$secret = wp_generate_password( 48, false );
+		
+		update_post_meta( $post_id, 'key', $key );
+		update_post_meta( $post_id, 'secret', $secret );
+	}
+
+}
+add_action( 'save_post', 'json_create_key_secret' );
+
 
 /**
  * Register the authorization page
