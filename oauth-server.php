@@ -77,7 +77,7 @@ add_action( 'edit_form_top', 'json_text_above_the_title_editor' );
 
 
 /**
- * smallenvelop_enter_title_here_filter function.
+ * json_enter_title_here_filter function.
  * 
  * @access public
  * @param mixed $label
