@@ -115,7 +115,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 				_n(
 					'Missing OAuth parameter %s',
 					'Missing OAuth parameters %s',
-					count( $errors ) 
+					count( $errors )
 				),
 				implode(', ', $errors )
 			);
@@ -431,7 +431,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	/**
 	 * Generate a new access token
 	 *
-	 * @param string $oauth_consumer_key Consumer key 
+	 * @param string $oauth_consumer_key Consumer key
 	 * @param string $oauth_token Request token key
 	 * @return WP_Error|array OAuth token data on success, error otherwise
 	 */
@@ -528,19 +528,13 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		unset( $params['oauth_signature'] );
 
 		// normalize parameter key/values
-		array_walk( $params, array( $this, 'normalize_parameters' ) );
+		array_walk_recursive( $params, array( $this, 'normalize_parameters' ) );
 
 		// sort parameters
 		if ( ! uksort( $params, 'strcmp' ) )
 			return new WP_Error( 'json_oauth1_failed_parameter_sort', __( 'Invalid Signature - failed to sort parameters' ), array( 'status' => 401 ) );
 
-		// form query string
-		$query_params = array();
-
-		foreach ( $params as $param_key => $param_value ) {
-			$query_params[] = $param_key . '%3D' . $param_value; // join with equals sign
-		}
-		$query_string = implode( '%26', $query_params ); // join with ampersand
+		$query_string = $this->create_signature_string( $params );
 
 		$token = (array) $token;
 		$string_to_sign = $http_method . '&' . $base_request_uri . '&' . $query_string;
@@ -558,7 +552,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 			case 'HMAC-SHA256':
 				$hash_algorithm = 'sha256';
 				break;
-			
+
 			default:
 				return new WP_Error( 'json_oauth1_invalid_signature_method', __( 'Signature method is invalid' ), array( 'status' => 401 ) );
 		}
@@ -570,6 +564,25 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		}
 
 		return true;
+	}
+
+	public function create_signature_string( $params ) {
+		return implode( '%26', $this->join_with_equals_sign( $params ) ); // join with ampersand
+	}
+
+	public function join_with_equals_sign( $params, $query_params = array(), $key = '' ) {
+		foreach ( $params as $param_key => $param_value ) {
+			if ( is_array( $param_value ) ) {
+				$query_params = $this->join_with_equals_sign( $param_value, $query_params, $param_key );
+			} else {
+				if ( $key ) {
+					$param_key = $key . '[' . $param_key . ']';
+				}
+				$string = $param_key . '=' . $param_value; // join with equals sign
+				$query_params[] = urlencode( $string );
+			}
+		}
+		return $query_params;
 	}
 
 	/**
@@ -588,7 +601,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 
 	/**
 	 * Verify that the timestamp and nonce provided with the request are valid
-	 * 
+	 *
 	 * This prevents replay attacks against the request. A timestamp is only
 	 * valid within 15 minutes of the current time, and a nonce is valid if it
 	 * has not been used within the last 15 minutes.
