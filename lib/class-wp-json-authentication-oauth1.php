@@ -578,13 +578,13 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	}
 
 	/**
-	 * Creates a urlencoded string out of an array of query parameters
+	 * Creates an array of urlencoded strings out of each array key/value pairs
 	 *
 	 * @since  0.1.0
 	 * @param  array  $params       Array of parameters to convert.
 	 * @param  array  $query_params Array to extend.
 	 * @param  string $key          Optional Array key to append
-	 * @return string               Urlencoded string
+	 * @return string               Array of urlencoded strings
 	 */
 	public function join_with_equals_sign( $params, $query_params = array(), $key = '' ) {
 		foreach ( $params as $param_key => $param_value ) {
