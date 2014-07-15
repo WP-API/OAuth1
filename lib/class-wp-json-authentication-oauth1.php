@@ -566,17 +566,33 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		return true;
 	}
 
+	/**
+	 * Creates a signature string from all query parameters
+	 *
+	 * @since  0.1
+	 * @param  array  $params Array of query parameters
+	 * @return string         Signature string
+	 */
 	public function create_signature_string( $params ) {
 		return implode( '%26', $this->join_with_equals_sign( $params ) ); // join with ampersand
 	}
 
+	/**
+	 * Creates a urlencoded string out of an array of query parameters
+	 *
+	 * @since  0.1.0
+	 * @param  array  $params       Array of parameters to convert.
+	 * @param  array  $query_params Array to extend.
+	 * @param  string $key          Optional Array key to append
+	 * @return string               Urlencoded string
+	 */
 	public function join_with_equals_sign( $params, $query_params = array(), $key = '' ) {
 		foreach ( $params as $param_key => $param_value ) {
 			if ( is_array( $param_value ) ) {
 				$query_params = $this->join_with_equals_sign( $param_value, $query_params, $param_key );
 			} else {
 				if ( $key ) {
-					$param_key = $key . '[' . $param_key . ']';
+					$param_key = $key . '[' . $param_key . ']'; // Handle multi-dimensional array
 				}
 				$string = $param_key . '=' . $param_value; // join with equals sign
 				$query_params[] = urlencode( $string );
