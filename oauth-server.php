@@ -36,14 +36,14 @@ function json_oauth_server_setup_authentication() {
 		'labels' => array(
 			'name' => __( 'API Clients' ),
 			'singular_name' => __( 'API Clients' ),
-	        'add_new' => _x( 'Add New' ),
-	        'add_new_item' => _x( 'Add New Client' ),
-	        'edit_item' => _x( 'Edit Client' ),
-	        'new_item' => _x( 'New Client' ),
-	        'view_item' => _x( 'View Client' ),
-	        'search_items' => _x( 'Search Clients' ),
-	        'not_found' => _x( 'No clients found' ),
-	        'not_found_in_trash' => _x( 'No clients found in Trash' )
+	        'add_new' => __( 'Add New' ),
+	        'add_new_item' => __( 'Add New Client' ),
+	        'edit_item' => __( 'Edit Client' ),
+	        'new_item' => __( 'New Client' ),
+	        'view_item' => __( 'View Client' ),
+	        'search_items' => __( 'Search Clients' ),
+	        'not_found' => __( 'No clients found' ),
+	        'not_found_in_trash' => __( 'No clients found in Trash' )
 		),
 		'public' => true,
 		'exclude_from_search' => true,
@@ -201,43 +201,29 @@ function json_create_key_secret( $post_id ) {
 	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 		return;
 	}
-
+	
 	// Check the user's permissions.
-	if ( isset( $_POST['json_consumer'] ) && 'page' == $_POST['json_consumer'] ) {
-
-		if ( ! current_user_can( 'edit_page', $post_id ) ) {
-			return;
-		}
-
-	} else {
-
+	if ( isset( $_POST['publish'] ) || isset( $_POST['save'] ) && $_POST['post_type'] === 'json_consumer' ) {
+		
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return;
 		}
-	}
 	
-	// check if keys exist or to renew them
-	$renew = false;
-	$keytrue = get_post_meta( $post_id, 'key' );
-	
-	if( $keytrue ) {
-		$renew = true;
-	}
-	
-	if( isset( $_REQUEST['renewkey'] ) ) {
-		$renew = true;
-	}
-
-	if( $renew ) {
-		$key = wp_generate_password( 12, false );
-		$secret = wp_generate_password( 48, false );
+		// check if keys exist or to renew them
+		$keytrue = get_post_meta( $post_id, 'key' );
 		
-		update_post_meta( $post_id, 'key', $key );
-		update_post_meta( $post_id, 'secret', $secret );
-	}
+		if( isset( $_REQUEST['renewkey'] ) || !$keytrue ) {
+			$key = wp_generate_password( 12, false );
+			$secret = wp_generate_password( 48, false );
+			
+			update_post_meta( $post_id, 'key', $key );
+			update_post_meta( $post_id, 'secret', $secret );
+		}
+	} 
+	
 
 }
-add_action( 'save_post', 'json_create_key_secret' );
+add_action( 'save_post', 'json_create_key_secret', 99 );
 
 
 /**
