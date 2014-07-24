@@ -218,7 +218,7 @@ function json_create_key_secret( $post_id ) {
 	
 	// check if keys exist or to renew them
 	$renew = false;
-	$keytrue = $key = get_post_meta( $post_id, 'key' );
+	$keytrue = get_post_meta( $post_id, 'key' );
 	
 	if( $keytrue ) {
 		$renew = true;
