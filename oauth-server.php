@@ -35,15 +35,15 @@ function json_oauth_server_setup_authentication() {
 	register_post_type( 'json_consumer', array(
 		'labels' => array(
 			'name' => __( 'API Clients' ),
-			'singular_name' => __( 'API Clients' ),
-	        'add_new' => __( 'Add New' ),
-	        'add_new_item' => __( 'Add New Client' ),
-	        'edit_item' => __( 'Edit Client' ),
-	        'new_item' => __( 'New Client' ),
-	        'view_item' => __( 'View Client' ),
-	        'search_items' => __( 'Search Clients' ),
-	        'not_found' => __( 'No clients found' ),
-	        'not_found_in_trash' => __( 'No clients found in Trash' )
+			'singular_name' => __( 'API Client' ),
+	        	'add_new' => __( 'Add New' ),
+	        	'add_new_item' => __( 'Add New Client' ),
+	        	'edit_item' => __( 'Edit Client' ),
+	        	'new_item' => __( 'New Client' ),
+	        	'view_item' => __( 'View Client' ),
+	        	'search_items' => __( 'Search Clients' ),
+	        	'not_found' => __( 'No clients found' ),
+	        	'not_found_in_trash' => __( 'No clients found in Trash' )
 		),
 		'public' => true,
 		'exclude_from_search' => true,
