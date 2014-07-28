@@ -36,14 +36,14 @@ function json_oauth_server_setup_authentication() {
 		'labels' => array(
 			'name' => __( 'API Clients' ),
 			'singular_name' => __( 'API Client' ),
-	        	'add_new' => __( 'Add New' ),
-	        	'add_new_item' => __( 'Add New Client' ),
-	        	'edit_item' => __( 'Edit Client' ),
-	        	'new_item' => __( 'New Client' ),
-	        	'view_item' => __( 'View Client' ),
-	        	'search_items' => __( 'Search Clients' ),
-	        	'not_found' => __( 'No clients found' ),
-	        	'not_found_in_trash' => __( 'No clients found in Trash' )
+			'add_new' => __( 'Add New' ),
+			'add_new_item' => __( 'Add New Client' ),
+			'edit_item' => __( 'Edit Client' ),
+			'new_item' => __( 'New Client' ),
+			'view_item' => __( 'View Client' ),
+			'search_items' => __( 'Search Clients' ),
+			'not_found' => __( 'No clients found' ),
+			'not_found_in_trash' => __( 'No clients found in Trash' )
 		),
 		'public' => true,
 		'exclude_from_search' => true,
@@ -67,7 +67,7 @@ add_action( 'init', 'json_oauth_server_setup_authentication' );
 
 /**
  * json_above_the_title function.
- * 
+ *
  * @access public
  * @return void
  */
@@ -81,45 +81,59 @@ add_action( 'edit_form_top', 'json_text_above_the_title_editor' );
 
 /**
  * json_enter_title_here_filter function.
- * 
+ *
  * @access public
  * @param mixed $label
  * @param mixed $post
  * @return void
  */
 function json_enter_title_here_filter( $label, $post ){
-
-    if( $post->post_type == 'json_consumer' )
-        $label= __( 'Enter Client Name Here', 'oauth' );
-
-    return $label;
+	if( $post->post_type == 'json_consumer' )
+		$label= __( 'Enter Client Name Here', 'oauth' );
+	return $label;
 }
 add_filter( 'enter_title_here', 'json_enter_title_here_filter', 2, 2 );
 
 
 
-function json_remove_permalink_from_title( $return ) {
-    $return = '';
-    return $return;
+/**
+ * json_remove_permalink_from_title function.
+ * 
+ * @access public
+ * @param mixed $return
+ * @return void
+ */
+function json_remove_permalink_from_title( $return, $id ) {
+	$post = get_post( $id );
+	if( $post->post_type == 'json_consumer' )
+		$return = '';
+	return $return;
 }
-add_filter( 'get_sample_permalink_html', 'json_remove_permalink_from_title' );
+add_filter( 'get_sample_permalink_html', 'json_remove_permalink_from_title', 10, 2 );
 
 
 
+/**
+ * json_custom_publish_box function.
+ * 
+ * removes unneccesary items from publish meta box
+ * @access public
+ * @return void
+ */
 function json_custom_publish_box() {
 
 	if ( 'json_consumer' == get_post_type() ) {
-	
-	    if( !is_admin() )
-	        return;
-	
-	    $style = '';
-	    $style .= '<style type="text/css">';
-	    $style .= '#edit-slug-box, #minor-publishing-actions, #visibility, .num-revisions, .curtime';
-	    $style .= '{display: none; }';
-	    $style .= '</style>';
-	
-	    echo $style;
+
+		 if( !is_admin() )
+			 return;
+
+		 $style = '';
+		 $style .= '<style type="text/css">';
+		 $style .= '#edit-slug-box, #minor-publishing-actions, #visibility, .num-revisions, .curtime';
+		 $style .= '{display: none; }';
+		 $style .= '</style>';
+
+		 echo $style;
 	}
 }
 add_action( 'admin_head', 'json_custom_publish_box' );
@@ -127,17 +141,18 @@ add_action( 'admin_head', 'json_custom_publish_box' );
 
 /**
  * json_remove_list_row_actions function.
- * 
+ *
  * @access public
  * @param mixed $actions
  * @param mixed $post
  * @return void
  */
 function json_remove_list_row_actions( $actions, $post ) {
-    unset( $actions['inline hide-if-no-js'] );
-    unset( $actions['view'] );
-
-    return $actions;
+	if( $post->post_type == 'json_consumer' ) {
+		unset( $actions['inline hide-if-no-js'] );
+		unset( $actions['view'] );
+	}
+	return $actions;
 }
 add_filter( 'page_row_actions', 'json_remove_list_row_actions', 10, 2 );
 add_filter( 'post_row_actions', 'json_remove_list_row_actions', 10, 2 );
@@ -145,44 +160,44 @@ add_filter( 'post_row_actions', 'json_remove_list_row_actions', 10, 2 );
 
 /**
  * json_key_secret_metabox function.
- * 
+ *
  * @access public
  * @param mixed $post
  * @return void
  */
 function json_key_secret_metabox( $post ){
 
-    if( $post->post_type == 'json_consumer' ) {
-    
+	if( $post->post_type == 'json_consumer' ) {
+
 		add_meta_box(
 			'api-client',
 			__( 'API Keys', 'oauth' ),
 			'json_key_secret_metabox_callback',
 			'json_consumer'
 		);
-	    
-    }
+
+	}
 }
 
 
 /**
  * json_key_secret_metabox_callback function.
- * 
+ *
  * @access public
  * @param mixed $post
  * @return void
  */
 function json_key_secret_metabox_callback( $post ){
-	
+
 	$secret = get_post_meta( $post->ID, 'secret', true );
 	$key = get_post_meta( $post->ID, 'key', true );
 
 	if ( $key ) {
-	    echo '<ul>';
-	        echo '<li> key:     ' . $key . '</li>';
-	        echo '<li> secret:  ' . $secret . '</li></br>';
-	    echo '</ul>';
-	    echo 'Renew Keys? <input type="checkbox" id="renewkey" name="renewkey">';
+		 echo '<ul>';
+			 echo '<li> key:	 ' . $key . '</li>';
+			 echo '<li> secret:	 ' . $secret . '</li></br>';
+		 echo '</ul>';
+		 echo 'Renew Keys? <input type="checkbox" id="renewkey" name="renewkey">';
 	} else {
 		echo 'Keys are created when client is published.';
 	}
@@ -192,7 +207,7 @@ function json_key_secret_metabox_callback( $post ){
 
 /**
  * json_create_key_secret function.
- * 
+ *
  * @access public
  * @param mixed $post_id
  * @return void
@@ -204,26 +219,26 @@ function json_create_key_secret( $post_id ) {
 	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 		return;
 	}
-	
+
 	// Check the user's permissions.
 	if ( isset( $_POST['publish'] ) || isset( $_POST['save'] ) && $_POST['post_type'] === 'json_consumer' ) {
-		
+
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return;
 		}
-	
+
 		// check if keys exist or to renew them
 		$keytrue = get_post_meta( $post_id, 'key' );
-		
+
 		if( isset( $_REQUEST['renewkey'] ) || !$keytrue ) {
 			$key = wp_generate_password( 12, false );
 			$secret = wp_generate_password( 48, false );
-			
+
 			update_post_meta( $post_id, 'key', $key );
 			update_post_meta( $post_id, 'secret', $secret );
 		}
-	} 
-	
+	}
+
 
 }
 add_action( 'save_post', 'json_create_key_secret', 99 );
