@@ -59,7 +59,8 @@ function json_oauth_server_setup_authentication() {
 		'menu_position' => 80,
 		'supports' => array('title'),
 		'register_meta_box_cb' => 'json_key_secret_metabox'
-	) );
+		)
+	);
 }
 add_action( 'init', 'json_oauth_server_setup_authentication' );
 
