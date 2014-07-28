@@ -70,8 +70,10 @@ add_action( 'init', 'json_oauth_server_setup_authentication' );
  * @access public
  * @return void
  */
-function json_text_above_the_title_editor() {
- 	_e('<p>Enter a client name and publish. A key and secret will be generated for you.</p>');
+function json_text_above_the_title_editor( $post ) {
+	if( $post->post_type == 'json_consumer' ) {
+ 		_e('<p>Enter a client name and publish. A key and secret will be generated for you.</p>');
+ 	}
 }
 add_action( 'edit_form_top', 'json_text_above_the_title_editor' );
 
