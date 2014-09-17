@@ -176,7 +176,16 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 
 		return null;
 	}
-
+	
+	/**
+	 * Allows for local URLs in the OAuth callback.
+	 *
+	 * @return true
+	 */
+	 public function http_request_allow_external( $allow ) {
+	 	return true;
+	 }
+	 
 	/**
 	 * Display an error using login page wrapper
 	 *
