@@ -60,19 +60,32 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 
 	}
 
+	public function retrieve_authorization_headers() {
+		$auth_headers = ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) ? $_SERVER['HTTP_AUTHORIZATION'] : false;
+
+		if ( ! $auth_headers && function_exists( 'getallheaders' ) ) {
+			$all_headers = getallheaders();
+			$auth_headers = isset( $all_headers['Authorization'] ) ? $all_headers['Authorization'] : false;
+		}
+
+		return $auth_headers;
+	}
+
 	public function get_parameters( $require_token = true, $extra = array() ) {
 		$params = array_merge( $_GET, $_POST );
 		$params = wp_unslash( $params );
 
-		if ( ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
-			$header = wp_unslash( $_SERVER['HTTP_AUTHORIZATION'] );
+		$auth_headers = $this->retrieve_authorization_headers();
+
+		if ( ! empty( $auth_headers ) ) {
+			$auth_headers = wp_unslash( $auth_headers );
 
 			// Trim leading spaces
-			$header = trim( $header );
+			$auth_headers = trim( $auth_headers );
 
-			$header_params = $this->parse_header( $header );
-			if ( ! empty( $header_params ) ) {
-				$params = array_merge( $params, $header_params );
+			$auth_header_params = $this->parse_header( $auth_headers );
+			if ( ! empty( $auth_header_params ) ) {
+				$params = array_merge( $params, $auth_header_params );
 			}
 		}
 
@@ -504,6 +517,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	 * @return boolean|WP_Error True on success, error otherwise
 	 */
 	protected function check_oauth_signature( $consumer, $oauth_params, $token = null ) {
+
 		$http_method = strtoupper( $_SERVER['REQUEST_METHOD'] );
 
 		switch ( $http_method ) {
