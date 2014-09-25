@@ -63,8 +63,8 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	public function retrieve_authorization_headers() {
 		$auth_headers = ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) ? $_SERVER['HTTP_AUTHORIZATION'] : false;
 
-		if ( ! $auth_headers && function_exists( 'getallheaders' ) ) {
-			$all_headers = getallheaders();
+		if ( ! $auth_headers && function_exists( 'apache_request_headers' ) ) {
+			$all_headers = apache_request_headers();
 			$auth_headers = isset( $all_headers['Authorization'] ) ? $all_headers['Authorization'] : false;
 		}
 
