@@ -287,7 +287,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 			return $consumer;
 		}
 
-		if ( $token['consumer'] !== $consumer->ID ) {
+		if ( ! hash_equals( $token['consumer'], $consumer->ID ) ) {
 			return new WP_Error( 'json_oauth1_consumer_mismatch', __( 'Token is not registered for the given consumer' ), array( 'status' => 401 ) );
 		}
 
@@ -559,7 +559,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 
 		$signature = base64_encode( hash_hmac( $hash_algorithm, $string_to_sign, $key, true ) );
 
-		if ( $signature !== $consumer_signature ) {
+		if ( ! hash_equals( $signature, $consumer_signature ) ) {
 			return new WP_Error( 'json_oauth1_signature_mismatch', __( 'OAuth signature does not match' ), array( 'status' => 401 ) );
 		}
 
