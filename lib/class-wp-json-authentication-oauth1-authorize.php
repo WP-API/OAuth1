@@ -162,7 +162,7 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 			'oauth_verifier' => $verifier,
 			'wp_scope' => '*',
 		);
-		$args = apply_filters( 'json_oauth1_callback_args', $args, $this->token );
+		$args = apply_filters( 'json_oauth1_callback_args', $args, $token );
 		$args = urlencode_deep( $args );
 		$callback = add_query_arg( $args, $callback );
 
