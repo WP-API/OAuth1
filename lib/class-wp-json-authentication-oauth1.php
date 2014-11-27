@@ -61,15 +61,22 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	}
 
 	public function retrieve_authorization_headers() {
-		$auth_headers = ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) ? $_SERVER['HTTP_AUTHORIZATION'] : false;
-
-		if ( ! $auth_headers && function_exists( 'apache_request_headers' ) ) {
-			$all_headers = apache_request_headers();
-
-			$auth_headers = array_key_exists( 'Authorization', $all_headers ) ? $all_headers['Authorization'] : false;
+		if ( ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
+			return wp_unslash( $_SERVER['HTTP_AUTHORIZATION'] );
 		}
 
-		return $auth_headers;
+		if ( function_exists( 'apache_request_headers' ) ) {
+			$headers = apache_request_headers();
+
+			// Check for the authoization header case-insensitively
+			foreach ( $headers as $key => $value ) {
+				if ( strtolower( $key ) === 'authorization' ) {
+					return $value;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	public function get_parameters( $require_token = true, $extra = array() ) {
@@ -79,8 +86,6 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		$auth_headers = $this->retrieve_authorization_headers();
 
 		if ( ! empty( $auth_headers ) ) {
-			$auth_headers = wp_unslash( $auth_headers );
-
 			// Trim leading spaces
 			$auth_headers = trim( $auth_headers );
 
