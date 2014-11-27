@@ -39,9 +39,9 @@ The OAuth API is motivated by three main factors:
 The OAuth API extends OAuth 1.0a to provide additional functionality. The
 following differences apply:
 
-* The authoirzation endpoint ("Resource Owner authorization endpoint") MAY
+* The authorization endpoint ("Resource Owner authorization endpoint") MAY
   accept a `wp_scope` parameter, based on the OAuth 2.0 `scope` parameter.
-  (See Step 2: Authorzation)
+  (See Step 2: Authorization)
 
 ## Step 0: Assessing Availability
 Before beginning the authorization process, clients SHOULD assess whether the
