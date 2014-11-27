@@ -549,7 +549,16 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 				break;
 		}
 
-		$params = array_merge( $params, $oauth_params );
+		// Filter out any non-oauth keys so they don't interfere with normalization and signature generation.
+		$oauth_params = array_merge( $params, $oauth_params );
+		unset ($params);
+		$params = array();
+		
+		foreach ( $oauth_params as $param_key => $param_value ) {
+			if (substr($param_key, 0, 6) === 'oauth_') {
+				$params[$param_key] = $param_value;
+			}
+		}
 
 		$base_request_uri = rawurlencode( get_home_url( null, parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ), 'http' ) );
 
