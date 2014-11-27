@@ -60,6 +60,16 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 
 	}
 
+	/**
+	 * Get the authorization header
+	 *
+	 * On certain systems and configurations, the Authorization header will be
+	 * stripped out by the server or PHP. Typically this is then used to
+	 * generate `PHP_AUTH_USER`/`PHP_AUTH_PASS` but not passed on. We use
+	 * `getallheaders` here to try and grab it out instead.
+	 *
+	 * @return string|null Authorization header if set, null otherwise
+	 */
 	public function get_authorization_header() {
 		if ( ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
 			return wp_unslash( $_SERVER['HTTP_AUTHORIZATION'] );
