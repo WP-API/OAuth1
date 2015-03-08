@@ -8,6 +8,8 @@ include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication.php' );
 include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication-oauth1.php' );
 include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication-oauth1-authorize.php' );
 
+include_once( dirname( __FILE__ ) . '/admin.php' );
+
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication-oauth1-cli.php' );
 
