@@ -66,8 +66,10 @@ function json_oauth_admin_render() {
 		<h2>
 			<?php
 			esc_html_e( 'Registered OAuth Applications', 'json_oauth' );
+
 			if ( current_user_can( 'create_users' ) ): ?>
-				<a href="user-new.php" class="add-new-h2"><?php echo esc_html_x( 'Add New', 'application', 'json_oauth' ); ?></a>
+				<a href="<?php echo admin_url( 'admin.php?action=json-oauth-add' ) ?>"
+					class="add-new-h2"><?php echo esc_html_x( 'Add New', 'application', 'json_oauth' ); ?></a>
 			<?php
 			endif;
 			?>
