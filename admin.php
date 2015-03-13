@@ -36,7 +36,7 @@ function json_oauth_admin_register() {
 		'list_users',
 
 		// Menu slug
-		'json_oauth',
+		'json-oauth',
 
 		// Callback
 		'json_oauth_admin_render'
@@ -44,7 +44,7 @@ function json_oauth_admin_register() {
 }
 
 function json_oauth_admin_prerender() {
-	$hook = get_plugin_page_hook( 'json_oauth', 'users.php' );
+	$hook = get_plugin_page_hook( 'json-oauth', 'users.php' );
 
 	add_action( 'load-' . $hook, 'json_oauth_admin_load' );
 }
@@ -213,7 +213,7 @@ function json_oauth_admin_edit_page() {
 	global $title, $parent_file, $submenu_file;
 	$title = $consumer ? __( 'Edit Consumer' ) : __( 'Add Consumer' );
 	$parent_file = 'users.php';
-	$submenu_file = 'json_oauth';
+	$submenu_file = 'json-oauth';
 
 	include( ABSPATH . 'wp-admin/admin-header.php' );
 ?>
