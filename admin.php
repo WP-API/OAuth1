@@ -11,6 +11,11 @@ add_action( 'admin_action_json-oauth-edit', 'json_oauth_admin_edit_page' );
 
 add_action( 'personal_options', 'json_oauth_profile_section', 50 );
 
+add_action( 'all_admin_notices', 'json_oauth_profile_messages' );
+
+add_action( 'personal_options_update',  'json_oauth_profile_save', 10, 1 );
+add_action( 'edit_user_profile_update', 'json_oauth_profile_save', 10, 1 );
+
 /**
  * Register the admin page
  */
@@ -282,28 +287,66 @@ function json_oauth_profile_section( $user ) {
 			<tr>
 				<th scope="row"><?php _e( 'Authorized Applications', 'json_oauth' ) ?></th>
 				<td>
-					<table class="widefat sessions-table">
-						<thead>
-						<tr>
-							<th scope="col"><?php _e( 'Application Name', 'wpsm' ); ?></th>
-						</tr>
-						</thead>
-						<tbody>
-						<?php foreach ( $approved as $row ): ?>
-							<?php
-							$application = $authenticator->get_consumer( $row['consumer'] );
-							?>
+					<?php if ( ! empty( $approved ) ): ?>
+						<table class="widefat sessions-table">
+							<thead>
 							<tr>
-								<td><?php echo esc_html( $application->post_title ) ?></td>
-								<td><button class="button" name="oauth_revoke" value="<?php echo esc_attr( $row['key'] ) ?>"><?php esc_html_e( 'Revoke', 'json_oauth' ) ?></button>
+								<th scope="col"><?php _e( 'Application Name', 'wpsm' ); ?></th>
 							</tr>
+							</thead>
+							<tbody>
+							<?php foreach ( $approved as $row ): ?>
+								<?php
+								$application = $authenticator->get_consumer( $row['consumer'] );
+								?>
+								<tr>
+									<td><?php echo esc_html( $application->post_title ) ?></td>
+									<td><button class="button" name="oauth_revoke" value="<?php echo esc_attr( $row['key'] ) ?>"><?php esc_html_e( 'Revoke', 'json_oauth' ) ?></button>
+								</tr>
 
-						<?php endforeach ?>
-						</tbody>
-					</table>
+							<?php endforeach ?>
+							</tbody>
+						</table>
+					<?php else: ?>
+						<p class="description"><?php esc_html_e( 'No applications authorized.' ) ?></p>
+					<?php endif ?>
 				</td>
 			</tr>
 			</tbody>
 		</table>
 	<?php
+}
+
+function json_oauth_profile_messages() {
+	global $pagenow;
+	if ( $pagenow !== 'profile.php' && $pagenow !== 'user-edit.php' ) {
+		return;
+	}
+
+	if ( ! empty( $_GET['oauth_revoked'] ) ) {
+		echo '<div id="message" class="updated"><p>' . __( 'Token revoked.' ) . '</p></div>';
+	}
+	if ( ! empty( $_GET['oauth_revocation_failed'] ) ) {
+		echo '<div id="message" class="updated"><p>' . __( 'Unable to revoke token.' ) . '</p></div>';
+	}
+}
+
+function json_oauth_profile_save( $user_id ) {
+	if ( empty( $_POST['oauth_revoke'] ) ) {
+		return;
+	}
+
+	$key = wp_unslash( $_POST['oauth_revoke'] );
+
+	$authenticator = new WP_JSON_Authentication_OAuth1();
+
+	$result = $authenticator->revoke_access_token( $key );
+	if ( is_wp_error( $result ) ) {
+		$redirect = add_query_arg( 'oauth_revocation_failed', true, get_edit_user_link( $user_id ) );
+	}
+	else {
+		$redirect = add_query_arg( 'oauth_revoked', $key, get_edit_user_link( $user_id ) );
+	}
+	wp_redirect($redirect);
+	exit;
 }
