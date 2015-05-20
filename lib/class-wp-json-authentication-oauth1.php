@@ -316,7 +316,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 			return $consumer;
 		}
 
-		if ( ! hash_equals( $token['consumer'], $consumer->ID ) ) {
+		if ( ! hash_equals( (string) $token['consumer'], (string) $consumer->ID ) ) {
 			return new WP_Error( 'json_oauth1_consumer_mismatch', __( 'Token is not registered for the given consumer' ), array( 'status' => 401 ) );
 		}
 
