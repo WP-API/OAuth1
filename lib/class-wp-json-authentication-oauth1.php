@@ -630,7 +630,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 				if ( $key ) {
 					$param_key = $key . '[' . $param_key . ']'; // Handle multi-dimensional array
 				}
-				$string = rawurlencode( $param_key ) . '=' . rawurlencode( $param_value ); // join with equals sign
+				$string = $param_key . '=' . $param_value; // join with equals sign
 				$query_params[] = $string;
 			}
 		}
