@@ -151,16 +151,19 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 
 		$callback = $this->token['callback'];
 
-		// Ensure the URL is safe to access
-		// wp_http_validate_url is overly restrictive for desktop applications which might use 
-		// 127.0.0.1:xx for the callback. Add hook that allows localhost and check scheme/host of URL.
 		$filtered_callback = parse_url($callback);
-		$filtered_callback = $filtered_callback['scheme'] . '://' . $filtered_callback['host'];
-		add_filter( 'http_request_host_is_external', array('WP_JSON_Authentication_OAuth1_Authorize', 'http_request_allow_external') );
-		$filtered_callback = wp_http_validate_url( $filtered_callback );
-		remove_filter( 'http_request_host_is_external', array('WP_JSON_Authentication_OAuth1_Authorize', 'http_request_allow_external') );
-		if ( empty( $filtered_callback ) ) {
-			return new WP_Error( 'json_oauth1_invalid_callback', __( 'The callback URL is invalid' ), array( 'status' => 400 ) );
+		$scheme = strtolower($filtered_callback['scheme']);
+		if (!empty($scheme) && ($scheme == 'http' || $scheme == 'https')) {
+			// If an http(s) URL, ensure the URL is safe to access
+			// wp_http_validate_url is overly restrictive for desktop applications which might use 
+			// 127.0.0.1:xx for the callback. Add hook that allows localhost and check scheme/host of URL. 
+			$filtered_callback = $scheme . '://' . $filtered_callback['host'];
+			add_filter( 'http_request_host_is_external', array('WP_JSON_Authentication_OAuth1_Authorize', 'http_request_allow_external') );
+			$filtered_callback = wp_http_validate_url( $filtered_callback );
+			remove_filter( 'http_request_host_is_external', array('WP_JSON_Authentication_OAuth1_Authorize', 'http_request_allow_external') );
+			if ( empty( $filtered_callback ) ) {
+				return new WP_Error( 'json_oauth1_invalid_callback', __( 'The callback URL is invalid' ), array( 'status' => 400 ) );
+			}
 		}
 
 		$args = array(
