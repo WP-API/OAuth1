@@ -365,13 +365,14 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 
 		// Generate token
 		$key = apply_filters( 'json_oauth1_request_token_key', wp_generate_password( self::TOKEN_KEY_LENGTH, false ) );
+		$callback = $params['oauth_callback'];
 		$data = array(
 			'key'        => $key,
 			'secret'     => wp_generate_password( self::TOKEN_SECRET_LENGTH, false ),
 			'consumer'   => $consumer->ID,
 			'authorized' => false,
 			'expiration' => time() + 24 * HOUR_IN_SECONDS,
-			'callback'   => null,
+			'callback'   => $callback,
 			'verifier'   => null,
 			'user'       => null,
 		);
