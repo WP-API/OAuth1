@@ -47,3 +47,5 @@ testing environment in a few easy steps:
    ```
 
 6. Refer to the [documentation][docs] on how to connect an OAuth client.
+
+[WP API]: https://github.com/WP-API/WP-API
