@@ -117,7 +117,7 @@ function json_oauth_server_loaded() {
 add_action( 'template_redirect', 'json_oauth_server_loaded', -100 );
 
 /**
- * Register API routes
+ * Register v1 API routes
  *
  * @param array $data Index data
  * @return array Filtered data
@@ -136,6 +136,27 @@ function json_oauth_api_routes( $data ) {
 	return $data;
 }
 add_filter( 'json_index', 'json_oauth_api_routes' );
+
+/**
+ * Register v2 API routes
+ *
+ * @param object $response_object WP_REST_Response Object 
+ * @return object Filtered WP_REST_Response object
+ */
+function json_oauth_api_routes_v2( $response_object ) {
+	if ( empty( $response_object->data['authentication'] ) ) {
+		$response_object->data['authentication'] = array();
+	}
+
+	$response_object->data['authentication']['oauth1'] = array(
+		'request' => home_url( 'oauth1/request' ),
+		'authorize' => home_url( 'oauth1/authorize' ),
+		'access' => home_url( 'oauth1/access' ),
+		'version' => '0.1',
+	);
+	return $response_object;
+}
+add_filter( 'rest_index', 'json_oauth_api_routes_v2' );
 
 /**
  * Register the authorization page
