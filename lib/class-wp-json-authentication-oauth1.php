@@ -568,11 +568,10 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 
 		$token = (array) $token;
 		$string_to_sign = $http_method . '&' . $base_request_uri . '&' . $query_string;
-		$key_parts = array(
-			$consumer->secret,
-			( $token ? $token['secret'] : '' )
-		);
-		$key = implode( '&', $key_parts );
+		$key = $consumer->secret;
+		if (!empty($token) && isset($token['secret'])) {
+			$key .= '&'.$token['secret'];
+		}
 
 		switch ($params['oauth_signature_method']) {
 			case 'HMAC-SHA1':
