@@ -551,8 +551,6 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 
 		$params = array_merge( $params, $oauth_params );
 
-		$base_request_uri = rawurlencode( get_home_url( null, parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) ) );
-		
 		$url_path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH);
 		$home_url_parts = parse_url(get_home_url( null, '' ));
 		$home_url = $home_url_parts['scheme'].'://'.$home_url_parts['host'].$url_path;
