@@ -26,9 +26,12 @@ abstract class WP_JSON_Authentication {
 		}
 
 		add_filter( 'json_check_authentication', array( $this, 'authenticate' ), 0 );
+		add_filter( 'rest_authentication_errors', array( $this, 'get_authentication_errors' ), 0 );
 	}
 
 	abstract public function authenticate( $user );
+
+	abstract public function get_authentication_errors( $value );
 
 	public function get_consumer( $key ) {
 		$this->should_attempt = false;
