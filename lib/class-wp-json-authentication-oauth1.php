@@ -551,13 +551,12 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 
 		$params = array_merge( $params, $oauth_params );
 
+		// $uri should be the REQUEST_URI minus the root URI of the site
+		$base_uri = parse_url( get_home_url(), PHP_URL_PATH );
 		$uri = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
+		$uri = substr( $uri, strlen( $base_uri ) );
 
-		// remove path components that are common between home url and request uri.
-		$baseUrl = parse_url( get_home_url( ), PHP_URL_PATH );
-		$uri = substr($uri, strlen($baseUrl));
-
-		$base_request_uri = rawurlencode( get_home_url( null,  $uri) );
+		$base_request_uri = rawurlencode( get_home_url( null, $uri ) );
 
 		// get the signature provided by the consumer and remove it from the parameters prior to checking the signature
 		$consumer_signature = rawurldecode( $params['oauth_signature'] );
