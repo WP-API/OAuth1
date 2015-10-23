@@ -547,6 +547,9 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 			case 'PUT':
 				$params = wp_unslash( $_POST );
 				break;
+			default:
+				return new WP_Error( 'json_oauth1_unknown_http_method', __( "Unknown http method: $http_method" ),
+					array( 'status'	=> 401 ) );
 		}
 
 		$params = array_merge( $params, $oauth_params );
