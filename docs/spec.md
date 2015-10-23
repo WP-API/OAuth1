@@ -2,6 +2,8 @@
 The following document describes the HTTP API for authenticating and authorizing
 a remote client with a WordPress installation.
 
+To generate a consumer for use by other applications, refer to the [client-cli instructions for doing so](https://github.com/WP-API/client-cli#step-1-creating-a-consumer).
+
 ## Framework
 The WordPress OAuth Authentication API ("OAuth API") is a HTTP-based API based
 on the [OAuth 1.0a][RFC5849]. It also builds on the OAuth 1.0a specification
