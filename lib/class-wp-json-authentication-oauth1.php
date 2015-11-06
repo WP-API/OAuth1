@@ -557,9 +557,6 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		$consumer_signature = rawurldecode( $params['oauth_signature'] );
 		unset( $params['oauth_signature'] );
 
-		// normalize parameter key/values
-		array_walk_recursive( $params, array( $this, 'normalize_parameters' ) );
-
 		// sort parameters
 		if ( ! uksort( $params, 'strcmp' ) )
 			return new WP_Error( 'json_oauth1_failed_parameter_sort', __( 'Invalid Signature - failed to sort parameters' ), array( 'status' => 401 ) );
@@ -629,20 +626,6 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 			}
 		}
 		return $query_params;
-	}
-
-	/**
-	 * Normalize each parameter by assuming each parameter may have already been encoded, so attempt to decode, and then
-	 * re-encode according to RFC 3986
-	 *
-	 * @since 2.1
-	 * @see rawurlencode()
-	 * @param string $key
-	 * @param string $value
-	 */
-	protected function normalize_parameters( &$key, &$value ) {
-		$key = rawurlencode( rawurldecode( $key ) );
-		$value = rawurlencode( rawurldecode( $value ) );
 	}
 
 	/**
