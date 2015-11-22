@@ -60,9 +60,18 @@ class WP_JSON_Authentication_OAuth1_ListTable extends WP_List_Table {
 			),
 			admin_url( 'admin.php' )
 		);
+		$delete_link = add_query_arg(
+			array(
+				'action' => 'json-oauth-delete',
+				'id'     => $item->ID,
+			),
+			admin_url( 'admin.php' )
+		);
+		$delete_link = wp_nonce_url( $delete_link, 'json-oauth-delete:' . $item->ID );
 
 		$actions = array(
 			'edit' => sprintf( '<a href="%s">%s</a>', $edit_link, __( 'Edit' ) ),
+			'delete' => sprintf( '<a href="%s">%s</a>', $delete_link, __( 'Delete' ) ),
 		);
 		$action_html = $this->row_actions( $actions );
 

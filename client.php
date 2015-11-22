@@ -74,3 +74,19 @@ function rest_create_client( $type, $params ) {
 
 	return get_post( $ID );
 }
+
+/**
+ * Delete a client.
+ *
+ * @param string $type Client type.
+ * @param int $id Client post ID.
+ * @return bool True if delete, false otherwise.
+ */
+function rest_delete_client( $id ) {
+	$post = get_post( $id );
+	if ( empty( $id ) || empty( $post ) || $post->post_type !== 'json_consumer' ) {
+		return false;
+	}
+
+	return (bool) wp_delete_post( $id, true );
+}

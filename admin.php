@@ -8,6 +8,7 @@ add_action( 'admin_init', 'json_oauth_admin_prerender' );
 
 add_action( 'admin_action_json-oauth-add', 'json_oauth_admin_edit_page' );
 add_action( 'admin_action_json-oauth-edit', 'json_oauth_admin_edit_page' );
+add_action( 'admin_action_json-oauth-delete', 'json_oauth_admin_delete' );
 
 add_action( 'personal_options', 'json_oauth_profile_section', 50 );
 
@@ -370,5 +371,24 @@ function json_oauth_profile_save( $user_id ) {
 		$redirect = add_query_arg( 'oauth_revoked', $key, get_edit_user_link( $user_id ) );
 	}
 	wp_redirect($redirect);
+	exit;
+}
+
+function json_oauth_admin_delete() {
+	if ( empty( $_GET['id'] ) ) {
+		return;
+	}
+
+	$id = $_GET['id'];
+	check_admin_referer( 'json-oauth-delete:' . $id );
+
+	if ( ! rest_client_delete( $id ) ) {
+		$message = 'Invalid consumer ID';
+		wp_die( $message );
+		return;
+	}
+
+	$redirect = admin_url( 'users.php?action=json-oauth' );
+	wp_redirect( $redirect );
 	exit;
 }
