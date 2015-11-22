@@ -68,7 +68,7 @@ class WP_REST_OAuth1_UI {
 			$scope = wp_unslash( $_REQUEST['wp_scope'] );
 		}
 
-		$authenticator = new WP_JSON_Authentication_OAuth1();
+		$authenticator = new WP_REST_OAuth1();
 		$errors = array();
 		$this->token = $authenticator->get_request_token( $token_key );
 		if ( is_wp_error( $this->token ) ) {

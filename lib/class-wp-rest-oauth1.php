@@ -6,7 +6,7 @@
  * @subpackage JSON API
  */
 
-class WP_JSON_Authentication_OAuth1 {
+class WP_REST_OAuth1 {
 	const CONSUMER_KEY_LENGTH = 12;
 	const CONSUMER_SECRET_LENGTH = 48;
 	const TOKEN_KEY_LENGTH = 24;

@@ -5,7 +5,7 @@
  * Version 0.1
  */
 
-include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication-oauth1.php' );
+include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1.php' );
 include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1-ui.php' );
 
 include_once( dirname( __FILE__ ) . '/admin.php' );
@@ -58,7 +58,7 @@ add_action( 'init', 'rest_oauth1_setup_authentication' );
 function rest_oauth1_load() {
 	global $wp_json_authentication_oauth1;
 
-	$wp_json_authentication_oauth1 = new WP_JSON_Authentication_OAuth1();
+	$wp_json_authentication_oauth1 = new WP_REST_OAuth1();
 	add_filter( 'determine_current_user', array( $wp_json_authentication_oauth1, 'authenticate' ) );
 	add_filter( 'rest_authentication_errors', array( $wp_json_authentication_oauth1, 'get_authentication_errors' ) );
 }
@@ -92,7 +92,7 @@ function rest_oauth1_loaded() {
 	if ( empty( $GLOBALS['wp']->query_vars['rest_oauth1'] ) )
 		return;
 
-	$authenticator = new WP_JSON_Authentication_OAuth1();
+	$authenticator = new WP_REST_OAuth1();
 	$response = $authenticator->dispatch( $GLOBALS['wp']->query_vars['rest_oauth1'] );
 
 	if ( is_wp_error( $response ) ) {

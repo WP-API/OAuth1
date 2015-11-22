@@ -131,7 +131,7 @@ function json_oauth_admin_handle_edit_submit( $consumer ) {
 	}
 
 	if ( empty( $consumer ) ) {
-		$authenticator = new WP_JSON_Authentication_OAuth1();
+		$authenticator = new WP_REST_OAuth1();
 
 		// Create the consumer
 		$data = array(
@@ -281,7 +281,7 @@ function json_oauth_profile_section( $user ) {
 		return $row['user'] === $user->ID;
 	} );
 
-	$authenticator = new WP_JSON_Authentication_OAuth1();
+	$authenticator = new WP_REST_OAuth1();
 
 	?>
 		<table class="form-table">
@@ -340,7 +340,7 @@ function json_oauth_profile_save( $user_id ) {
 
 	$key = wp_unslash( $_POST['oauth_revoke'] );
 
-	$authenticator = new WP_JSON_Authentication_OAuth1();
+	$authenticator = new WP_REST_OAuth1();
 
 	$result = $authenticator->revoke_access_token( $key );
 	if ( is_wp_error( $result ) ) {
