@@ -6,7 +6,7 @@
  * @subpackage JSON API
  */
 
-class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
+class WP_JSON_Authentication_OAuth1 {
 	const CONSUMER_KEY_LENGTH = 12;
 	const CONSUMER_SECRET_LENGTH = 48;
 	const TOKEN_KEY_LENGTH = 24;
@@ -300,7 +300,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		}
 		$params['meta'] = array_merge( $params['meta'], $meta );
 
-		return parent::add_consumer( $params );
+		return rest_create_client( $this->type, $params );
 	}
 
 	/**
@@ -311,7 +311,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	 * @return array Array of consumer object, user object
 	 */
 	public function check_token( $token, $consumer_key ) {
-		$consumer = $this->get_consumer( $consumer_key );
+		$consumer = rest_get_client( $this->type, $consumer_key );
 		if ( is_wp_error( $consumer ) ) {
 			return $consumer;
 		}
@@ -352,7 +352,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	 * @return array|WP_Error Array of token data on success, error otherwise
 	 */
 	public function generate_request_token( $params ) {
-		$consumer = $this->get_consumer( $params['oauth_consumer_key'] );
+		$consumer = rest_get_client( $this->type, $params['oauth_consumer_key'] );
 		if ( is_wp_error( $consumer ) ) {
 			return $consumer;
 		}
@@ -479,7 +479,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 			return new WP_Error( 'json_oauth1_invalid_verifier', __( 'OAuth verifier does not match' ), array( 'status' => 400 ) );
 		}
 
-		$consumer = $this->get_consumer( $oauth_consumer_key );
+		$consumer = rest_get_client( $this->type, $oauth_consumer_key );
 		if ( is_wp_error( $consumer ) ) {
 			return $consumer;
 		}

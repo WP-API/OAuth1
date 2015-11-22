@@ -5,11 +5,11 @@
  * Version 0.1
  */
 
-include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication.php' );
 include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication-oauth1.php' );
 include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1-ui.php' );
 
 include_once( dirname( __FILE__ ) . '/admin.php' );
+include_once( dirname( __FILE__ ) . '/client.php' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1-cli.php' );
