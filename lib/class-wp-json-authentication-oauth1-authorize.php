@@ -152,8 +152,14 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 		$callback = $this->token['callback'];
 
 		// Ensure the URL is safe to access
-		$callback = wp_http_validate_url( $callback );
-		if ( empty( $callback ) ) {
+		// wp_http_validate_url is overly restrictive for desktop applications which might use 
+		// 127.0.0.1:xx for the callback. Add hook that allows localhost and check scheme/host of URL.
+		$filtered_callback = parse_url($callback);
+		$filtered_callback = $filtered_callback['scheme'] . '://' . $filtered_callback['host'];
+		add_filter( 'http_request_host_is_external', array('WP_JSON_Authentication_OAuth1_Authorize', 'http_request_allow_external') );
+		$filtered_callback = wp_http_validate_url( $filtered_callback );
+		remove_filter( 'http_request_host_is_external', array('WP_JSON_Authentication_OAuth1_Authorize', 'http_request_allow_external') );
+		if ( empty( $filtered_callback ) ) {
 			return new WP_Error( 'json_oauth1_invalid_callback', __( 'The callback URL is invalid' ), array( 'status' => 400 ) );
 		}
 
@@ -170,7 +176,16 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 
 		return null;
 	}
-
+	
+	/**
+	 * Allows for local URLs in the OAuth callback.
+	 *
+	 * @return true
+	 */
+	 public function http_request_allow_external( $allow ) {
+	 	return true;
+	 }
+	 
 	/**
 	 * Display an error using login page wrapper
 	 *
