@@ -32,7 +32,7 @@ function rest_get_client( $type, $key ) {
 		return new WP_Error( 'json_consumer_notfound', __( 'Consumer Key is invalid' ), array( 'status' => 401 ) );
 	}
 
-	return new $consumers[0];
+	return $consumers[0];
 }
 
 /**
