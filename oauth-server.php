@@ -60,7 +60,7 @@ function json_oauth_load() {
 
 	$wp_json_authentication_oauth1 = new WP_JSON_Authentication_OAuth1();
 	add_filter( 'determine_current_user', array( $wp_json_authentication_oauth1, 'authenticate' ) );
-	add_filter( 'json_authentication_errors', array( $wp_json_authentication_oauth1, 'get_authentication_errors' ) );
+	add_filter( 'rest_authentication_errors', array( $wp_json_authentication_oauth1, 'get_authentication_errors' ) );
 }
 add_action( 'init', 'json_oauth_load' );
 

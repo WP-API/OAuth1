@@ -24,9 +24,6 @@ abstract class WP_JSON_Authentication {
 			_doing_it_wrong( 'WP_JSON_Authentication::__construct', __( 'The type of authentication must be set' ), 'WPAPI-0.9' );
 			return;
 		}
-
-		add_filter( 'json_check_authentication', array( $this, 'authenticate' ), 0 );
-		add_filter( 'rest_authentication_errors', array( $this, 'get_authentication_errors' ), 0 );
 	}
 
 	abstract public function authenticate( $user );
