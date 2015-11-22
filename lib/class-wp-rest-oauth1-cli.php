@@ -1,6 +1,6 @@
 <?php
 
-class WP_JSON_Authentication_OAuth1_CLI extends WP_CLI_Command {
+class WP_REST_OAuth1_CLI extends WP_CLI_Command {
 
 	/**
 	 * ## OPTIONS
