@@ -238,6 +238,7 @@ function json_oauth_admin_edit_page() {
 					<input type="text" class="regular-text"
 						name="name" id="oauth-name"
 						value="<?php echo esc_attr( $data['name'] ) ?>" />
+					<p class="description"><?php echo esc_html( 'This is shown to users during authorization and in their profile.' ) ?></p>
 				</td>
 			</tr>
 			<tr>
@@ -249,6 +250,25 @@ function json_oauth_admin_edit_page() {
 						cols="30" rows="5" style="width: 500px"><?php echo esc_textarea( $data['description'] ) ?></textarea>
 				</td>
 			</tr>
+
+			<?php if ( ! empty( $consumer ) ): ?>
+				<tr>
+					<th scope="row">
+						<?php echo esc_html( 'Client Key' ) ?>
+					</th>
+					<td>
+						<code><?php echo esc_html( $consumer->key ) ?></code>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<?php echo esc_html( 'Client Secret' ) ?>
+					</th>
+					<td>
+						<code><?php echo esc_html( $consumer->secret ) ?></code>
+					</td>
+				</tr>
+			<?php endif ?>
 		</table>
 
 		<?php
