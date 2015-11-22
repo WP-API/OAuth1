@@ -7,7 +7,7 @@
 
 include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication.php' );
 include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication-oauth1.php' );
-include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication-oauth1-authorize.php' );
+include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1-ui.php' );
 
 include_once( dirname( __FILE__ ) . '/admin.php' );
 
@@ -147,7 +147,7 @@ add_filter( 'rest_index', 'rest_oauth1_register_routes' );
  * sanitized before this.
  */
 function rest_oauth1_load_authorize_page() {
-	$authorizer = new WP_JSON_Authentication_OAuth1_Authorize();
+	$authorizer = new WP_REST_OAuth1_UI();
 	$authorizer->register_hooks();
 }
 add_action( 'init', 'rest_oauth1_load_authorize_page' );
