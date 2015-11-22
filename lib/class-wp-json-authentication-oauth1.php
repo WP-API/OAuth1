@@ -365,13 +365,14 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 
 		// Generate token
 		$key = apply_filters( 'json_oauth1_request_token_key', wp_generate_password( self::TOKEN_KEY_LENGTH, false ) );
+		$callback = $params['oauth_callback'];
 		$data = array(
 			'key'        => $key,
 			'secret'     => wp_generate_password( self::TOKEN_SECRET_LENGTH, false ),
 			'consumer'   => $consumer->ID,
 			'authorized' => false,
 			'expiration' => time() + 24 * HOUR_IN_SECONDS,
-			'callback'   => null,
+			'callback'   => $callback,
 			'verifier'   => null,
 			'user'       => null,
 		);
@@ -551,7 +552,13 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 
 		$params = array_merge( $params, $oauth_params );
 
-		$base_request_uri = rawurlencode( get_home_url( null, parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) ) );
+		// Support WP blog roots that point to a folder and not just a domain
+		$home_url_path = parse_url(get_home_url (null,''), PHP_URL_PATH );
+		$request_uri_path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
+		if (substr($request_uri_path, 0, strlen($home_url_path)) == $home_url_path) {
+			$request_uri_path = substr($request_uri_path, strlen($home_url_path));
+		}
+		$base_request_uri = get_home_url( null, $request_uri_path );
 
 		// get the signature provided by the consumer and remove it from the parameters prior to checking the signature
 		$consumer_signature = rawurldecode( $params['oauth_signature'] );
@@ -567,7 +574,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		$query_string = $this->create_signature_string( $params );
 
 		$token = (array) $token;
-		$string_to_sign = $http_method . '&' . $base_request_uri . '&' . $query_string;
+		$string_to_sign = $http_method . '&' . rawurlencode( $base_request_uri ) . '&' . rawurlencode( $query_string );
 		$key_parts = array(
 			$consumer->secret,
 			( $token ? $token['secret'] : '' )
@@ -604,7 +611,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	 * @return string         Signature string
 	 */
 	public function create_signature_string( $params ) {
-		return implode( '%26', $this->join_with_equals_sign( $params ) ); // join with ampersand
+		return implode( '&', $this->join_with_equals_sign( $params ) ); // join with ampersand
 	}
 
 	/**
@@ -625,7 +632,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 					$param_key = $key . '[' . $param_key . ']'; // Handle multi-dimensional array
 				}
 				$string = $param_key . '=' . $param_value; // join with equals sign
-				$query_params[] = urlencode( $string );
+				$query_params[] = $string;
 			}
 		}
 		return $query_params;
