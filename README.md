@@ -28,7 +28,7 @@ testing environment in a few easy steps:
    cd api-tester
    mkdir -p content/plugins content/themes
    cp -r wp/wp-content/themes/* content/themes
-   git clone git@github.com:WP-API/WP-API.git content/plugins/json-rest-api
+   git clone --recursive git@github.com:WP-API/WP-API.git content/plugins/json-rest-api
    git clone git@github.com:WP-API/OAuth1.git content/plugins/oauth-server
    ```
 
