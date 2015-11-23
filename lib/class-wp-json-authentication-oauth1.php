@@ -93,6 +93,15 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		$params = array_merge( $_GET, $_POST );
 		$params = wp_unslash( $params );
 
+		// @kosso: Check for raw POST Content-Type: application/json data (requires php://input since PHP 5.6) and then json_decode it. 
+		if($_SERVER['CONTENT_TYPE']=='application/json'){
+			$raw_post_data_params = json_decode(file_get_contents('php://input'), true);
+			if ( ! empty( $raw_post_data_params ) ) {
+				$raw_post_data_params = wp_unslash( $raw_post_data_params );
+				$params = array_merge( $params, $raw_post_data_params );
+				ksort($params);
+			}
+		}
 		$header = $this->get_authorization_header();
 
 		if ( ! empty( $header ) ) {

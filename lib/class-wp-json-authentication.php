@@ -42,12 +42,12 @@ abstract class WP_JSON_Authentication {
 			'post_status' => 'any',
 			'meta_query' => array(
 				array(
-					'meta_key' => 'key',
-					'meta_value' => $key,
+					'key' => 'key',
+					'value' => $key,
 				),
 				array(
-					'meta_key' => 'type',
-					'meta_value' => $this->type,
+					'key' => 'type',
+					'value' => $this->type,
 				),
 			),
 		) );
