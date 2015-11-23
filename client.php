@@ -8,8 +8,6 @@
  * @return WP_Post|WP_Error
  */
 function rest_get_client( $type, $key ) {
-	// $this->should_attempt = false;
-
 	$query = new WP_Query();
 	$consumers = $query->query( array(
 		'post_type' => 'json_consumer',
@@ -25,8 +23,6 @@ function rest_get_client( $type, $key ) {
 			),
 		),
 	) );
-
-	// $this->should_attempt = true;
 
 	if ( empty( $consumers ) || empty( $consumers[0] ) ) {
 		return new WP_Error( 'json_consumer_notfound', __( 'Consumer Key is invalid' ), array( 'status' => 401 ) );

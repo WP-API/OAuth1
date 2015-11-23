@@ -311,7 +311,10 @@ class WP_REST_OAuth1 {
 	 * @return array Array of consumer object, user object
 	 */
 	public function check_token( $token, $consumer_key ) {
+		$this->should_attempt = false;
 		$consumer = rest_get_client( $this->type, $consumer_key );
+		$this->should_attempt = true;
+
 		if ( is_wp_error( $consumer ) ) {
 			return $consumer;
 		}
@@ -479,7 +482,10 @@ class WP_REST_OAuth1 {
 			return new WP_Error( 'json_oauth1_invalid_verifier', __( 'OAuth verifier does not match' ), array( 'status' => 400 ) );
 		}
 
+		$this->should_attempt = false;
 		$consumer = rest_get_client( $this->type, $oauth_consumer_key );
+		$this->should_attempt = true;
+
 		if ( is_wp_error( $consumer ) ) {
 			return $consumer;
 		}
