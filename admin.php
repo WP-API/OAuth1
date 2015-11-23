@@ -105,6 +105,13 @@ function json_oauth_admin_validate_parameters( $params ) {
 	}
 	$valid['description'] = wp_filter_post_kses( $params['description'] );
 
+	if ( empty( $params['callback'] ) ) {
+		return new WP_Error( 'json_oauth_missing_description', __( 'Consumer callback is required and must be a valid URL.' ) );
+	}
+	if ( ! empty( $params['callback'] ) ) {
+		$valid['callback'] = $params['callback'];
+	}
+
 	return $valid;
 }
 
@@ -138,6 +145,9 @@ function json_oauth_admin_handle_edit_submit( $consumer ) {
 		$data = array(
 			'name' => $params['name'],
 			'description' => $params['description'],
+			'meta' => array(
+				'callback' => $params['callback'],
+			),
 		);
 		$consumer = $result = $authenticator->add_consumer( $data );
 	}
@@ -149,6 +159,7 @@ function json_oauth_admin_handle_edit_submit( $consumer ) {
 			'post_content' => $params['description'],
 		);
 		$result = wp_update_post( $data, true );
+		update_post_meta( $consumer->ID, 'callback', wp_slash( $params['callback'] ) );
 	}
 
 	if ( is_wp_error( $result ) ) {
@@ -201,13 +212,14 @@ function json_oauth_admin_edit_page() {
 	$data = array();
 
 	if ( empty( $consumer ) || ! empty( $_POST['_wpnonce'] ) ) {
-		foreach ( array( 'name', 'description' ) as $key ) {
+		foreach ( array( 'name', 'description', 'callback' ) as $key ) {
 			$data[ $key ] = empty( $_POST[ $key ] ) ? '' : wp_unslash( $_POST[ $key ] );
 		}
 	}
 	else {
 		$data['name'] = $consumer->post_title;
 		$data['description'] = $consumer->post_content;
+		$data['callback'] = $consumer->callback;
 	}
 
 	// Header time!
@@ -249,6 +261,17 @@ function json_oauth_admin_edit_page() {
 				<td>
 					<textarea class="regular-text" name="description" id="oauth-description"
 						cols="30" rows="5" style="width: 500px"><?php echo esc_textarea( $data['description'] ) ?></textarea>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">
+					<label for="oauth-callback"><?php echo esc_html_x( 'Callback', 'field name' ) ?></label>
+				</th>
+				<td>
+					<input type="text" class="regular-text"
+						name="callback" id="oauth-callback"
+						value="<?php echo esc_attr( $data['callback'] ) ?>" />
+					<p class="description"><?php echo esc_html( "Your application's callback URL. The callback passed with the request token must match the scheme, host, port, and path of this URL." ) ?></p>
 				</td>
 			</tr>
 

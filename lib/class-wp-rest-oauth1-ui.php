@@ -152,8 +152,8 @@ class WP_REST_OAuth1_UI {
 		$callback = $this->token['callback'];
 
 		// Ensure the URL is safe to access
-		$callback = wp_http_validate_url( $callback );
-		if ( empty( $callback ) ) {
+		$authenticator = new WP_REST_OAuth1();
+		if ( ! $authenticator->check_callback( $callback, $this->token['consumer'] ) ) {
 			return new WP_Error( 'json_oauth1_invalid_callback', __( 'The callback URL is invalid' ), array( 'status' => 400 ) );
 		}
 
