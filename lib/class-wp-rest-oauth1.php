@@ -402,7 +402,7 @@ class WP_REST_OAuth1 {
 		}
 
 		$consumer = $token['consumer'];
-		if ( ! $this->validate_callback( $callback ) || ! $this->check_callback( $callback, $consumer ) ) {
+		if ( ! $this->check_callback( $callback, $consumer ) ) {
 			return new WP_Error( 'json_oauth1_invalid_callback', __( 'Callback URL is invalid' ) );
 		}
 
@@ -454,6 +454,17 @@ class WP_REST_OAuth1 {
 
 		$registered = $consumer->callback;
 		if ( empty( $registered ) ) {
+			return false;
+		}
+
+		// Out-of-band isn't a URL, but is still valid
+		if ( $registered === 'oob' || $url === 'oob' ) {
+			// Ensure both the registered URL and requested are 'oob'
+			return ( $registered === $url );
+		}
+
+		// Validate the supplied URL
+		if ( ! $this->validate_callback( $url ) ) {
 			return false;
 		}
 
