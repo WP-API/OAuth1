@@ -405,13 +405,13 @@ function json_oauth_admin_delete() {
 	$id = $_GET['id'];
 	check_admin_referer( 'json-oauth-delete:' . $id );
 
-	if ( ! rest_client_delete( $id ) ) {
+	if ( ! rest_delete_client( $id ) ) {
 		$message = 'Invalid consumer ID';
 		wp_die( $message );
 		return;
 	}
 
-	$redirect = admin_url( 'users.php?action=json-oauth' );
+	$redirect = admin_url( 'users.php?page=json-oauth' );
 	wp_redirect( $redirect );
 	exit;
 }
