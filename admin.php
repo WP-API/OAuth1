@@ -343,7 +343,7 @@ function json_oauth_profile_section( $user ) {
 							<tbody>
 							<?php foreach ( $approved as $row ): ?>
 								<?php
-								$application = rest_get_client( 'oauth1', $row['consumer'] );
+								$application = get_post($row['consumer']);
 								?>
 								<tr>
 									<td><?php echo esc_html( $application->post_title ) ?></td>
