@@ -331,14 +331,14 @@ function json_oauth_profile_section( $user ) {
 		<table class="form-table">
 			<tbody>
 			<tr>
-				<th></th>
 				<th scope="row"><?php _e( 'Authorized Applications', 'json_oauth' ) ?></th>
 				<td>
 					<?php if ( ! empty( $approved ) ): ?>
-						<table class="widefat sessions-table">
+						<table class="widefat">
 							<thead>
 							<tr>
-								<th scope="col"><?php _e( 'Application Name', 'wpsm' ); ?></th>
+								<th style="padding-left:10px;"><?php _e( 'Application Name', 'wpsm' ); ?></th>
+								<th></th>
 							</tr>
 							</thead>
 							<tbody>
