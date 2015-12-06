@@ -331,6 +331,7 @@ function json_oauth_profile_section( $user ) {
 		<table class="form-table">
 			<tbody>
 			<tr>
+				<th></th>
 				<th scope="row"><?php _e( 'Authorized Applications', 'json_oauth' ) ?></th>
 				<td>
 					<?php if ( ! empty( $approved ) ): ?>
