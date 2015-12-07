@@ -334,16 +334,17 @@ function json_oauth_profile_section( $user ) {
 				<th scope="row"><?php _e( 'Authorized Applications', 'json_oauth' ) ?></th>
 				<td>
 					<?php if ( ! empty( $approved ) ): ?>
-						<table class="widefat sessions-table">
+						<table class="widefat">
 							<thead>
 							<tr>
-								<th scope="col"><?php _e( 'Application Name', 'wpsm' ); ?></th>
+								<th style="padding-left:10px;"><?php _e( 'Application Name', 'wpsm' ); ?></th>
+								<th></th>
 							</tr>
 							</thead>
 							<tbody>
 							<?php foreach ( $approved as $row ): ?>
 								<?php
-								$application = rest_get_client( 'oauth1', $row['consumer'] );
+								$application = get_post($row['consumer']);
 								?>
 								<tr>
 									<td><?php echo esc_html( $application->post_title ) ?></td>
