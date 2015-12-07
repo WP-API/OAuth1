@@ -108,6 +108,11 @@ class WP_REST_OAuth1_Admin {
 				endif;
 				?>
 			</h2>
+			<?php
+			if ( ! empty( $_GET['deleted'] ) ) {
+				echo '<div id="message" class="updated"><p>' . esc_html__( 'Deleted application.', 'rest_oauth1' ) . '</p></div>';
+			}
+			?>
 
 			<?php $wp_list_table->views(); ?>
 
@@ -368,7 +373,7 @@ class WP_REST_OAuth1_Admin {
 			return;
 		}
 
-		wp_redirect( self::get_url() );
+		wp_redirect( self::get_url( 'deleted=1' ) );
 		exit;
 	}
 }
