@@ -1,7 +1,7 @@
 <?php
 
-class Wombat_Admin {
-	const BASE_SLUG = 'wombat-apps';
+class WP_REST_OAuth1_Admin {
+	const BASE_SLUG = 'rest-oauth1-apps';
 
 	/**
 	 * Register the admin page
@@ -10,14 +10,14 @@ class Wombat_Admin {
 		/**
 		 * Include anything we need that relies on admin classes/functions
 		 */
-		include_once dirname( __FILE__ ) . '/class-wombat-listtable.php';
+		include_once dirname( __FILE__ ) . '/class-wp-rest-oauth1-listtable.php';
 
 		$hook = add_users_page(
 			// Page title
-			__( 'Registered OAuth Applications', 'wombat' ),
+			__( 'Registered OAuth Applications', 'rest_oauth1' ),
 
 			// Menu title
-			_x( 'Applications', 'menu title', 'wombat' ),
+			_x( 'Applications', 'menu title', 'rest_oauth1' ),
 
 			// Capability
 			'list_users',
@@ -68,7 +68,7 @@ class Wombat_Admin {
 			default:
 				global $wp_list_table;
 
-				$wp_list_table = new Wombat_ListTable();
+				$wp_list_table = new WP_REST_OAuth1_ListTable();
 
 				$wp_list_table->prepare_items();
 
@@ -99,11 +99,11 @@ class Wombat_Admin {
 		<div class="wrap">
 			<h2>
 				<?php
-				esc_html_e( 'Registered Applications', 'wombat' );
+				esc_html_e( 'Registered Applications', 'rest_oauth1' );
 
 				if ( current_user_can( 'create_users' ) ): ?>
 					<a href="<?php echo esc_url( self::get_url( 'action=add' ) ) ?>"
-						class="add-new-h2"><?php echo esc_html_x( 'Add New', 'application', 'wombat' ); ?></a>
+						class="add-new-h2"><?php echo esc_html_x( 'Add New', 'application', 'rest_oauth1' ); ?></a>
 				<?php
 				endif;
 				?>
@@ -113,7 +113,7 @@ class Wombat_Admin {
 
 			<form action="" method="get">
 
-				<?php $wp_list_table->search_box( __( 'Search Applications', 'wombat' ), 'wombat' ); ?>
+				<?php $wp_list_table->search_box( __( 'Search Applications', 'rest_oauth1' ), 'rest_oauth1' ); ?>
 
 				<?php $wp_list_table->display(); ?>
 
@@ -129,17 +129,17 @@ class Wombat_Admin {
 		$valid = array();
 
 		if ( empty( $params['name'] ) ) {
-			return new WP_Error( 'wombat_missing_name', __( 'Consumer name is required', 'wombat' ) );
+			return new WP_Error( 'rest_oauth1_missing_name', __( 'Consumer name is required', 'rest_oauth1' ) );
 		}
 		$valid['name'] = wp_filter_post_kses( $params['name'] );
 
 		if ( empty( $params['description'] ) ) {
-			return new WP_Error( 'wombat_missing_description', __( 'Consumer description is required', 'wombat' ) );
+			return new WP_Error( 'rest_oauth1_missing_description', __( 'Consumer description is required', 'rest_oauth1' ) );
 		}
 		$valid['description'] = wp_filter_post_kses( $params['description'] );
 
 		if ( empty( $params['callback'] ) ) {
-			return new WP_Error( 'wombat_missing_description', __( 'Consumer callback is required and must be a valid URL.', 'wombat' ) );
+			return new WP_Error( 'rest_oauth1_missing_description', __( 'Consumer callback is required and must be a valid URL.', 'rest_oauth1' ) );
 		}
 		if ( ! empty( $params['callback'] ) ) {
 			$valid['callback'] = $params['callback'];
@@ -157,11 +157,11 @@ class Wombat_Admin {
 		$messages = array();
 		if ( empty( $consumer ) ) {
 			$did_action = 'add';
-			check_admin_referer( 'wombat-add' );
+			check_admin_referer( 'rest-oauth1-add' );
 		}
 		else {
 			$did_action = 'edit';
-			check_admin_referer( 'wombat-edit-' . $consumer->ID );
+			check_admin_referer( 'rest-oauth1-edit-' . $consumer->ID );
 		}
 
 		// Check that the parameters are correct first
@@ -202,15 +202,12 @@ class Wombat_Admin {
 		}
 
 		// Success, redirect to alias page
-		$location = add_query_arg(
+		$location = self::get_url(
 			array(
-				'action'     => 'wombat-edit',
+				'action'     => 'edit',
 				'id'         => $consumer->ID,
 				'did_action' => $did_action,
-				'processed'  => 1,
-				'_wpnonce'   => wp_create_nonce( 'wombat-edit-' . $id ),
-			),
-			network_admin_url( 'admin.php' )
+			)
 		);
 		wp_safe_redirect( $location );
 		exit;
@@ -226,7 +223,7 @@ class Wombat_Admin {
 
 		// Are we editing?
 		$consumer = null;
-		$form_action = admin_url( 'admin.php?action=wombat-add' );
+		$form_action = self::get_url('action=add');
 		if ( ! empty( $_REQUEST['id'] ) ) {
 			$id = absint( $_REQUEST['id'] );
 			$consumer = get_post( $id );
@@ -234,7 +231,7 @@ class Wombat_Admin {
 				wp_die( __( 'Invalid consumer ID.' ) );
 			}
 
-			$form_action = admin_url( 'admin.php?action=wombat-edit' );
+			$form_action = self::get_url( array( 'action' => 'edit', 'id' => $id ) );
 		}
 
 		// Handle form submission
@@ -258,7 +255,7 @@ class Wombat_Admin {
 
 		// Header time!
 		global $title, $parent_file, $submenu_file;
-		$title = $consumer ? __( 'Edit Application', 'wombat' ) : __( 'Add Application', 'wombat' );
+		$title = $consumer ? __( 'Edit Application', 'rest_oauth1' ) : __( 'Add Application', 'rest_oauth1' );
 		$parent_file = 'users.php';
 		$submenu_file = self::BASE_SLUG;
 
@@ -332,12 +329,12 @@ class Wombat_Admin {
 			<?php
 
 			if ( empty( $consumer ) ) {
-				wp_nonce_field( 'wombat-add' );
+				wp_nonce_field( 'rest-oauth1-add' );
 				submit_button( __( 'Add Consumer' ) );
 			}
 			else {
 				echo '<input type="hidden" name="id" value="' . esc_attr( $consumer->ID ) . '" />';
-				wp_nonce_field( 'wombat-edit-' . $consumer->ID );
+				wp_nonce_field( 'rest-oauth1-edit-' . $consumer->ID );
 				submit_button( __( 'Save Consumer' ) );
 			}
 
@@ -356,7 +353,7 @@ class Wombat_Admin {
 		}
 
 		$id = $_GET['id'];
-		check_admin_referer( 'wombat-delete:' . $id );
+		check_admin_referer( 'rest-oauth1-delete:' . $id );
 
 		if ( ! rest_delete_client( $id ) ) {
 			$message = 'Invalid consumer ID';
