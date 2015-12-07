@@ -65,6 +65,9 @@ class WP_REST_OAuth1_Admin {
 			case 'delete':
 				return self::handle_delete();
 
+			case 'regenerate':
+				return self::handle_regenerate();
+
 			default:
 				global $wp_list_table;
 
@@ -238,6 +241,7 @@ class WP_REST_OAuth1_Admin {
 			}
 
 			$form_action = self::get_url( array( 'action' => 'edit', 'id' => $id ) );
+			$regenerate_action = self::get_url( array( 'action' => 'regenerate', 'id' => $id ) );
 		}
 
 		// Handle form submission
@@ -246,10 +250,18 @@ class WP_REST_OAuth1_Admin {
 			$messages = self::handle_edit_submit( $consumer );
 		}
 		if ( ! empty( $_GET['did_action'] ) ) {
-			if ( $_GET['did_action'] === 'edit' ) {
-				$messages[] = __( 'Updated application.', 'rest_oauth1' );
-			} else {
-				$messages[] = __( 'Successfully created application.', 'rest_oauth1' );
+			switch ( $_GET['did_action'] ) {
+				case 'edit':
+					$messages[] = __( 'Updated application.', 'rest_oauth1' );
+					break;
+
+				case 'regenerate':
+					$messages[] = __( 'Regenerated secret.', 'rest_oauth1' );
+					break;
+
+				default:
+					$messages[] = __( 'Successfully created application.', 'rest_oauth1' );
+					break;
 			}
 		}
 
@@ -318,25 +330,6 @@ class WP_REST_OAuth1_Admin {
 						<p class="description"><?php echo esc_html( "Your application's callback URL. The callback passed with the request token must match the scheme, host, port, and path of this URL." ) ?></p>
 					</td>
 				</tr>
-
-				<?php if ( ! empty( $consumer ) ): ?>
-					<tr>
-						<th scope="row">
-							<?php echo esc_html__( 'Client Key' ) ?>
-						</th>
-						<td>
-							<code><?php echo esc_html( $consumer->key ) ?></code>
-						</td>
-					</tr>
-					<tr>
-						<th scope="row">
-							<?php echo esc_html__( 'Client Secret' ) ?>
-						</th>
-						<td>
-							<code><?php echo esc_html( $consumer->secret ) ?></code>
-						</td>
-					</tr>
-				<?php endif ?>
 			</table>
 
 			<?php
@@ -353,11 +346,39 @@ class WP_REST_OAuth1_Admin {
 
 			?>
 		</form>
+
+		<?php if ( ! empty( $consumer ) ): ?>
+			<form method="post" action="<?php echo esc_url( $regenerate_action ) ?>">
+				<h3><?php esc_html_e( 'OAuth Credentials', 'rest_oauth1' ) ?></h3>
+
+				<table class="form-table">
+					<tr>
+						<th scope="row">
+							<?php echo esc_html__( 'Client Key', 'rest_oauth1' ) ?>
+						</th>
+						<td>
+							<code><?php echo esc_html( $consumer->key ) ?></code>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">
+							<?php echo esc_html__( 'Client Secret', 'rest_oauth1' ) ?>
+						</th>
+						<td>
+							<code><?php echo esc_html( $consumer->secret ) ?></code>
+						</td>
+					</tr>
+				</table>
+
+				<?php
+				wp_nonce_field( 'rest-oauth1-regenerate:' . $consumer->ID );
+				submit_button( __( 'Regenerate Secret', 'rest_oauth1' ), 'delete' );
+				?>
+			</form>
+		<?php endif ?>
 	</div>
 
 	<?php
-
-		include(ABSPATH . 'wp-admin/admin-footer.php');
 	}
 
 	public static function handle_delete() {
@@ -381,6 +402,21 @@ class WP_REST_OAuth1_Admin {
 		}
 
 		wp_redirect( self::get_url( 'deleted=1' ) );
+		exit;
+	}
+
+	public static function handle_regenerate() {
+		if ( empty( $_GET['id'] ) ) {
+			return;
+		}
+
+		$id = $_GET['id'];
+		check_admin_referer( 'rest-oauth1-regenerate:' . $id );
+
+		$client = WP_REST_OAuth1_Client::get( $id );
+		$client->regenerate_secret();
+
+		wp_redirect( self::get_url( array( 'action' => 'edit', 'id' => $id, 'did_action' => 'regenerate' ) ) );
 		exit;
 	}
 }

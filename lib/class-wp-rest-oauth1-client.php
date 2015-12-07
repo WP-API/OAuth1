@@ -5,6 +5,21 @@ class WP_REST_OAuth1_Client extends WP_REST_Client {
 	const CONSUMER_SECRET_LENGTH = 48;
 
 	/**
+	 * Regenerate the secret for the client.
+	 *
+	 * @return bool|WP_Error True on success, error otherwise.
+	 */
+	public function regenerate_secret() {
+		$params = array(
+			'meta' => array(
+				'secret' => wp_generate_password( self::CONSUMER_SECRET_LENGTH, false ),
+			),
+		);
+
+		return $this->update( $params );
+	}
+
+	/**
 	 * Get the client type.
 	 *
 	 * @return string
