@@ -1,4 +1,4 @@
-# Table of Contents
+## Table of Contents
 
 * [Start Here](/README.md)
 * [Introduction](/docs/introduction/README.md)
