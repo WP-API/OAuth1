@@ -46,7 +46,7 @@ class WP_REST_OAuth1_ListTable extends WP_List_Table {
 			for="cb-select-<?php echo esc_attr( $item->ID ) ?>"><?php esc_html_e( 'Select consumer', 'rest_oauth1' ); ?></label>
 
 		<input id="cb-select-<?php echo esc_attr( $item->ID ) ?>" type="checkbox"
-			name="consumers[]" value="<?php echo $item->ID ?>" />
+			name="consumers[]" value="<?php echo esc_attr( $item->ID ) ?>" />
 
 		<?php
 	}
@@ -76,8 +76,8 @@ class WP_REST_OAuth1_ListTable extends WP_List_Table {
 		$delete_link = wp_nonce_url( $delete_link, 'rest-oauth1-delete:' . $item->ID );
 
 		$actions = array(
-			'edit' => sprintf( '<a href="%s">%s</a>', $edit_link, esc_html__( 'Edit', 'rest_oauth1' ) ),
-			'delete' => sprintf( '<a href="%s">%s</a>', $delete_link, esc_html__( 'Delete', 'rest_oauth1' ) ),
+			'edit' => sprintf( '<a href="%s">%s</a>', esc_url( $edit_link ), esc_html__( 'Edit', 'rest_oauth1' ) ),
+			'delete' => sprintf( '<a href="%s">%s</a>', esc_url( $delete_link ), esc_html__( 'Delete', 'rest_oauth1' ) ),
 		);
 		$action_html = $this->row_actions( $actions );
 
