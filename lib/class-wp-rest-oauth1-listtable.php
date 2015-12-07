@@ -1,6 +1,6 @@
 <?php
 
-class WP_JSON_Authentication_OAuth1_ListTable extends WP_List_Table {
+class WP_REST_OAuth1_ListTable extends WP_List_Table {
 	public function prepare_items() {
 		$paged = $this->get_pagenum();
 
@@ -42,27 +42,42 @@ class WP_JSON_Authentication_OAuth1_ListTable extends WP_List_Table {
 
 	public function column_cb( $item ) {
 		?>
-		<label class="screen-reader-text" for="cb-select-<?php echo $item->ID ?>"><?php _e( 'Select consumer' ); ?></label>
-		<input id="cb-select-<?php echo $item->ID ?>" type="checkbox" name="consumers[]" value="<?php echo $item->ID ?>" />
+		<label class="screen-reader-text"
+			for="cb-select-<?php echo esc_attr( $item->ID ) ?>"><?php esc_html_e( 'Select consumer', 'rest_oauth1' ); ?></label>
+
+		<input id="cb-select-<?php echo esc_attr( $item->ID ) ?>" type="checkbox"
+			name="consumers[]" value="<?php echo $item->ID ?>" />
+
 		<?php
 	}
 
 	protected function column_name( $item ) {
 		$title = get_the_title( $item->ID );
 		if ( empty( $title ) ) {
-			$title = '<em>' . __( 'Untitled' ) . '</em>';
+			$title = '<em>' . esc_html__( 'Untitled', 'rest_oauth1' ) . '</em>';
 		}
 
 		$edit_link = add_query_arg(
 			array(
-				'action' => 'json-oauth-edit',
+				'page'   => 'rest-oauth1-apps',
+				'action' => 'edit',
 				'id'     => $item->ID,
 			),
-			admin_url( 'admin.php' )
+			admin_url( 'users.php' )
 		);
+		$delete_link = add_query_arg(
+			array(
+				'page'   => 'rest-oauth1-apps',
+				'action' => 'delete',
+				'id'     => $item->ID,
+			),
+			admin_url( 'users.php' )
+		);
+		$delete_link = wp_nonce_url( $delete_link, 'rest-oauth1-delete:' . $item->ID );
 
 		$actions = array(
-			'edit' => sprintf( '<a href="%s">%s</a>', $edit_link, __( 'Edit' ) ),
+			'edit' => sprintf( '<a href="%s">%s</a>', $edit_link, esc_html__( 'Edit', 'rest_oauth1' ) ),
+			'delete' => sprintf( '<a href="%s">%s</a>', $delete_link, esc_html__( 'Delete', 'rest_oauth1' ) ),
 		);
 		$action_html = $this->row_actions( $actions );
 

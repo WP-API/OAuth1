@@ -8,7 +8,7 @@
  * @subpackage JSON API
  */
 
-class WP_JSON_Authentication_OAuth1_Authorize {
+class WP_REST_OAuth1_UI {
 	/**
 	 * Request token for the current authorization request
 	 *
@@ -68,7 +68,7 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 			$scope = wp_unslash( $_REQUEST['wp_scope'] );
 		}
 
-		$authenticator = new WP_JSON_Authentication_OAuth1();
+		$authenticator = new WP_REST_OAuth1();
 		$errors = array();
 		$this->token = $authenticator->get_request_token( $token_key );
 		if ( is_wp_error( $this->token ) ) {
@@ -152,8 +152,8 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 		$callback = $this->token['callback'];
 
 		// Ensure the URL is safe to access
-		$callback = wp_http_validate_url( $callback );
-		if ( empty( $callback ) ) {
+		$authenticator = new WP_REST_OAuth1();
+		if ( ! $authenticator->check_callback( $callback, $this->token['consumer'] ) ) {
 			return new WP_Error( 'json_oauth1_invalid_callback', __( 'The callback URL is invalid' ), array( 'status' => 400 ) );
 		}
 

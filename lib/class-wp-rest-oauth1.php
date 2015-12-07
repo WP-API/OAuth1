@@ -6,9 +6,7 @@
  * @subpackage JSON API
  */
 
-class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
-	const CONSUMER_KEY_LENGTH = 12;
-	const CONSUMER_SECRET_LENGTH = 48;
+class WP_REST_OAuth1 {
 	const TOKEN_KEY_LENGTH = 24;
 	const TOKEN_SECRET_LENGTH = 48;
 	const VERIFIER_LENGTH = 24;
@@ -281,29 +279,6 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	}
 
 	/**
-	 * Add a new consumer
-	 *
-	 * Ensures that the consumer has an associated key/secret pair, which can be
-	 * overridden for consumers with a pre-existing pair (such as via an import)
-	 *
-	 * @param array $params Consumer parameters
-	 * @return WP_Post Consumer data
-	 */
-	public function add_consumer( $params ) {
-		$meta = array(
-			'key'    => wp_generate_password( self::CONSUMER_KEY_LENGTH, false ),
-			'secret' => wp_generate_password( self::CONSUMER_SECRET_LENGTH, false ),
-		);
-
-		if ( empty( $params['meta'] ) ) {
-			$params['meta'] = array();
-		}
-		$params['meta'] = array_merge( $params['meta'], $meta );
-
-		return parent::add_consumer( $params );
-	}
-
-	/**
 	 * Check a token against the database
 	 *
 	 * @param string $token Token object
@@ -311,7 +286,10 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	 * @return array Array of consumer object, user object
 	 */
 	public function check_token( $token, $consumer_key ) {
-		$consumer = $this->get_consumer( $consumer_key );
+		$this->should_attempt = false;
+		$consumer = WP_REST_OAuth1_Client::get_by_key( $consumer_key );
+		$this->should_attempt = true;
+
 		if ( is_wp_error( $consumer ) ) {
 			return $consumer;
 		}
@@ -352,7 +330,7 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 	 * @return array|WP_Error Array of token data on success, error otherwise
 	 */
 	public function generate_request_token( $params ) {
-		$consumer = $this->get_consumer( $params['oauth_consumer_key'] );
+		$consumer = WP_REST_OAuth1_Client::get_by_key( $params['oauth_consumer_key'] );
 		if ( is_wp_error( $consumer ) ) {
 			return $consumer;
 		}
@@ -377,6 +355,12 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 		);
 		$data = apply_filters( 'json_oauth1_request_token_data', $data );
 		add_option( 'oauth1_request_' . $key, $data, null, 'no' );
+		if ( ! empty( $params['oauth_callback'] ) ) {
+			$error = $this->set_request_token_callback( $key, $params['oauth_callback'] );
+			if ( $error ) {
+				return $error;
+			}
+		}
 
 		$data = array(
 			'oauth_token' => self::urlencode_rfc3986($key),
@@ -392,13 +376,111 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 			return $token;
 		}
 
-		if ( esc_url_raw( $callback ) !== $callback ) {
+		$consumer = $token['consumer'];
+		if ( ! $this->check_callback( $callback, $consumer ) ) {
 			return new WP_Error( 'json_oauth1_invalid_callback', __( 'Callback URL is invalid' ) );
 		}
 
 		$token['callback'] = $callback;
 		update_option( 'oauth1_request_' . $key, $token );
 		return $token['verifier'];
+	}
+
+	/**
+	 * Validate a callback URL.
+	 *
+	 * Based on {@see wp_http_validate_url}, but less restrictive around ports
+	 * and hosts. In particular, it allows any scheme, host or port rather than
+	 * just HTTP with standard ports.
+	 *
+	 * @param string $url URL for the callback.
+	 * @return bool True for a valid callback URL, false otherwise.
+	 */
+	protected function validate_callback( $url ) {
+		if ( strpos( $url, ':' ) === false ) {
+			return false;
+		}
+
+		$parsed_url = wp_parse_url( $url );
+		if ( ! $parsed_url || empty( $parsed_url['host'] ) )
+			return false;
+
+		if ( isset( $parsed_url['user'] ) || isset( $parsed_url['pass'] ) )
+			return false;
+
+		if ( false !== strpbrk( $parsed_url['host'], ':#?[]' ) )
+			return false;
+
+		return true;
+	}
+
+	/**
+	 * Check whether a callback is valid for a given consumer.
+	 *
+	 * @param string $url Supplied callback.
+	 * @param int|WP_Post $consumer_id Consumer post ID or object.
+	 * @return bool True if valid, false otherwise.
+	 */
+	public function check_callback( $url, $consumer_id ) {
+		$consumer = get_post( $consumer_id );
+		if ( empty( $consumer ) || $consumer->post_type !== 'json_consumer' || $consumer->type !== $this->type ) {
+			return false;
+		}
+
+		$registered = $consumer->callback;
+		if ( empty( $registered ) ) {
+			return false;
+		}
+
+		// Out-of-band isn't a URL, but is still valid
+		if ( $registered === 'oob' || $url === 'oob' ) {
+			// Ensure both the registered URL and requested are 'oob'
+			return ( $registered === $url );
+		}
+
+		// Validate the supplied URL
+		if ( ! $this->validate_callback( $url ) ) {
+			return false;
+		}
+
+		$registered = wp_parse_url( $registered );
+		$supplied = wp_parse_url( $url );
+
+		// Check all components except query and fragment
+		$parts = array( 'scheme', 'host', 'port', 'user', 'pass', 'path' );
+		$valid = true;
+		foreach ( $parts as $part ) {
+			if ( isset( $registered[ $part ] ) !== isset( $supplied[ $part ] ) ) {
+				$valid = false;
+				break;
+			}
+
+			if ( ! isset( $registered[ $part ] ) ) {
+				continue;
+			}
+
+			if ( $registered[ $part ] !== $supplied[ $part ] ) {
+				$valid = false;
+				break;
+			}
+		}
+
+		/**
+		 * Filter whether a callback is counted as valid.
+		 *
+		 * By default, the URLs must match scheme, host, port, user, pass, and
+		 * path. Query and fragment segments are allowed to be different.
+		 *
+		 * To change this behaviour, filter this value. Note that consumers must
+		 * have a callback registered, even if you relax this restruction. It is
+		 * highly recommended not to change this behaviour, as clients will
+		 * expect the same behaviour across all WP sites.
+		 *
+		 * @param boolean $valid True if the callback URL is valid, false otherwise.
+		 * @param string $url Supplied callback URL.
+		 * @param WP_Post $consumer Consumer post; stored callback saved as `consumer` meta value.
+		 */
+		return apply_filters( 'rest_oauth.check_callback', $valid, $url, $consumer );
 	}
 
 	/**
@@ -479,7 +561,10 @@ class WP_JSON_Authentication_OAuth1 extends WP_JSON_Authentication {
 			return new WP_Error( 'json_oauth1_invalid_verifier', __( 'OAuth verifier does not match' ), array( 'status' => 400 ) );
 		}
 
-		$consumer = $this->get_consumer( $oauth_consumer_key );
+		$this->should_attempt = false;
+		$consumer = WP_REST_OAuth1_Client::get_by_key( $oauth_consumer_key );
+		$this->should_attempt = true;
+
 		if ( is_wp_error( $consumer ) ) {
 			return $consumer;
 		}
