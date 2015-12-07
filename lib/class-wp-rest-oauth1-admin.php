@@ -239,6 +239,13 @@ class WP_REST_OAuth1_Admin {
 		if ( ! empty( $_POST['submit'] ) ) {
 			$messages = self::handle_edit_submit( $consumer );
 		}
+		if ( ! empty( $_GET['did_action'] ) ) {
+			if ( $_GET['did_action'] === 'edit' ) {
+				$messages[] = __( 'Updated application.', 'rest_oauth1' );
+			} else {
+				$messages[] = __( 'Successfully created application.', 'rest_oauth1' );
+			}
+		}
 
 		$data = array();
 
@@ -268,7 +275,7 @@ class WP_REST_OAuth1_Admin {
 		<?php
 		if ( ! empty( $messages ) ) {
 			foreach ( $messages as $msg )
-				echo '<div id="message" class="updated"><p>' . $msg . '</p></div>';
+				echo '<div id="message" class="updated"><p>' . esc_html( $msg ) . '</p></div>';
 		}
 		?>
 
