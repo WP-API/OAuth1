@@ -389,6 +389,14 @@ class WP_REST_OAuth1_Admin {
 		$id = $_GET['id'];
 		check_admin_referer( 'rest-oauth1-delete:' . $id );
 
+		if ( ! current_user_can( 'delete_post', $id ) ) {
+			wp_die(
+				'<h1>' . __( 'Cheatin&#8217; uh?' ) . '</h1>' .
+				'<p>' . __( 'You are not allowed to delete this application.' ) . '</p>',
+				403
+			);
+		}
+
 		$client = WP_REST_OAuth1_Client::get( $id );
 		if ( is_wp_error( $client ) ) {
 			wp_die( $client );
@@ -412,6 +420,14 @@ class WP_REST_OAuth1_Admin {
 
 		$id = $_GET['id'];
 		check_admin_referer( 'rest-oauth1-regenerate:' . $id );
+
+		if ( ! current_user_can( 'edit_post', $id ) ) {
+			wp_die(
+				'<h1>' . __( 'Cheatin&#8217; uh?' ) . '</h1>' .
+				'<p>' . __( 'You are not allowed to edit this application.' ) . '</p>',
+				403
+			);
+		}
 
 		$client = WP_REST_OAuth1_Client::get( $id );
 		$client->regenerate_secret();
