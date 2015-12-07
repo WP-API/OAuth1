@@ -1,6 +1,16 @@
 {
-  "gitbook": "2.x.x",
+  "gitbook": "2.5.2",
   "structure": {
     "summary": "docs/README.md"
+  },
+  "plugins": ["edit-link", "github"],
+  "pluginsConfig": {
+    "edit-link": {
+      "base": "https://github.com/WP-API/OAuth1/tree/master",
+      "label": "Edit This Page"
+    },
+    "github": {
+      "url": "https://github.com/WP-API/OAuth1/"
+    }
   }
 }
