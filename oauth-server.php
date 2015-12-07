@@ -2,7 +2,21 @@
 /**
  * Plugin Name: WP REST API - OAuth 1.0a Server
  * Description: Authenticate with your site via OAuth 1.0a
- * Version 0.1
+ * Version: 0.2
+ * Author: WP REST API Team
+ * Author URI: http://wp-api.org/
+ *
+ * Hello adventurer, and welcome to the OAuth Server codebase!
+ *
+ * The codebase has three main parts:
+ *   - OAuth token handling (lib/class-wp-rest-oauth1.php)
+ *   - Frontend UI (lib/class-wp-rest-oauth1-ui.php and theme/oauth1-authorize.php)
+ *   - Management and admin UI (everything else)
+ *
+ * Be very careful changing anything in the token handling; everything else is
+ * up for grabs!
+ *
+ * Thanks for being fantastic. <3
  */
 
 include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1.php' );
