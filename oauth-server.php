@@ -7,9 +7,10 @@
 
 include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1.php' );
 include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1-ui.php' );
+include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-client.php' );
+include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1-client.php' );
 
 include_once( dirname( __FILE__ ) . '/admin.php' );
-include_once( dirname( __FILE__ ) . '/client.php' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1-cli.php' );

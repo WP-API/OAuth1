@@ -7,8 +7,6 @@
  */
 
 class WP_REST_OAuth1 {
-	const CONSUMER_KEY_LENGTH = 12;
-	const CONSUMER_SECRET_LENGTH = 48;
 	const TOKEN_KEY_LENGTH = 24;
 	const TOKEN_SECRET_LENGTH = 48;
 	const VERIFIER_LENGTH = 24;
@@ -281,29 +279,6 @@ class WP_REST_OAuth1 {
 	}
 
 	/**
-	 * Add a new consumer
-	 *
-	 * Ensures that the consumer has an associated key/secret pair, which can be
-	 * overridden for consumers with a pre-existing pair (such as via an import)
-	 *
-	 * @param array $params Consumer parameters
-	 * @return WP_Post Consumer data
-	 */
-	public function add_consumer( $params ) {
-		$meta = array(
-			'key'    => wp_generate_password( self::CONSUMER_KEY_LENGTH, false ),
-			'secret' => wp_generate_password( self::CONSUMER_SECRET_LENGTH, false ),
-		);
-
-		if ( empty( $params['meta'] ) ) {
-			$params['meta'] = array();
-		}
-		$params['meta'] = array_merge( $params['meta'], $meta );
-
-		return rest_create_client( $this->type, $params );
-	}
-
-	/**
 	 * Check a token against the database
 	 *
 	 * @param string $token Token object
@@ -312,7 +287,7 @@ class WP_REST_OAuth1 {
 	 */
 	public function check_token( $token, $consumer_key ) {
 		$this->should_attempt = false;
-		$consumer = rest_get_client( $this->type, $consumer_key );
+		$consumer = WP_REST_OAuth1_Client::get_by_key( $consumer_key );
 		$this->should_attempt = true;
 
 		if ( is_wp_error( $consumer ) ) {
@@ -355,7 +330,7 @@ class WP_REST_OAuth1 {
 	 * @return array|WP_Error Array of token data on success, error otherwise
 	 */
 	public function generate_request_token( $params ) {
-		$consumer = rest_get_client( $this->type, $params['oauth_consumer_key'] );
+		$consumer = WP_REST_OAuth1_Client::get_by_key( $params['oauth_consumer_key'] );
 		if ( is_wp_error( $consumer ) ) {
 			return $consumer;
 		}
@@ -587,7 +562,7 @@ class WP_REST_OAuth1 {
 		}
 
 		$this->should_attempt = false;
-		$consumer = rest_get_client( $this->type, $oauth_consumer_key );
+		$consumer = WP_REST_OAuth1_Client::get( $oauth_consumer_key );
 		$this->should_attempt = true;
 
 		if ( is_wp_error( $consumer ) ) {

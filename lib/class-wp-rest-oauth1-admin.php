@@ -187,17 +187,18 @@ class WP_REST_OAuth1_Admin {
 					'callback' => $params['callback'],
 				),
 			);
-			$consumer = $result = $authenticator->add_consumer( $data );
+			$consumer = $result = WP_REST_OAuth1_Client::create( $data );
 		}
 		else {
 			// Update the existing consumer post
 			$data = array(
-				'ID' => $consumer->ID,
-				'post_title' => $params['name'],
-				'post_content' => $params['description'],
+				'name' => $params['name'],
+				'description' => $params['description'],
+				'meta' => array(
+					'callback' => $params['callback'],
+				),
 			);
-			$result = wp_update_post( $data, true );
-			update_post_meta( $consumer->ID, 'callback', wp_slash( $params['callback'] ) );
+			$result = $consumer->update( $data );
 		}
 
 		if ( is_wp_error( $result ) ) {
@@ -231,7 +232,7 @@ class WP_REST_OAuth1_Admin {
 		$form_action = self::get_url('action=add');
 		if ( ! empty( $_REQUEST['id'] ) ) {
 			$id = absint( $_REQUEST['id'] );
-			$consumer = get_post( $id );
+			$consumer = WP_REST_OAuth1_Client::get( $id );
 			if ( is_wp_error( $consumer ) || empty( $consumer ) ) {
 				wp_die( __( 'Invalid consumer ID.' ) );
 			}
@@ -367,7 +368,13 @@ class WP_REST_OAuth1_Admin {
 		$id = $_GET['id'];
 		check_admin_referer( 'rest-oauth1-delete:' . $id );
 
-		if ( ! rest_delete_client( $id ) ) {
+		$client = WP_REST_OAuth1_Client::get( $id );
+		if ( is_wp_error( $client ) ) {
+			wp_die( $client );
+			return;
+		}
+
+		if ( ! $client->delete() ) {
 			$message = 'Invalid consumer ID';
 			wp_die( $message );
 			return;
