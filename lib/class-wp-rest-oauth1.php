@@ -562,7 +562,7 @@ class WP_REST_OAuth1 {
 		}
 
 		$this->should_attempt = false;
-		$consumer = WP_REST_OAuth1_Client::get( $oauth_consumer_key );
+		$consumer = WP_REST_OAuth1_Client::get_by_key( $oauth_consumer_key );
 		$this->should_attempt = true;
 
 		if ( is_wp_error( $consumer ) ) {
