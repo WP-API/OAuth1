@@ -227,7 +227,7 @@ class WP_REST_OAuth1_Admin {
 	 */
 	public static function render_edit_page() {
 		if ( ! current_user_can( 'edit_users' ) ) {
-			wp_die( __( 'You do not have permission to access this page.' ) );
+			wp_die( __( 'You do not have permission to access this page.', 'rest_oauth1' ) );
 		}
 
 		// Are we editing?
@@ -237,7 +237,7 @@ class WP_REST_OAuth1_Admin {
 			$id = absint( $_REQUEST['id'] );
 			$consumer = WP_REST_OAuth1_Client::get( $id );
 			if ( is_wp_error( $consumer ) || empty( $consumer ) ) {
-				wp_die( __( 'Invalid consumer ID.' ) );
+				wp_die( __( 'Invalid consumer ID.', 'rest_oauth1' ) );
 			}
 
 			$form_action = self::get_url( array( 'action' => 'edit', 'id' => $id ) );
@@ -301,18 +301,18 @@ class WP_REST_OAuth1_Admin {
 			<table class="form-table">
 				<tr>
 					<th scope="row">
-						<label for="oauth-name"><?php echo esc_html_x( 'Consumer Name', 'field name' ) ?></label>
+						<label for="oauth-name"><?php echo esc_html_x( 'Consumer Name', 'field name', 'rest_oauth1' ) ?></label>
 					</th>
 					<td>
 						<input type="text" class="regular-text"
 							name="name" id="oauth-name"
 							value="<?php echo esc_attr( $data['name'] ) ?>" />
-						<p class="description"><?php echo esc_html( 'This is shown to users during authorization and in their profile.' ) ?></p>
+						<p class="description"><?php esc_html_e( 'This is shown to users during authorization and in their profile.', 'rest_oauth1' ) ?></p>
 					</td>
 				</tr>
 				<tr>
 					<th scope="row">
-						<label for="oauth-description"><?php echo esc_html_x( 'Description', 'field name' ) ?></label>
+						<label for="oauth-description"><?php echo esc_html_x( 'Description', 'field name', 'rest_oauth1' ) ?></label>
 					</th>
 					<td>
 						<textarea class="regular-text" name="description" id="oauth-description"
@@ -321,13 +321,13 @@ class WP_REST_OAuth1_Admin {
 				</tr>
 				<tr>
 					<th scope="row">
-						<label for="oauth-callback"><?php echo esc_html_x( 'Callback', 'field name' ) ?></label>
+						<label for="oauth-callback"><?php echo esc_html_x( 'Callback', 'field name', 'rest_oauth1' ) ?></label>
 					</th>
 					<td>
 						<input type="text" class="regular-text"
 							name="callback" id="oauth-callback"
 							value="<?php echo esc_attr( $data['callback'] ) ?>" />
-						<p class="description"><?php echo esc_html( "Your application's callback URL. The callback passed with the request token must match the scheme, host, port, and path of this URL." ) ?></p>
+						<p class="description"><?php esc_html_e( "Your application's callback URL. The callback passed with the request token must match the scheme, host, port, and path of this URL.", 'rest_oauth1' ) ?></p>
 					</td>
 				</tr>
 			</table>
@@ -336,12 +336,12 @@ class WP_REST_OAuth1_Admin {
 
 			if ( empty( $consumer ) ) {
 				wp_nonce_field( 'rest-oauth1-add' );
-				submit_button( __( 'Add Consumer' ) );
+				submit_button( __( 'Add Consumer', 'rest_oauth1' ) );
 			}
 			else {
 				echo '<input type="hidden" name="id" value="' . esc_attr( $consumer->ID ) . '" />';
 				wp_nonce_field( 'rest-oauth1-edit-' . $consumer->ID );
-				submit_button( __( 'Save Consumer' ) );
+				submit_button( __( 'Save Consumer', 'rest_oauth1' ) );
 			}
 
 			?>
@@ -354,7 +354,7 @@ class WP_REST_OAuth1_Admin {
 				<table class="form-table">
 					<tr>
 						<th scope="row">
-							<?php echo esc_html__( 'Client Key', 'rest_oauth1' ) ?>
+							<?php esc_html_e( 'Client Key', 'rest_oauth1' ) ?>
 						</th>
 						<td>
 							<code><?php echo esc_html( $consumer->key ) ?></code>
@@ -362,7 +362,7 @@ class WP_REST_OAuth1_Admin {
 					</tr>
 					<tr>
 						<th scope="row">
-							<?php echo esc_html__( 'Client Secret', 'rest_oauth1' ) ?>
+							<?php esc_html_e( 'Client Secret', 'rest_oauth1' ) ?>
 						</th>
 						<td>
 							<code><?php echo esc_html( $consumer->secret ) ?></code>
@@ -391,8 +391,8 @@ class WP_REST_OAuth1_Admin {
 
 		if ( ! current_user_can( 'delete_post', $id ) ) {
 			wp_die(
-				'<h1>' . __( 'Cheatin&#8217; uh?' ) . '</h1>' .
-				'<p>' . __( 'You are not allowed to delete this application.' ) . '</p>',
+				'<h1>' . __( 'Cheatin&#8217; uh?', 'rest_oauth1' ) . '</h1>' .
+				'<p>' . __( 'You are not allowed to delete this application.', 'rest_oauth1' ) . '</p>',
 				403
 			);
 		}
@@ -423,8 +423,8 @@ class WP_REST_OAuth1_Admin {
 
 		if ( ! current_user_can( 'edit_post', $id ) ) {
 			wp_die(
-				'<h1>' . __( 'Cheatin&#8217; uh?' ) . '</h1>' .
-				'<p>' . __( 'You are not allowed to edit this application.' ) . '</p>',
+				'<h1>' . __( 'Cheatin&#8217; uh?', 'rest_oauth1' ) . '</h1>' .
+				'<p>' . __( 'You are not allowed to edit this application.', 'rest_oauth1' ) . '</p>',
 				403
 			);
 		}

@@ -52,8 +52,8 @@ function rest_oauth1_register_rewrites() {
 function rest_oauth1_setup_authentication() {
 	register_post_type( 'json_consumer', array(
 		'labels' => array(
-			'name' => __( 'Consumer' ),
-			'singular_name' => __( 'Consumers' ),
+			'name' => __( 'Consumer', 'rest_oauth1' ),
+			'singular_name' => __( 'Consumers', 'rest_oauth1' ),
 		),
 		'public' => false,
 		'hierarchical' => false,
