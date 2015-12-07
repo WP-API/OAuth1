@@ -1,4 +1,4 @@
-# WP REST API - OAuth 1.0a Server
+# [WP REST API - OAuth 1.0a Server](http://oauth1.wp-api.org/)
 
 Connect applications to your WordPress site without ever giving away your password.
 
