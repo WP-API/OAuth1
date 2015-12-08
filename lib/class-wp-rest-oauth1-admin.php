@@ -409,7 +409,7 @@ class WP_REST_OAuth1_Admin {
 			return;
 		}
 
-		wp_redirect( self::get_url( 'deleted=1' ) );
+		wp_safe_redirect( self::get_url( 'deleted=1' ) );
 		exit;
 	}
 
@@ -432,7 +432,7 @@ class WP_REST_OAuth1_Admin {
 		$client = WP_REST_OAuth1_Client::get( $id );
 		$client->regenerate_secret();
 
-		wp_redirect( self::get_url( array( 'action' => 'edit', 'id' => $id, 'did_action' => 'regenerate' ) ) );
+		wp_safe_redirect( self::get_url( array( 'action' => 'edit', 'id' => $id, 'did_action' => 'regenerate' ) ) );
 		exit;
 	}
 }
