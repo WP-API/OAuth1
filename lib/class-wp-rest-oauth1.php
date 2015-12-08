@@ -140,8 +140,8 @@ class WP_REST_OAuth1 {
 		if ( ! empty( $errors ) ) {
 			$message = sprintf(
 				_n(
-					'Missing OAuth parameter %s',
-					'Missing OAuth parameters %s',
+					__( 'Missing OAuth parameter %s', 'rest_oauth1' ),
+					__( 'Missing OAuth parameters %s', 'rest_oauth1' ),
 					count( $errors )
 				),
 				implode(', ', $errors )
@@ -252,7 +252,7 @@ class WP_REST_OAuth1 {
 					return $params;
 				}
 				if ( empty( $params ) ) {
-					return new WP_Error( 'json_oauth1_missing_parameter', __( 'No OAuth parameters supplied' ), array( 'status' => 400 ) );
+					return new WP_Error( 'json_oauth1_missing_parameter', __( 'No OAuth parameters supplied', 'rest_oauth1' ), array( 'status' => 400 ) );
 				}
 
 				return $this->generate_request_token( $params );
@@ -264,7 +264,7 @@ class WP_REST_OAuth1 {
 					return $params;
 				}
 				if ( empty( $params ) ) {
-					return new WP_Error( 'json_oauth1_missing_parameter', __( 'No OAuth parameters supplied' ), array( 'status' => 400 ) );
+					return new WP_Error( 'json_oauth1_missing_parameter', __( 'No OAuth parameters supplied', 'rest_oauth1' ), array( 'status' => 400 ) );
 				}
 
 				return $this->generate_access_token(
@@ -274,7 +274,7 @@ class WP_REST_OAuth1 {
 				);
 
 			default:
-				return new WP_Error( 'json_oauth1_invalid_route', __( 'Route is invalid' ), array( 'status' => 404 ) );
+				return new WP_Error( 'json_oauth1_invalid_route', __( 'Route is invalid', 'rest_oauth1' ), array( 'status' => 404 ) );
 		}
 	}
 
@@ -295,7 +295,7 @@ class WP_REST_OAuth1 {
 		}
 
 		if ( ! hash_equals( (string) $token['consumer'], (string) $consumer->ID ) ) {
-			return new WP_Error( 'json_oauth1_consumer_mismatch', __( 'Token is not registered for the given consumer' ), array( 'status' => 401 ) );
+			return new WP_Error( 'json_oauth1_consumer_mismatch', __( 'Token is not registered for the given consumer', 'rest_oauth1' ), array( 'status' => 401 ) );
 		}
 
 		return array( $consumer, new WP_User( $token['user'] ) );
@@ -311,13 +311,13 @@ class WP_REST_OAuth1 {
 		$data = get_option( 'oauth1_request_' . $key, null );
 
 		if ( empty( $data ) ) {
-			return new WP_Error( 'json_oauth1_invalid_token', __( 'Invalid token' ), array( 'status' => 400 ) );
+			return new WP_Error( 'json_oauth1_invalid_token', __( 'Invalid token', 'rest_oauth1' ), array( 'status' => 400 ) );
 		}
 
 		// Check expiration
 		if ( $data['expiration'] < time() ) {
 			$this->remove_request_token( $key );
-			return new WP_Error( 'json_oauth1_expired_token', __( 'OAuth request token has expired' ), array( 'status' => 401 ) );
+			return new WP_Error( 'json_oauth1_expired_token', __( 'OAuth request token has expired', 'rest_oauth1' ), array( 'status' => 401 ) );
 		}
 
 		return $data;
@@ -378,7 +378,7 @@ class WP_REST_OAuth1 {
 
 		$consumer = $token['consumer'];
 		if ( ! $this->check_callback( $callback, $consumer ) ) {
-			return new WP_Error( 'json_oauth1_invalid_callback', __( 'Callback URL is invalid' ) );
+			return new WP_Error( 'json_oauth1_invalid_callback', __( 'Callback URL is invalid', 'rest_oauth1' ) );
 		}
 
 		$token['callback'] = $callback;
@@ -504,7 +504,7 @@ class WP_REST_OAuth1 {
 		}
 
 		if ( empty( $user ) ) {
-			return new WP_Error( 'json_oauth1_invalid_user', __( 'Invalid user specified for access token' ) );
+			return new WP_Error( 'json_oauth1_invalid_user', __( 'Invalid user specified for access token', 'rest_oauth1' ) );
 		}
 
 		$token['authorized'] = true;
@@ -554,11 +554,11 @@ class WP_REST_OAuth1 {
 
 		// Check verification
 		if ( $token['authorized'] !== true ) {
-			return new WP_Error( 'json_oauth1_unauthorized_token', __( 'OAuth token has not been authorized' ), array( 'status' => 401 ) );
+			return new WP_Error( 'json_oauth1_unauthorized_token', __( 'OAuth token has not been authorized', 'rest_oauth1' ), array( 'status' => 401 ) );
 		}
 
 		if ( $oauth_verifier !== $token['verifier'] ) {
-			return new WP_Error( 'json_oauth1_invalid_verifier', __( 'OAuth verifier does not match' ), array( 'status' => 400 ) );
+			return new WP_Error( 'json_oauth1_invalid_verifier', __( 'OAuth verifier does not match', 'rest_oauth1' ), array( 'status' => 400 ) );
 		}
 
 		$this->should_attempt = false;
@@ -600,7 +600,7 @@ class WP_REST_OAuth1 {
 	public function revoke_access_token( $key ) {
 		$data = $this->get_access_token( $key );
 		if ( empty( $data ) ) {
-			return new WP_Error( 'json_oauth1_invalid_token', __( 'Access token does not exist' ), array( 'status' => 401 ) );
+			return new WP_Error( 'json_oauth1_invalid_token', __( 'Access token does not exist', 'rest_oauth1' ), array( 'status' => 401 ) );
 		}
 
 		delete_option( 'oauth1_access_' . $key );
@@ -652,7 +652,7 @@ class WP_REST_OAuth1 {
 
 		// sort parameters
 		if ( ! uksort( $params, 'strcmp' ) )
-			return new WP_Error( 'json_oauth1_failed_parameter_sort', __( 'Invalid Signature - failed to sort parameters' ), array( 'status' => 401 ) );
+			return new WP_Error( 'json_oauth1_failed_parameter_sort', __( 'Invalid Signature - failed to sort parameters', 'rest_oauth1' ), array( 'status' => 401 ) );
 
 		$query_string = $this->create_signature_string( $params );
 
@@ -674,13 +674,13 @@ class WP_REST_OAuth1 {
 				break;
 
 			default:
-				return new WP_Error( 'json_oauth1_invalid_signature_method', __( 'Signature method is invalid' ), array( 'status' => 401 ) );
+				return new WP_Error( 'json_oauth1_invalid_signature_method', __( 'Signature method is invalid', 'rest_oauth1' ), array( 'status' => 401 ) );
 		}
 
 		$signature = base64_encode( hash_hmac( $hash_algorithm, $string_to_sign, $key, true ) );
 
 		if ( ! hash_equals( $signature, $consumer_signature ) ) {
-			return new WP_Error( 'json_oauth1_signature_mismatch', __( 'OAuth signature does not match' ), array( 'status' => 401 ) );
+			return new WP_Error( 'json_oauth1_signature_mismatch', __( 'OAuth signature does not match', 'rest_oauth1' ), array( 'status' => 401 ) );
 		}
 
 		return true;
@@ -751,7 +751,7 @@ class WP_REST_OAuth1 {
 		$valid_window = apply_filters( 'json_oauth1_timestamp_window', 15 * MINUTE_IN_SECONDS );
 
 		if ( ( $timestamp < time() - $valid_window ) ||  ( $timestamp > time() + $valid_window ) )
-			return new WP_Error( 'json_oauth1_invalid_timestamp', __( 'Invalid timestamp' ), array( 'status' => 401 ) );
+			return new WP_Error( 'json_oauth1_invalid_timestamp', __( 'Invalid timestamp', 'rest_oauth1' ), array( 'status' => 401 ) );
 
 		$used_nonces = $consumer->nonces;
 
@@ -759,7 +759,7 @@ class WP_REST_OAuth1 {
 			$used_nonces = array();
 
 		if ( in_array( $nonce, $used_nonces ) )
-			return new WP_Error( 'json_oauth1_nonce_already_used', __( 'Invalid nonce - nonce has already been used' ), array( 'status' => 401 ) );
+			return new WP_Error( 'json_oauth1_nonce_already_used', __( 'Invalid nonce - nonce has already been used', 'rest_oauth1' ), array( 'status' => 401 ) );
 
 		$used_nonces[ $timestamp ] = $nonce;
 
