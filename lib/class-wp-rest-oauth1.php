@@ -267,11 +267,7 @@ class WP_REST_OAuth1 {
 					return new WP_Error( 'json_oauth1_missing_parameter', __( 'No OAuth parameters supplied', 'rest_oauth1' ), array( 'status' => 400 ) );
 				}
 
-				return $this->generate_access_token(
-					$params['oauth_consumer_key'],
-					$params['oauth_token'],
-					$params['oauth_verifier']
-				);
+				return $this->generate_access_token( $params );
 
 			default:
 				return new WP_Error( 'json_oauth1_invalid_route', __( 'Route is invalid', 'rest_oauth1' ), array( 'status' => 404 ) );
@@ -339,6 +335,11 @@ class WP_REST_OAuth1 {
 		$result = $this->check_oauth_signature( $consumer, $params );
 		if ( is_wp_error( $result ) ) {
 			return $result;
+		}
+
+		$error = $this->check_oauth_timestamp_and_nonce( $consumer, $params['oauth_timestamp'], $params['oauth_nonce'] );
+		if ( is_wp_error( $error ) ) {
+			return $error;
 		}
 
 		// Generate token
@@ -546,10 +547,26 @@ class WP_REST_OAuth1 {
 	 * @param string $oauth_token Request token key
 	 * @return WP_Error|array OAuth token data on success, error otherwise
 	 */
-	public function generate_access_token( $oauth_consumer_key, $oauth_token, $oauth_verifier ) {
-		$token = $this->get_request_token( $oauth_token );
+	public function generate_access_token( $params ) {
+		$consumer = WP_REST_OAuth1_Client::get_by_key( $params['oauth_consumer_key'] );
+		if ( is_wp_error( $consumer ) ) {
+			return $consumer;
+		}
+
+		$token = $this->get_request_token( $params['oauth_token'] );
 		if ( is_wp_error( $token ) ) {
 			return $token;
+		}
+
+		// Check the OAuth request signature against the current request
+		$result = $this->check_oauth_signature( $consumer, $params, $token );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		$error = $this->check_oauth_timestamp_and_nonce( $consumer, $params['oauth_timestamp'], $params['oauth_nonce'] );
+		if ( is_wp_error( $error ) ) {
+			return $error;
 		}
 
 		// Check verification
@@ -557,12 +574,12 @@ class WP_REST_OAuth1 {
 			return new WP_Error( 'json_oauth1_unauthorized_token', __( 'OAuth token has not been authorized', 'rest_oauth1' ), array( 'status' => 401 ) );
 		}
 
-		if ( $oauth_verifier !== $token['verifier'] ) {
+		if ( ! hash_equals( (string) $params['oauth_verifier'], (string) $token['verifier'] ) ) {
 			return new WP_Error( 'json_oauth1_invalid_verifier', __( 'OAuth verifier does not match', 'rest_oauth1' ), array( 'status' => 400 ) );
 		}
 
 		$this->should_attempt = false;
-		$consumer = WP_REST_OAuth1_Client::get_by_key( $oauth_consumer_key );
+		$consumer = WP_REST_OAuth1_Client::get_by_key( $params['oauth_consumer_key'] );
 		$this->should_attempt = true;
 
 		if ( is_wp_error( $consumer ) ) {
@@ -581,7 +598,7 @@ class WP_REST_OAuth1 {
 		add_option( 'oauth1_access_' . $key, $data, null, 'no' );
 
 		// Delete the request token
-		$this->remove_request_token( $oauth_token );
+		$this->remove_request_token( $params['oauth_token'] );
 
 		// Return the new token's data
 		$data = array(
