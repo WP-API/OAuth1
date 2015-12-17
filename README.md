@@ -4,6 +4,8 @@ Connect applications to your WordPress site without ever giving away your passwo
 
 This plugin uses the OAuth 1.0a protocol to allow delegated authorization; that is, to allow applications to access a site using a set of secondary credentials. This allows server administrators to control which applications can access the site, as well as allowing users to control which applications have access to their data.
 
+This plugin only supports WordPress >= 4.4.
+
 ## New to OAuth
 
 We strongly recommend you use an existing OAuth library. You'll be best off if you understand the authorization process, but leave the actual implementation to well-tested libraries, as there are a lot of edge cases.
