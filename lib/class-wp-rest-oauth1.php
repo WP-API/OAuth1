@@ -649,6 +649,10 @@ class WP_REST_OAuth1 {
 			case 'PUT':
 				$params = wp_unslash( $_POST );
 				break;
+			default:
+				return new WP_Error( 'json_oauth1_unknown_http_method',
+					sprintf( __( 'Unknown http method: %s' ), $http_method ),
+					array( 'status' => 401 ) );
 		}
 
 		$params = array_merge( $params, $oauth_params );
