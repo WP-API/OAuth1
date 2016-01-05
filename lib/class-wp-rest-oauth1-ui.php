@@ -8,7 +8,7 @@
  * @subpackage JSON API
  */
 
-class WP_JSON_Authentication_OAuth1_Authorize {
+class WP_REST_OAuth1_UI {
 	/**
 	 * Request token for the current authorization request
 	 *
@@ -58,7 +58,7 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 	public function render_page() {
 		// Check required fields
 		if ( empty( $_REQUEST['oauth_token'] ) ) {
-			return new WP_Error( 'json_oauth1_missing_param', sprintf( __( 'Missing parameter %s' ), 'oauth_token' ), array( 'status' => 400 ) );
+			return new WP_Error( 'json_oauth1_missing_param', sprintf( __( 'Missing parameter %s', 'rest_oauth1' ), 'oauth_token' ), array( 'status' => 400 ) );
 		}
 
 		// Set up fields
@@ -68,7 +68,7 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 			$scope = wp_unslash( $_REQUEST['wp_scope'] );
 		}
 
-		$authenticator = new WP_JSON_Authentication_OAuth1();
+		$authenticator = new WP_REST_OAuth1();
 		$errors = array();
 		$this->token = $authenticator->get_request_token( $token_key );
 		if ( is_wp_error( $this->token ) ) {
@@ -105,7 +105,7 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 					exit;
 
 				default:
-					return new WP_Error( 'json_oauth1_invalid_action', __( 'Invalid authorization action' ), array( 'status' => 400 ) );
+					return new WP_Error( 'json_oauth1_invalid_action', __( 'Invalid authorization action', 'rest_oauth1' ), array( 'status' => 400 ) );
 			}
 		}
 
@@ -142,8 +142,8 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 
 		if ( empty( $this->token['callback'] ) ) {
 			// No callback registered, display verification code to the user
-			login_header( __( 'Access Token' ) );
-			echo '<p>' . sprintf( __( 'Your verification token is <code>%s</code>' ), $verifier ) . '</p>';
+			login_header( __( 'Access Token', 'rest_oauth1' ) );
+			echo '<p>' . sprintf( __( 'Your verification token is <code>%s</code>', 'rest_oauth1' ), $verifier ) . '</p>';
 			login_footer();
 
 			return null;
@@ -152,9 +152,9 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 		$callback = $this->token['callback'];
 
 		// Ensure the URL is safe to access
-		$callback = wp_http_validate_url( $callback );
-		if ( empty( $callback ) ) {
-			return new WP_Error( 'json_oauth1_invalid_callback', __( 'The callback URL is invalid' ), array( 'status' => 400 ) );
+		$authenticator = new WP_REST_OAuth1();
+		if ( ! $authenticator->check_callback( $callback, $this->token['consumer'] ) ) {
+			return new WP_Error( 'json_oauth1_invalid_callback', __( 'The callback URL is invalid', 'rest_oauth1' ), array( 'status' => 400 ) );
 		}
 
 		$args = array(
@@ -166,6 +166,7 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 		$args = urlencode_deep( $args );
 		$callback = add_query_arg( $args, $callback );
 
+		// Offsite, so skip safety check
 		wp_redirect( $callback );
 
 		return null;
@@ -177,7 +178,7 @@ class WP_JSON_Authentication_OAuth1_Authorize {
 	 * @param WP_Error $error Error object
 	 */
 	public function display_error( WP_Error $error ) {
-		login_header( __( 'Error' ), '', $error );
+		login_header( __( 'Error', 'rest_oauth1' ), '', $error );
 		login_footer();
 	}
 }

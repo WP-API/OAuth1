@@ -1,41 +1,59 @@
 <?php
 /**
- * Plugin Name: OAuth Server
- * Version 0.1
+ * Plugin Name: WP REST API - OAuth 1.0a Server
+ * Description: Authenticate with your site via OAuth 1.0a
+ * Version: 0.2.1
+ * Author: WP REST API Team
+ * Author URI: http://wp-api.org/
+ *
+ * Hello adventurer, and welcome to the OAuth Server codebase!
+ *
+ * The codebase has three main parts:
+ *   - OAuth token handling (lib/class-wp-rest-oauth1.php)
+ *   - Frontend UI (lib/class-wp-rest-oauth1-ui.php and theme/oauth1-authorize.php)
+ *   - Management and admin UI (everything else)
+ *
+ * Be very careful changing anything in the token handling; everything else is
+ * up for grabs!
+ *
+ * Thanks for being fantastic. <3
  */
 
-include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication.php' );
-include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication-oauth1.php' );
-include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication-oauth1-authorize.php' );
+include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1.php' );
+include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1-ui.php' );
+include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-client.php' );
+include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1-client.php' );
+
+include_once( dirname( __FILE__ ) . '/admin.php' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
-	include_once( dirname( __FILE__ ) . '/lib/class-wp-json-authentication-oauth1-cli.php' );
+	include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1-cli.php' );
 
-	WP_CLI::add_command( 'oauth1', 'WP_JSON_Authentication_OAuth1_CLI' );
+	WP_CLI::add_command( 'oauth1', 'WP_REST_OAuth1_CLI' );
 }
 
 /**
  * Register our rewrite rules for the API
  */
-function json_oauth_server_init() {
-	json_oauth_server_register_rewrites();
+function rest_oauth1_init() {
+	rest_oauth1_register_rewrites();
 
 	global $wp;
-	$wp->add_query_var('json_oauth_route');
+	$wp->add_query_var('rest_oauth1');
 }
-add_action( 'init', 'json_oauth_server_init' );
+add_action( 'init', 'rest_oauth1_init' );
 
-function json_oauth_server_register_rewrites() {
-	add_rewrite_rule( '^oauth1/authorize/?$','index.php?json_oauth_route=authorize','top' );
-	add_rewrite_rule( '^oauth1/request/?$','index.php?json_oauth_route=request','top' );
-	add_rewrite_rule( '^oauth1/access/?$','index.php?json_oauth_route=access','top' );
+function rest_oauth1_register_rewrites() {
+	add_rewrite_rule( '^oauth1/authorize/?$','index.php?rest_oauth1=authorize','top' );
+	add_rewrite_rule( '^oauth1/request/?$','index.php?rest_oauth1=request','top' );
+	add_rewrite_rule( '^oauth1/access/?$','index.php?rest_oauth1=access','top' );
 }
 
-function json_oauth_server_setup_authentication() {
+function rest_oauth1_setup_authentication() {
 	register_post_type( 'json_consumer', array(
 		'labels' => array(
-			'name' => __( 'Consumer' ),
-			'singular_name' => __( 'Consumers' ),
+			'name' => __( 'Consumer', 'rest_oauth1' ),
+			'singular_name' => __( 'Consumers', 'rest_oauth1' ),
 		),
 		'public' => false,
 		'hierarchical' => false,
@@ -44,7 +62,7 @@ function json_oauth_server_setup_authentication() {
 		'query_var' => false,
 	) );
 }
-add_action( 'init', 'json_oauth_server_setup_authentication' );
+add_action( 'init', 'rest_oauth1_setup_authentication' );
 
 /**
  * Register the authorization page
@@ -52,14 +70,14 @@ add_action( 'init', 'json_oauth_server_setup_authentication' );
  * Alas, login_init is too late to register pages, as the action is already
  * sanitized before this.
  */
-function json_oauth_load() {
+function rest_oauth1_load() {
 	global $wp_json_authentication_oauth1;
 
-	$wp_json_authentication_oauth1 = new WP_JSON_Authentication_OAuth1();
+	$wp_json_authentication_oauth1 = new WP_REST_OAuth1();
 	add_filter( 'determine_current_user', array( $wp_json_authentication_oauth1, 'authenticate' ) );
-	add_filter( 'json_authentication_errors', array( $wp_json_authentication_oauth1, 'get_authentication_errors' ) );
+	add_filter( 'rest_authentication_errors', array( $wp_json_authentication_oauth1, 'get_authentication_errors' ) );
 }
-add_action( 'init', 'json_oauth_load' );
+add_action( 'init', 'rest_oauth1_load' );
 
 /**
  * Force reauthentication after we've registered our handler
@@ -67,7 +85,7 @@ add_action( 'init', 'json_oauth_load' );
  * We could have checked authentication before OAuth was loaded. If so, let's
  * try and reauthenticate now that OAuth is loaded.
  */
-function json_oauth_force_reauthentication() {
+function rest_oauth1_force_reauthentication() {
 	if ( is_user_logged_in() ) {
 		// Another handler has already worked successfully, no need to
 		// reauthenticate.
@@ -80,17 +98,17 @@ function json_oauth_force_reauthentication() {
 	$current_user = null;
 	get_currentuserinfo();
 }
-add_action( 'init', 'json_oauth_force_reauthentication', 100 );
+add_action( 'init', 'rest_oauth1_force_reauthentication', 100 );
 
 /**
  * Load the JSON API
  */
-function json_oauth_server_loaded() {
-	if ( empty( $GLOBALS['wp']->query_vars['json_oauth_route'] ) )
+function rest_oauth1_loaded() {
+	if ( empty( $GLOBALS['wp']->query_vars['rest_oauth1'] ) )
 		return;
 
-	$authenticator = new WP_JSON_Authentication_OAuth1();
-	$response = $authenticator->dispatch( $GLOBALS['wp']->query_vars['json_oauth_route'] );
+	$authenticator = new WP_REST_OAuth1();
+	$response = $authenticator->dispatch( $GLOBALS['wp']->query_vars['rest_oauth1'] );
 
 	if ( is_wp_error( $response ) ) {
 		$error_data = $response->get_error_data();
@@ -114,36 +132,15 @@ function json_oauth_server_loaded() {
 	// Finish off our request
 	die();
 }
-add_action( 'template_redirect', 'json_oauth_server_loaded', -100 );
-
-/**
- * Register v1 API routes
- *
- * @param array $data Index data
- * @return array Filtered data
- */
-function json_oauth_api_routes( $data ) {
-	if (empty($data['authentication'])) {
-		$data['authentication'] = array();
-	}
-
-	$data['authentication']['oauth1'] = array(
-		'request' => home_url( 'oauth1/request' ),
-		'authorize' => home_url( 'oauth1/authorize' ),
-		'access' => home_url( 'oauth1/access' ),
-		'version' => '0.1',
-	);
-	return $data;
-}
-add_filter( 'json_index', 'json_oauth_api_routes' );
+add_action( 'template_redirect', 'rest_oauth1_loaded', -100 );
 
 /**
  * Register v2 API routes
  *
- * @param object $response_object WP_REST_Response Object 
+ * @param object $response_object WP_REST_Response Object
  * @return object Filtered WP_REST_Response object
  */
-function json_oauth_api_routes_v2( $response_object ) {
+function rest_oauth1_register_routes( $response_object ) {
 	if ( empty( $response_object->data['authentication'] ) ) {
 		$response_object->data['authentication'] = array();
 	}
@@ -156,7 +153,7 @@ function json_oauth_api_routes_v2( $response_object ) {
 	);
 	return $response_object;
 }
-add_filter( 'rest_index', 'json_oauth_api_routes_v2' );
+add_filter( 'rest_index', 'rest_oauth1_register_routes' );
 
 /**
  * Register the authorization page
@@ -164,16 +161,16 @@ add_filter( 'rest_index', 'json_oauth_api_routes_v2' );
  * Alas, login_init is too late to register pages, as the action is already
  * sanitized before this.
  */
-function json_oauth_load_authorize_page() {
-	$authorizer = new WP_JSON_Authentication_OAuth1_Authorize();
+function rest_oauth1_load_authorize_page() {
+	$authorizer = new WP_REST_OAuth1_UI();
 	$authorizer->register_hooks();
 }
-add_action( 'init', 'json_oauth_load_authorize_page' );
+add_action( 'init', 'rest_oauth1_load_authorize_page' );
 
 /**
  * Register routes and flush the rewrite rules on activation.
  */
-function json_oauth_server_activation( $network_wide ) {
+function rest_oauth1_activation( $network_wide ) {
 	if ( function_exists( 'is_multisite' ) && is_multisite() && $network_wide ) {
 
 		$mu_blogs = wp_get_sites();
@@ -181,7 +178,7 @@ function json_oauth_server_activation( $network_wide ) {
 		foreach ( $mu_blogs as $mu_blog ) {
 
 			switch_to_blog( $mu_blog['blog_id'] );
-			json_oauth_server_register_rewrites();
+			rest_oauth1_register_rewrites();
 			flush_rewrite_rules();
 		}
 
@@ -189,16 +186,16 @@ function json_oauth_server_activation( $network_wide ) {
 
 	} else {
 
-		json_oauth_server_register_rewrites();
+		rest_oauth1_register_rewrites();
 		flush_rewrite_rules();
 	}
 }
-register_activation_hook( __FILE__, 'json_oauth_server_activation' );
+register_activation_hook( __FILE__, 'rest_oauth1_activation' );
 
 /**
  * Flush the rewrite rules on deactivation
  */
-function json_oauth_server_deactivation( $network_wide ) {
+function rest_oauth1_deactivation( $network_wide ) {
 	if ( function_exists( 'is_multisite' ) && is_multisite() && $network_wide ) {
 
 		$mu_blogs = wp_get_sites();
@@ -216,4 +213,4 @@ function json_oauth_server_deactivation( $network_wide ) {
 		flush_rewrite_rules();
 	}
 }
-register_deactivation_hook( __FILE__, 'json_oauth_server_deactivation' );
+register_deactivation_hook( __FILE__, 'rest_oauth1_deactivation' );
