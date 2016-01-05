@@ -1,51 +1,26 @@
-# OAuth 1.0a Server for WordPress
-This project is an OAuth 1.0a-compatible authentication method for WordPress.
-This is a separate-but-related project to [WP API][], designed to provide
-authentication suitable for the API.
+# [WP REST API - OAuth 1.0a Server](http://oauth1.wp-api.org/)
 
-## Documentation
+Connect applications to your WordPress site without ever giving away your password.
 
-Read the [plugin's documentation][docs].
+This plugin uses the OAuth 1.0a protocol to allow delegated authorization; that is, to allow applications to access a site using a set of secondary credentials. This allows server administrators to control which applications can access the site, as well as allowing users to control which applications have access to their data.
 
-[docs]: https://github.com/WP-API/OAuth1/tree/master/docs
+## New to OAuth
 
+We strongly recommend you use an existing OAuth library. You'll be best off if you understand the authorization process, but leave the actual implementation to well-tested libraries, as there are a lot of edge cases.
 
-## Quick Setup
+Start reading from [the Introduction](docs/introduction/README.md) to get started!
 
-Want to test out the OAuth API and work on it? Here's how you can set up your own
-testing environment in a few easy steps:
+## For OAuth Veterans
 
-1. Install [Vagrant](http://vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/).
-2. Clone [Chassis](https://github.com/Chassis/Chassis):
+If you already know how to use OAuth, here's the lowdown:
 
-   ```bash
-   git clone --recursive git@github.com:Chassis/Chassis.git api-tester
-   ```
-
-3. Grab a copy of WP API and OAuth API:
-
-   ```bash
-   cd api-tester
-   mkdir -p content/plugins content/themes
-   cp -r wp/wp-content/themes/* content/themes
-   git clone git@github.com:WP-API/WP-API.git content/plugins/json-rest-api
-   git clone git@github.com:WP-API/OAuth1.git content/plugins/oauth-server
-   ```
-
-4. Start the virtual machine:
-
-   ```bash
-   vagrant up
-   ```
-
-5. Browse to http://vagrant.local/wp/wp-admin/ and activate the WP API and OAuth
-   API plugins
-
-   ```
-   Username: admin
-   Password: password
-   ```
-
-6. Refer to the [documentation][docs] on how to connect an OAuth client.
-
-[WP API]: https://github.com/WP-API/WP-API
+* The plugin uses **OAuth 1.0a** in
+* We use the **three-legged flow**
+* To find the REST API index, apply the [API autodiscovery process](http://v2.wp-api.org/guide/discovery/)
+* The endpoints for the OAuth process are available in the REST API index: check for `$.authentication.oauth1` in the index data.
+    * The **temporary credentials** (request token) endpoint is `$.authentication.oauth1.request` (typically `/oauth1/request`)
+    * The **authorization** endpoint is `$.authentication.oauth1.authorize` (typically `/oauth1/authorize`)
+    * The **token exchange** (access token) endpoint is `$.authentication.oauth1.access` (typically `/oauth1/access`)
+* Your callback URL must match the registered callback URL for the application in the scheme, authority (user/password) host, port, and path sections. (**Subpaths are not allowed.**)
+* The only signature method supported is **HMAC-SHA1**.
+* OAuth parameters are supported in the Authorization header, query (GET) parameters, or request body (POST) parameters (if encoded as `application/x-www-form-urlencoded`). **OAuth parameters are not supported in JSON data.**
