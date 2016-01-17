@@ -96,7 +96,8 @@ function rest_oauth1_force_reauthentication() {
 	// Force reauthentication
 	global $current_user;
 	$current_user = null;
-	get_currentuserinfo();
+
+	wp_get_current_user();
 }
 add_action( 'init', 'rest_oauth1_force_reauthentication', 100 );
 
