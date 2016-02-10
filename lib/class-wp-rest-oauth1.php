@@ -732,7 +732,7 @@ class WP_REST_OAuth1 {
 				$query_params = $this->join_with_equals_sign( $param_value, $query_params, $param_key );
 			} else {
 				$string = $param_key . '=' . $param_value; // join with equals sign
-				$query_params[] = urlencode( $string );
+				$query_params[] = self::urlencode_rfc3986( $string );
 			}
 		}
 		return $query_params;
