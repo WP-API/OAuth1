@@ -731,7 +731,7 @@ class WP_REST_OAuth1 {
 				if ( $key ) {
 					$param_key = $key . '[' . $param_key . ']'; // Handle multi-dimensional array
 				}
-				$string = $param_key . '=' . $param_value; // join with equals sign
+				$string = urlencode( $param_key ) . '=' . urlencode( $param_value ); // join with equals sign
 				$query_params[] = urlencode( $string );
 			}
 		}
