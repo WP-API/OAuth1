@@ -46,7 +46,7 @@ function rest_oauth1_profile_section( $user ) {
 								?>
 								<tr>
 									<td><?php echo esc_html( $application->post_title ) ?></td>
-									<td><button class="button" name="oauth_revoke" value="<?php echo esc_attr( $row['key'] ) ?>"><?php esc_html_e( 'Revoke', 'rest_oauth1' ) ?></button>
+									<td><button class="button" name="rest_oauth1_revoke" value="<?php echo esc_attr( $row['key'] ) ?>"><?php esc_html_e( 'Revoke', 'rest_oauth1' ) ?></button>
 								</tr>
 
 							<?php endforeach ?>
