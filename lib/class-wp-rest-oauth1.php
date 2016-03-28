@@ -729,12 +729,12 @@ class WP_REST_OAuth1 {
 	 */
 	public function join_with_equals_sign( $params, $query_params = array(), $key = '' ) {
 		foreach ( $params as $param_key => $param_value ) {
+			if ( $key ) {
+				$param_key = $key . '[' . $param_key . ']'; // Handle multi-dimensional array
+			}
 			if ( is_array( $param_value ) ) {
 				$query_params = $this->join_with_equals_sign( $param_value, $query_params, $param_key );
 			} else {
-				if ( $key ) {
-					$param_key = $key . '[' . $param_key . ']'; // Handle multi-dimensional array
-				}
 				$string = $param_key . '=' . $param_value; // join with equals sign
 				$query_params[] = urlencode( $string );
 			}
