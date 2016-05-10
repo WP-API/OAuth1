@@ -397,7 +397,7 @@ class WP_REST_OAuth1 {
 	 * @param string $url URL for the callback.
 	 * @return bool True for a valid callback URL, false otherwise.
 	 */
-	protected function validate_callback( $url ) {
+	public static function validate_callback( $url ) {
 		if ( strpos( $url, ':' ) === false ) {
 			return false;
 		}
