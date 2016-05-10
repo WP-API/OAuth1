@@ -786,7 +786,7 @@ class WP_REST_OAuth1 {
 
 		// Remove expired nonces
 		foreach ( $used_nonces as $nonce_timestamp => $nonce ) {
-			if ( $nonce_timestamp < $valid_window )
+			if ( $nonce_timestamp < time() - $valid_window )
 				unset( $used_nonces[ $nonce_timestamp ] );
 		}
 
