@@ -397,7 +397,7 @@ class WP_REST_OAuth1 {
 	 * @param string $url URL for the callback.
 	 * @return bool True for a valid callback URL, false otherwise.
 	 */
-	protected function validate_callback( $url ) {
+	public static function validate_callback( $url ) {
 		if ( strpos( $url, ':' ) === false ) {
 			return false;
 		}
@@ -634,7 +634,7 @@ class WP_REST_OAuth1 {
 	 * @param array $params the request parameters
 	 * @return boolean|WP_Error True on success, error otherwise
 	 */
-	protected function check_oauth_signature( $consumer, $oauth_params, $token = null ) {
+	public function check_oauth_signature( $consumer, $oauth_params, $token = null ) {
 
 		$http_method = strtoupper( $_SERVER['REQUEST_METHOD'] );
 
@@ -768,7 +768,7 @@ class WP_REST_OAuth1 {
 	 * @param string $nonce a unique (for the given user) 32 alphanumeric string, consumer-generated
 	 * @return boolean|WP_Error True on success, error otherwise
 	 */
-	protected function check_oauth_timestamp_and_nonce( $consumer, $timestamp, $nonce ) {
+	public function check_oauth_timestamp_and_nonce( $consumer, $timestamp, $nonce ) {
 		$valid_window = apply_filters( 'json_oauth1_timestamp_window', 15 * MINUTE_IN_SECONDS );
 
 		if ( ( $timestamp < time() - $valid_window ) ||  ( $timestamp > time() + $valid_window ) )
