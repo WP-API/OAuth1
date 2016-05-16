@@ -715,31 +715,21 @@ class WP_REST_OAuth1 {
 	 * @return string         Signature string
 	 */
 	public function create_signature_string( $params ) {
-		return implode( '%26', $this->join_with_equals_sign( $params ) ); // join with ampersand
-	}
+		$query = http_build_query( $params );
+		// http_build_query will attach numeric indices for array values, eg
+		// filter[post__not_in][0]=1 instead of filter[post__not_in][]=1.
+		//
+		// Clients issue requests in the form filter[post__not_in][]=1 so
+		// we should compare against that. This regex will strip out
+		// the numeric indices.
+		//
+		// cf. http://php.net/manual/en/function.http-build-query.php
+		// cf. http://stackoverflow.com/a/11996686/751089
+		$replaced = preg_replace( '/%5B[0-9]+%5D/simU', '%5B%5D', $query );
 
-	/**
-	 * Creates an array of urlencoded strings out of each array key/value pairs
-	 *
-	 * @since  0.1.0
-	 * @param  array  $params       Array of parameters to convert.
-	 * @param  array  $query_params Array to extend.
-	 * @param  string $key          Optional Array key to append
-	 * @return string               Array of urlencoded strings
-	 */
-	public function join_with_equals_sign( $params, $query_params = array(), $key = '' ) {
-		foreach ( $params as $param_key => $param_value ) {
-			if ( is_array( $param_value ) ) {
-				$query_params = $this->join_with_equals_sign( $param_value, $query_params, $param_key );
-			} else {
-				if ( $key ) {
-					$param_key = $key . '[' . $param_key . ']'; // Handle multi-dimensional array
-				}
-				$string = $param_key . '=' . $param_value; // join with equals sign
-				$query_params[] = urlencode( $string );
-			}
-		}
-		return $query_params;
+		// http_build_query has urlencoded the parameters, but our calling function
+		// expects a double-encoded return value
+		return urlencode( $replaced );
 	}
 
 	/**
