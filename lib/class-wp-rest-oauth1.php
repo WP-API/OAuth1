@@ -783,10 +783,15 @@ class WP_REST_OAuth1 {
 			return new WP_Error( 'json_oauth1_nonce_already_used', __( 'Invalid nonce - nonce has already been used', 'rest_oauth1' ), array( 'status' => 401 ) );
 
 		$used_nonces[ $timestamp ] = $nonce;
-
+		
+		// Get the current time
+		$current_time = time();
+		
 		// Remove expired nonces
 		foreach ( $used_nonces as $nonce_timestamp => $nonce ) {
-			if ( $nonce_timestamp < $valid_window )
+			
+			// If the nonce timestamp is expired
+			if ( $nonce_timestamp < $current_time - $valid_window )
 				unset( $used_nonces[ $nonce_timestamp ] );
 		}
 
