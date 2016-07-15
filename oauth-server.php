@@ -108,6 +108,13 @@ function rest_oauth1_loaded() {
 	if ( empty( $GLOBALS['wp']->query_vars['rest_oauth1'] ) )
 		return;
 
+	rest_send_cors_headers( null );
+	header( 'Access-Control-Allow-Headers: Authorization' );
+
+	if ( $_SERVER['REQUEST_METHOD'] === 'OPTIONS' ) {
+		die();
+	}
+
 	$authenticator = new WP_REST_OAuth1();
 	$response = $authenticator->dispatch( $GLOBALS['wp']->query_vars['rest_oauth1'] );
 
