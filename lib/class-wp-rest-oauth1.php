@@ -662,7 +662,7 @@ class WP_REST_OAuth1 {
 		if ( substr( $request_path, 0, strlen( $wp_base ) ) === $wp_base ) {
 			$request_path = substr( $request_path, strlen( $wp_base ) );
 		}
-		$base_request_uri = rawurlencode( get_home_url( null, $request_path ) );
+		$base_request_uri = self::urlencode_rfc3986( get_home_url( null, $request_path ) );
 
 		// get the signature provided by the consumer and remove it from the parameters prior to checking the signature
 		$consumer_signature = rawurldecode( $params['oauth_signature'] );
@@ -736,7 +736,7 @@ class WP_REST_OAuth1 {
 					$param_key = $key . self::urlencode_rfc3986( '[' ) . $param_key . self::urlencode_rfc3986( ']' ); // Handle multi-dimensional array
 				}
 				$string = $param_key . '=' . $param_value; // join with equals sign
-				$query_params[] = urlencode( $string );
+				$query_params[] = self::urlencode_rfc3986($string );
 			}
 		}
 		return $query_params;
@@ -752,8 +752,8 @@ class WP_REST_OAuth1 {
 	 * @param string $value
 	 */
 	protected function normalize_parameters( &$key, &$value ) {
-		$key = rawurlencode( rawurldecode( $key ) );
-		$value = rawurlencode( rawurldecode( $value ) );
+		$key = self::urlencode_rfc3986( rawurldecode( $key ) );
+		$value = self::urlencode_rfc3986( rawurldecode( $value ) );
 	}
 
 	/**
