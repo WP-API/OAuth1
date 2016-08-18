@@ -136,11 +136,7 @@ class WP_REST_OAuth1_UI {
 	 * @return null|WP_Error Null on success, error otherwise
 	 */
 	public function handle_callback_redirect( $verifier ) {
-		if ( ! empty( $this->token['callback'] ) && $this->token['callback'] === 'oob' ) {
-			return apply_filters( 'json_oauth1_handle_callback', null, $this->token );
-		}
-
-		if ( empty( $this->token['callback'] ) ) {
+		if ( empty( $this->token['callback'] ) || $this->token['callback'] === 'oob' ) {
 			// No callback registered, display verification code to the user
 			login_header( __( 'Access Token', 'rest_oauth1' ) );
 			echo '<p>' . sprintf( __( 'Your verification token is <code>%s</code>', 'rest_oauth1' ), $verifier ) . '</p>';
