@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP REST API - OAuth 1.0a Server
  * Description: Authenticate with your site via OAuth 1.0a
- * Version: 0.2.1
+ * Version: 0.3.0
  * Author: WP REST API Team
  * Author URI: http://wp-api.org/
  *
