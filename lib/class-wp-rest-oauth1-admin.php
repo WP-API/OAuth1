@@ -100,7 +100,7 @@ class WP_REST_OAuth1_Admin {
 
 		?>
 		<div class="wrap">
-			<h2>
+			<h1>
 				<?php
 				esc_html_e( 'Registered Applications', 'rest_oauth1' );
 
@@ -110,7 +110,7 @@ class WP_REST_OAuth1_Admin {
 				<?php
 				endif;
 				?>
-			</h2>
+			</h1>
 			<?php
 			if ( ! empty( $_GET['deleted'] ) ) {
 				echo '<div id="message" class="updated"><p>' . esc_html__( 'Deleted application.', 'rest_oauth1' ) . '</p></div>';
@@ -291,7 +291,7 @@ class WP_REST_OAuth1_Admin {
 	?>
 
 	<div class="wrap">
-		<h2 id="edit-site"><?php echo esc_html( $title ) ?></h2>
+		<h1 id="edit-site"><?php echo esc_html( $title ) ?></h1>
 
 		<?php
 		if ( ! empty( $messages ) ) {
