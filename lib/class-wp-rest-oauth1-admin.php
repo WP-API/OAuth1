@@ -135,22 +135,25 @@ class WP_REST_OAuth1_Admin {
 
 	protected static function validate_parameters( $params ) {
 		$valid = array();
+		$error = new WP_Error();
 
 		if ( empty( $params['name'] ) ) {
-			return new WP_Error( 'rest_oauth1_missing_name', __( 'Application name is required', 'rest_oauth1' ) );
+			$error->add( 'rest_oauth1_missing_name', __( 'Application name is required', 'rest_oauth1' ) );
 		}
 		$valid['name'] = wp_filter_post_kses( $params['name'] );
 
 		if ( empty( $params['description'] ) ) {
-			return new WP_Error( 'rest_oauth1_missing_description', __( 'Application description is required', 'rest_oauth1' ) );
+			$error->add( 'rest_oauth1_missing_description', __( 'Application description is required', 'rest_oauth1' ) );
 		}
 		$valid['description'] = wp_filter_post_kses( $params['description'] );
 
 		if ( empty( $params['callback'] ) ) {
-			return new WP_Error( 'rest_oauth1_missing_description', __( 'Application callback is required and must be a valid URL.', 'rest_oauth1' ) );
+			$error->add( 'rest_oauth1_missing_callback', __( 'Application callback is required and must be a valid URL.', 'rest_oauth1' ) );
 		}
-		if ( ! empty( $params['callback'] ) ) {
-			$valid['callback'] = $params['callback'];
+		$valid['callback'] = $params['callback'];
+
+		if ( count( $error->get_error_codes() ) > 0 ) {
+			return $error;
 		}
 
 		return $valid;
@@ -175,7 +178,7 @@ class WP_REST_OAuth1_Admin {
 		// Check that the parameters are correct first
 		$params = self::validate_parameters( wp_unslash( $_POST ) );
 		if ( is_wp_error( $params ) ) {
-			$messages[] = $params->get_error_message();
+			$messages = array_merge( $messages, $params->get_error_messages() );
 			return $messages;
 		}
 
