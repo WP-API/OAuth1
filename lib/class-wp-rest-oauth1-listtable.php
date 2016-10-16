@@ -41,9 +41,18 @@ class WP_REST_OAuth1_ListTable extends WP_List_Table {
 	}
 
 	public function column_cb( $item ) {
+		$title = get_the_title( $item->ID );
+		if ( empty( $title ) ) {
+			$title = esc_html__( 'Untitled', 'rest_oauth1' );
+		}
+		$label = sprintf(
+			esc_html__( 'Select application "%s"' ),
+			$title
+		);
+
 		?>
 		<label class="screen-reader-text"
-			for="cb-select-<?php echo esc_attr( $item->ID ) ?>"><?php esc_html_e( 'Select consumer', 'rest_oauth1' ); ?></label>
+			for="cb-select-<?php echo esc_attr( $item->ID ) ?>"><?php echo $label ?></label>
 
 		<input id="cb-select-<?php echo esc_attr( $item->ID ) ?>" type="checkbox"
 			name="consumers[]" value="<?php echo esc_attr( $item->ID ) ?>" />
