@@ -18,10 +18,13 @@ function rest_oauth1_profile_section( $user ) {
 	global $wpdb;
 
 	$results = $wpdb->get_col( "SELECT option_value FROM {$wpdb->options} WHERE option_name LIKE 'oauth1_access_%'", 0 );
-	$results = array_map( 'unserialize', $results );
-	$approved = array_filter( $results, function ( $row ) use ( $user ) {
-		return $row['user'] === $user->ID;
-	} );
+	$approved = array();
+	foreach ( $results as $result ) {
+		$row = unserialize( $result );
+		if ( $row['user'] === $user->ID ) {
+			$approved[] = $row;
+		}
+	}
 
 	$authenticator = new WP_REST_OAuth1();
 
