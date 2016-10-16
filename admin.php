@@ -26,39 +26,35 @@ function rest_oauth1_profile_section( $user ) {
 	$authenticator = new WP_REST_OAuth1();
 
 	?>
-		<table class="form-table">
-			<tbody>
-			<tr>
-				<th scope="row"><?php _e( 'Authorized Applications', 'rest_oauth1' ) ?></th>
-				<td>
-					<?php if ( ! empty( $approved ) ): ?>
-						<table class="widefat">
-							<thead>
+		<tr>
+			<th scope="row"><?php _e( 'Authorized Applications', 'rest_oauth1' ) ?></th>
+			<td>
+				<?php if ( ! empty( $approved ) ): ?>
+					<table class="widefat">
+						<thead>
+						<tr>
+							<th style="padding-left:10px;"><?php esc_html_e( 'Application Name', 'rest_oauth1' ); ?></th>
+							<th></th>
+						</tr>
+						</thead>
+						<tbody>
+						<?php foreach ( $approved as $row ): ?>
+							<?php
+							$application = get_post($row['consumer']);
+							?>
 							<tr>
-								<th style="padding-left:10px;"><?php esc_html_e( 'Application Name', 'rest_oauth1' ); ?></th>
-								<th></th>
+								<td><?php echo esc_html( $application->post_title ) ?></td>
+								<td><button class="button" name="rest_oauth1_revoke" value="<?php echo esc_attr( $row['key'] ) ?>"><?php esc_html_e( 'Revoke', 'rest_oauth1' ) ?></button>
 							</tr>
-							</thead>
-							<tbody>
-							<?php foreach ( $approved as $row ): ?>
-								<?php
-								$application = get_post($row['consumer']);
-								?>
-								<tr>
-									<td><?php echo esc_html( $application->post_title ) ?></td>
-									<td><button class="button" name="rest_oauth1_revoke" value="<?php echo esc_attr( $row['key'] ) ?>"><?php esc_html_e( 'Revoke', 'rest_oauth1' ) ?></button>
-								</tr>
 
-							<?php endforeach ?>
-							</tbody>
-						</table>
-					<?php else: ?>
-						<p class="description"><?php esc_html_e( 'No applications authorized.', 'rest_oauth1' ) ?></p>
-					<?php endif ?>
-				</td>
-			</tr>
-			</tbody>
-		</table>
+						<?php endforeach ?>
+						</tbody>
+					</table>
+				<?php else: ?>
+					<p class="description"><?php esc_html_e( 'No applications authorized.', 'rest_oauth1' ) ?></p>
+				<?php endif ?>
+			</td>
+		</tr>
 	<?php
 }
 
