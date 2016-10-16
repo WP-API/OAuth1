@@ -305,6 +305,7 @@ class WP_REST_OAuth1_Admin {
 					</th>
 					<td>
 						<input type="text" class="regular-text"
+							required="required"
 							name="name" id="oauth-name"
 							value="<?php echo esc_attr( $data['name'] ) ?>" />
 						<p class="description"><?php esc_html_e( 'This is shown to users during authorization and in their profile.', 'rest_oauth1' ) ?></p>
@@ -316,6 +317,7 @@ class WP_REST_OAuth1_Admin {
 					</th>
 					<td>
 						<textarea class="regular-text" name="description" id="oauth-description"
+							required="required"
 							cols="30" rows="5" style="width: 500px"><?php echo esc_textarea( $data['description'] ) ?></textarea>
 					</td>
 				</tr>
@@ -325,6 +327,7 @@ class WP_REST_OAuth1_Admin {
 					</th>
 					<td>
 						<input type="text" class="regular-text"
+							required="required"
 							name="callback" id="oauth-callback"
 							value="<?php echo esc_attr( $data['callback'] ) ?>" />
 						<p class="description"><?php esc_html_e( "Your application's callback URL. The callback passed with the request token must match the scheme, host, port, and path of this URL.", 'rest_oauth1' ) ?></p>
