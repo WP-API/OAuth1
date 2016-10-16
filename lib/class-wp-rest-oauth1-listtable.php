@@ -61,8 +61,9 @@ class WP_REST_OAuth1_ListTable extends WP_List_Table {
 	}
 
 	protected function column_name( $item ) {
-		$title = get_the_title( $item->ID );
+		$name = $title = get_the_title( $item->ID );
 		if ( empty( $title ) ) {
+			$name = 'Untitled';
 			$title = '<em>' . esc_html__( 'Untitled', 'rest_oauth1' ) . '</em>';
 		}
 
@@ -85,8 +86,18 @@ class WP_REST_OAuth1_ListTable extends WP_List_Table {
 		$delete_link = wp_nonce_url( $delete_link, 'rest-oauth1-delete:' . $item->ID );
 
 		$actions = array(
-			'edit' => sprintf( '<a href="%s">%s</a>', esc_url( $edit_link ), esc_html__( 'Edit', 'rest_oauth1' ) ),
-			'delete' => sprintf( '<a href="%s">%s</a>', esc_url( $delete_link ), esc_html__( 'Delete', 'rest_oauth1' ) ),
+			'edit' => sprintf(
+				'<a href="%s" aria-label="%s">%s</a>',
+				esc_url( $edit_link ),
+				esc_attr( sprintf( __( 'Edit application "%s"', 'rest_oauth1' ), $name ) ),
+				esc_html__( 'Edit', 'rest_oauth1' )
+			),
+			'delete' => sprintf(
+				'<a href="%s" aria-label="%s">%s</a>',
+				esc_url( $delete_link ),
+				esc_attr( sprintf( __( 'Edit application "%s"', 'rest_oauth1' ), $name ) ),
+				esc_html__( 'Delete', 'rest_oauth1' )
+			),
 		);
 		$action_html = $this->row_actions( $actions );
 
