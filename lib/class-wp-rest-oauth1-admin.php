@@ -137,17 +137,17 @@ class WP_REST_OAuth1_Admin {
 		$valid = array();
 
 		if ( empty( $params['name'] ) ) {
-			return new WP_Error( 'rest_oauth1_missing_name', __( 'Consumer name is required', 'rest_oauth1' ) );
+			return new WP_Error( 'rest_oauth1_missing_name', __( 'Application name is required', 'rest_oauth1' ) );
 		}
 		$valid['name'] = wp_filter_post_kses( $params['name'] );
 
 		if ( empty( $params['description'] ) ) {
-			return new WP_Error( 'rest_oauth1_missing_description', __( 'Consumer description is required', 'rest_oauth1' ) );
+			return new WP_Error( 'rest_oauth1_missing_description', __( 'Application description is required', 'rest_oauth1' ) );
 		}
 		$valid['description'] = wp_filter_post_kses( $params['description'] );
 
 		if ( empty( $params['callback'] ) ) {
-			return new WP_Error( 'rest_oauth1_missing_description', __( 'Consumer callback is required and must be a valid URL.', 'rest_oauth1' ) );
+			return new WP_Error( 'rest_oauth1_missing_description', __( 'Application callback is required and must be a valid URL.', 'rest_oauth1' ) );
 		}
 		if ( ! empty( $params['callback'] ) ) {
 			$valid['callback'] = $params['callback'];
@@ -237,7 +237,7 @@ class WP_REST_OAuth1_Admin {
 			$id = absint( $_REQUEST['id'] );
 			$consumer = WP_REST_OAuth1_Client::get( $id );
 			if ( is_wp_error( $consumer ) || empty( $consumer ) ) {
-				wp_die( __( 'Invalid consumer ID.', 'rest_oauth1' ) );
+				wp_die( __( 'Invalid application ID.', 'rest_oauth1' ) );
 			}
 
 			$form_action = self::get_url( array( 'action' => 'edit', 'id' => $id ) );
@@ -301,7 +301,7 @@ class WP_REST_OAuth1_Admin {
 			<table class="form-table">
 				<tr>
 					<th scope="row">
-						<label for="oauth-name"><?php echo esc_html_x( 'Consumer Name', 'field name', 'rest_oauth1' ) ?></label>
+						<label for="oauth-name"><?php echo esc_html_x( 'Application Name', 'field name', 'rest_oauth1' ) ?></label>
 					</th>
 					<td>
 						<input type="text" class="regular-text"
@@ -336,12 +336,12 @@ class WP_REST_OAuth1_Admin {
 
 			if ( empty( $consumer ) ) {
 				wp_nonce_field( 'rest-oauth1-add' );
-				submit_button( __( 'Add Consumer', 'rest_oauth1' ) );
+				submit_button( __( 'Create Application', 'rest_oauth1' ) );
 			}
 			else {
 				echo '<input type="hidden" name="id" value="' . esc_attr( $consumer->ID ) . '" />';
 				wp_nonce_field( 'rest-oauth1-edit-' . $consumer->ID );
-				submit_button( __( 'Save Consumer', 'rest_oauth1' ) );
+				submit_button( __( 'Update Application', 'rest_oauth1' ) );
 			}
 
 			?>
@@ -404,7 +404,7 @@ class WP_REST_OAuth1_Admin {
 		}
 
 		if ( ! $client->delete() ) {
-			$message = 'Invalid consumer ID';
+			$message = __( 'Invalid application ID' );
 			wp_die( $message );
 			return;
 		}

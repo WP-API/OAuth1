@@ -6,10 +6,10 @@ class WP_REST_OAuth1_CLI extends WP_CLI_Command {
 	 * ## OPTIONS
 	 *
 	 * [--name=<name>]
-	 * : Consumer name
+	 * : Application name
 	 *
 	 * [--description=<description>]
-	 * : Consumer description
+	 * : Application description
 	 */
 	public function add( $_, $args ) {
 		$consumer = WP_REST_OAuth1_Client::create( $args );
