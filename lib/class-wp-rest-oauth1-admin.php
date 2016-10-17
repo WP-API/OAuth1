@@ -308,10 +308,10 @@ class WP_REST_OAuth1_Admin {
 					</th>
 					<td>
 						<input type="text" class="regular-text"
-							required="required"
+							required="required" aria-describedby="oauth-name-description"
 							name="name" id="oauth-name"
 							value="<?php echo esc_attr( $data['name'] ) ?>" />
-						<p class="description"><?php esc_html_e( 'This is shown to users during authorization and in their profile.', 'rest_oauth1' ) ?></p>
+						<p class="description" id="oauth-name-description"><?php esc_html_e( 'This is shown to users during authorization and in their profile.', 'rest_oauth1' ) ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -330,10 +330,10 @@ class WP_REST_OAuth1_Admin {
 					</th>
 					<td>
 						<input type="text" class="regular-text"
-							required="required"
+							required="required" aria-describedby="oauth-callback-description"
 							name="callback" id="oauth-callback"
 							value="<?php echo esc_attr( $data['callback'] ) ?>" />
-						<p class="description"><?php esc_html_e( "Your application's callback URL. The callback passed with the request token must match the scheme, host, port, and path of this URL.", 'rest_oauth1' ) ?></p>
+						<p class="description" id="oauth-callback-description"><?php esc_html_e( "Your application's callback URL. The callback passed with the request token must match the scheme, host, port, and path of this URL.", 'rest_oauth1' ) ?></p>
 					</td>
 				</tr>
 			</table>
