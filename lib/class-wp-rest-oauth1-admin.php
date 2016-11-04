@@ -257,18 +257,18 @@ class WP_REST_OAuth1_Admin {
 		if ( ! empty( $_GET['did_action'] ) ) {
 			switch ( $_GET['did_action'] ) {
 				case 'edit':
-					$messages[] = __( 'Updated application.', 'rest_oauth1' );
-					$notice_type     = 'info';
+					$messages[]  = __( 'Updated application.', 'rest_oauth1' );
+					$notice_type = 'info';
 					break;
 
 				case 'regenerate':
-					$messages[] = __( 'Regenerated secret.', 'rest_oauth1' );
-					$notice_type     = 'success';
+					$messages[]  = __( 'Regenerated secret.', 'rest_oauth1' );
+					$notice_type = 'success';
 					break;
 
 				default:
-					$messages[] = __( 'Successfully created application.', 'rest_oauth1' );
-					$notice_type     = 'success';
+					$messages[]  = __( 'Successfully created application.', 'rest_oauth1' );
+					$notice_type = 'success';
 					break;
 			}
 		}
