@@ -244,23 +244,31 @@ class WP_REST_OAuth1_Admin {
 			$regenerate_action = self::get_url( array( 'action' => 'regenerate', 'id' => $id ) );
 		}
 
-		// Handle form submission
+		// Handle form submission.
 		$messages = array();
+
+		// Handle type of notice.
+		$notice_type = '';
+
 		if ( ! empty( $_POST['submit'] ) ) {
 			$messages = self::handle_edit_submit( $consumer );
+			$notice_type   = 'error';
 		}
 		if ( ! empty( $_GET['did_action'] ) ) {
 			switch ( $_GET['did_action'] ) {
 				case 'edit':
 					$messages[] = __( 'Updated application.', 'rest_oauth1' );
+					$notice_type     = 'info';
 					break;
 
 				case 'regenerate':
 					$messages[] = __( 'Regenerated secret.', 'rest_oauth1' );
+					$notice_type     = 'success';
 					break;
 
 				default:
 					$messages[] = __( 'Successfully created application.', 'rest_oauth1' );
+					$notice_type     = 'success';
 					break;
 			}
 		}
@@ -292,8 +300,11 @@ class WP_REST_OAuth1_Admin {
 
 		<?php
 		if ( ! empty( $messages ) ) {
+			// Notice type sane defaults.
+			$notice_type = ( isset( $notice_type) && ! empty ( $notice_type ) ) ? $notice_type : 'info';
+
 			foreach ( $messages as $msg )
-				echo '<div id="message" class="updated"><p>' . esc_html( $msg ) . '</p></div>';
+				echo '<div id="message" class="notice is-dismissible notice-' . $notice_type . '"><p>' . esc_html( $msg ) . '</p></div>';
 		}
 		?>
 
