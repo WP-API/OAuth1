@@ -1,5 +1,5 @@
 {
-    "name": "wp-api/oauth1",
+    "name": "thomasfw/oauth1",
     "description": "OAuth 1.0a Server for WordPress",
     "type": "wordpress-plugin",
     "license": "GPL2+",
