@@ -647,6 +647,7 @@ class WP_REST_OAuth1 {
 
 			case 'POST':
 			case 'PUT':
+			case 'PATCH':
 				$params = wp_unslash( $_POST );
 				break;
 			default:
