@@ -39,7 +39,7 @@ class WP_REST_OAuth1_UI {
 	 */
 	public function handle_request() {
 		if ( ! is_user_logged_in() ) {
-			wp_safe_redirect( wp_login_url( $_SERVER['REQUEST_URI'] ) );
+			wp_safe_redirect( wp_login_url( filter_input( INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL ) ) );
 			exit;
 		}
 
@@ -57,15 +57,15 @@ class WP_REST_OAuth1_UI {
 	 */
 	public function render_page() {
 		// Check required fields
-		if ( empty( $_REQUEST['oauth_token'] ) ) {
+		if ( empty( filter_input( INPUT_REQUEST, 'oauth_token' ) ) ) {
 			return new WP_Error( 'json_oauth1_missing_param', sprintf( __( 'Missing parameter %s', 'rest_oauth1' ), 'oauth_token' ), array( 'status' => 400 ) );
 		}
 
 		// Set up fields
-		$token_key = wp_unslash( $_REQUEST['oauth_token'] );
+		$token_key = wp_unslash( filter_input( INPUT_REQUEST, 'oauth_token' ) );
 		$scope = '*';
-		if ( ! empty( $_REQUEST['wp_scope'] ) ) {
-			$scope = wp_unslash( $_REQUEST['wp_scope'] );
+		if ( ! empty( filter_input( INPUT_REQUEST, 'wp_scope' ) ) ) {
+			$scope = wp_unslash( filter_input( INPUT_REQUEST, 'wp_scope' ) );
 		}
 
 		$authenticator = new WP_REST_OAuth1();
@@ -75,24 +75,24 @@ class WP_REST_OAuth1_UI {
 			return $this->token;
 		}
 
-		if ( ! empty( $_REQUEST['oauth_callback'] ) ) {
-			$resp = $authenticator->set_request_token_callback( $this->token['key'], $_REQUEST['oauth_callback'] );
+		if ( ! empty( filter_input( INPUT_REQUEST, 'oauth_callback' ) ) ) {
+			$resp = $authenticator->set_request_token_callback( $this->token['key'], filter_input( INPUT_REQUEST, 'oauth_callback' ) );
 			if ( is_wp_error( $resp ) ) {
 				return $resp;
 			}
 		}
 
-		if ( $this->token['authorized'] === true ) {
+		if ( true === $this->token['authorized'] ) {
 			return $this->handle_callback_redirect( $this->token['verifier'] );
 		}
 
 		// Fetch consumer
 		$this->consumer = $consumer = get_post( $this->token['consumer'] );
 
-		if ( ! empty( $_POST['wp-submit'] ) ) {
+		if ( ! empty( filter_input( INPUT_POST, 'wp-submit' ) ) ) {
 			check_admin_referer( 'json_oauth1_authorize' );
 
-			switch ( $_POST['wp-submit'] ) {
+			switch ( filter_input( INPUT_POST, 'wp-submit' ) ) {
 				case 'authorize':
 					$verifier = $authenticator->authorize_request_token( $this->token['key'] );
 					if ( is_wp_error( $verifier ) ) {
@@ -136,10 +136,10 @@ class WP_REST_OAuth1_UI {
 	 * @return null|WP_Error Null on success, error otherwise
 	 */
 	public function handle_callback_redirect( $verifier ) {
-		if ( empty( $this->token['callback'] ) || $this->token['callback'] === 'oob' ) {
+		if ( empty( $this->token['callback'] ) || 'oob' === $this->token['callback'] ) {
 			// No callback registered, display verification code to the user
 			login_header( __( 'Access Token', 'rest_oauth1' ) );
-			echo '<p>' . sprintf( __( 'Your verification token is <code>%s</code>', 'rest_oauth1' ), $verifier ) . '</p>';
+			echo '<p>' . sprintf( __( 'Your verification token is <code>%s</code>', 'rest_oauth1' ), $verifier ) . '</p>'; // WPCS: XSS okay.
 			login_footer();
 
 			return null;
@@ -163,7 +163,7 @@ class WP_REST_OAuth1_UI {
 		$callback = add_query_arg( $args, $callback );
 
 		// Offsite, so skip safety check
-		wp_redirect( $callback );
+		wp_safe_redirect( $callback );
 
 		return null;
 	}

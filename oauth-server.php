@@ -39,7 +39,7 @@ function rest_oauth1_init() {
 	rest_oauth1_register_rewrites();
 
 	global $wp;
-	$wp->add_query_var('rest_oauth1');
+	$wp->add_query_var( 'rest_oauth1' );
 }
 add_action( 'init', 'rest_oauth1_init' );
 
@@ -105,13 +105,14 @@ add_action( 'init', 'rest_oauth1_force_reauthentication', 100 );
  * Load the JSON API
  */
 function rest_oauth1_loaded() {
-	if ( empty( $GLOBALS['wp']->query_vars['rest_oauth1'] ) )
+	if ( empty( $GLOBALS['wp']->query_vars['rest_oauth1'] ) ) {
 		return;
+	}
 
 	rest_send_cors_headers( null );
 	header( 'Access-Control-Allow-Headers: Authorization' );
 
-	if ( $_SERVER['REQUEST_METHOD'] === 'OPTIONS' ) {
+	if ( 'OPTIONS' === filter_input( INPUT_SERVER, 'REQUEST_METHOD', FILTER_SANITIZE_STRING ) ) {
 		die();
 	}
 
@@ -122,20 +123,19 @@ function rest_oauth1_loaded() {
 		$error_data = $response->get_error_data();
 		if ( is_array( $error_data ) && isset( $error_data['status'] ) ) {
 			$status = $error_data['status'];
-		}
-		else {
+		} else {
 			$status = 500;
 		}
 
 		status_header( $status );
-		echo $response->get_error_message();
+		echo $response->get_error_message(); // WPCS: XSS okay
 		die();
 	}
 
 	header( 'Content-Type: application/x-www-form-urlencoded; charset=utf-8' );
 	$response = http_build_query( $response, '', '&' );
 
-	echo $response;
+	echo $response; // WPCS: XSS okay
 
 	// Finish off our request
 	die();

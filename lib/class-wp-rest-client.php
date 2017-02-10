@@ -115,7 +115,7 @@ abstract class WP_REST_Client {
 	 */
 	public static function get( $id ) {
 		$post = get_post( $id );
-		if ( empty( $id ) || empty( $post ) || $post->post_type !== 'json_consumer' ) {
+		if ( empty( $id ) || empty( $post ) || 'json_consumer' !== $post->post_type ) {
 			return new WP_Error( 'rest_oauth1_invalid_id', __( 'Client ID is not valid.', 'rest_oauth1' ), array( 'status' => 404 ) );
 		}
 
@@ -138,7 +138,7 @@ abstract class WP_REST_Client {
 		$consumers = $query->query( array(
 			'post_type' => 'json_consumer',
 			'post_status' => 'any',
-			'meta_query' => array(
+			'meta_query' => array( // WPCS: tax_query okay.
 				array(
 					'key' => 'key',
 					'value' => $key,

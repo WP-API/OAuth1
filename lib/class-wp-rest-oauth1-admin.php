@@ -50,7 +50,8 @@ class WP_REST_OAuth1_Admin {
 	 * @return string One of 'add', 'edit', 'delete', or '' for default (list)
 	 */
 	protected static function current_action() {
-		return isset( $_GET['action'] ) ? $_GET['action'] : '';
+		$action = filter_input( INPUT_GET, 'action' );
+		return isset( $action ) ? $action : '';
 	}
 
 	/**
@@ -71,7 +72,7 @@ class WP_REST_OAuth1_Admin {
 			default:
 				global $wp_list_table;
 
-				$wp_list_table = new WP_REST_OAuth1_ListTable();
+				$wp_list_table = new WP_REST_OAuth1_ListTable(); // WPCS: override ok.
 
 				$wp_list_table->prepare_items();
 
@@ -104,7 +105,7 @@ class WP_REST_OAuth1_Admin {
 				<?php
 				esc_html_e( 'Registered Applications', 'rest_oauth1' );
 
-				if ( current_user_can( 'create_users' ) ): ?>
+				if ( current_user_can( 'create_users' ) ) : ?>
 					<a href="<?php echo esc_url( self::get_url( 'action=add' ) ) ?>"
 						class="add-new-h2"><?php echo esc_html_x( 'Add New', 'application', 'rest_oauth1' ); ?></a>
 				<?php
@@ -112,7 +113,7 @@ class WP_REST_OAuth1_Admin {
 				?>
 			</h2>
 			<?php
-			if ( ! empty( $_GET['deleted'] ) ) {
+			if ( ! empty( filter_input( INPUT_GET, 'deleted' ) ) ) {
 				echo '<div id="message" class="updated"><p>' . esc_html__( 'Deleted application.', 'rest_oauth1' ) . '</p></div>';
 			}
 			?>
@@ -166,14 +167,13 @@ class WP_REST_OAuth1_Admin {
 		if ( empty( $consumer ) ) {
 			$did_action = 'add';
 			check_admin_referer( 'rest-oauth1-add' );
-		}
-		else {
+		} else {
 			$did_action = 'edit';
 			check_admin_referer( 'rest-oauth1-edit-' . $consumer->ID );
 		}
 
 		// Check that the parameters are correct first
-		$params = self::validate_parameters( wp_unslash( $_POST ) );
+		$params = self::validate_parameters( wp_unslash( $_POST ) ); // WPCS: input var ok.
 		if ( is_wp_error( $params ) ) {
 			$messages[] = $params->get_error_message();
 			return $messages;
@@ -191,8 +191,7 @@ class WP_REST_OAuth1_Admin {
 				),
 			);
 			$consumer = $result = WP_REST_OAuth1_Client::create( $data );
-		}
-		else {
+		} else {
 			// Update the existing consumer post
 			$data = array(
 				'name' => $params['name'],
@@ -227,17 +226,17 @@ class WP_REST_OAuth1_Admin {
 	 */
 	public static function render_edit_page() {
 		if ( ! current_user_can( 'edit_users' ) ) {
-			wp_die( __( 'You do not have permission to access this page.', 'rest_oauth1' ) );
+			wp_die( esc_html__( 'You do not have permission to access this page.', 'rest_oauth1' ) );
 		}
 
 		// Are we editing?
 		$consumer = null;
-		$form_action = self::get_url('action=add');
-		if ( ! empty( $_REQUEST['id'] ) ) {
-			$id = absint( $_REQUEST['id'] );
+		$form_action = self::get_url( 'action=add' );
+		if ( ! empty( filter_input( INPUT_REQUEST, 'id' ) ) ) {
+			$id = absint( filter_input( INPUT_REQUEST, 'id' ) );
 			$consumer = WP_REST_OAuth1_Client::get( $id );
 			if ( is_wp_error( $consumer ) || empty( $consumer ) ) {
-				wp_die( __( 'Invalid consumer ID.', 'rest_oauth1' ) );
+				wp_die( esc_html__( 'Invalid consumer ID.', 'rest_oauth1' ) );
 			}
 
 			$form_action = self::get_url( array( 'action' => 'edit', 'id' => $id ) );
@@ -246,11 +245,12 @@ class WP_REST_OAuth1_Admin {
 
 		// Handle form submission
 		$messages = array();
-		if ( ! empty( $_POST['submit'] ) ) {
+		if ( ! empty( filter_input( INPUT_REQUEST, 'submit' ) ) ) {
 			$messages = self::handle_edit_submit( $consumer );
 		}
-		if ( ! empty( $_GET['did_action'] ) ) {
-			switch ( $_GET['did_action'] ) {
+		$did_action = filter_input( INPUT_GET, 'did_action' );
+		if ( ! empty( $did_action ) ) {
+			switch ( $did_action ) {
 				case 'edit':
 					$messages[] = __( 'Updated application.', 'rest_oauth1' );
 					break;
@@ -267,12 +267,11 @@ class WP_REST_OAuth1_Admin {
 
 		$data = array();
 
-		if ( empty( $consumer ) || ! empty( $_POST['_wpnonce'] ) ) {
+		if ( empty( $consumer ) || ! empty( filter_input( INPUT_POST, '_wpnonce' ) ) ) {
 			foreach ( array( 'name', 'description', 'callback' ) as $key ) {
-				$data[ $key ] = empty( $_POST[ $key ] ) ? '' : wp_unslash( $_POST[ $key ] );
+				$data[ $key ] = empty( filter_input( INPUT_POST, $key ) ) ? '' : wp_unslash( filter_input( INPUT_POST, $key ) );
 			}
-		}
-		else {
+		} else {
 			$data['name'] = $consumer->post_title;
 			$data['description'] = $consumer->post_content;
 			$data['callback'] = $consumer->callback;
@@ -292,8 +291,9 @@ class WP_REST_OAuth1_Admin {
 
 		<?php
 		if ( ! empty( $messages ) ) {
-			foreach ( $messages as $msg )
+			foreach ( $messages as $msg ) {
 				echo '<div id="message" class="updated"><p>' . esc_html( $msg ) . '</p></div>';
+			}
 		}
 		?>
 
@@ -337,8 +337,7 @@ class WP_REST_OAuth1_Admin {
 			if ( empty( $consumer ) ) {
 				wp_nonce_field( 'rest-oauth1-add' );
 				submit_button( __( 'Add Consumer', 'rest_oauth1' ) );
-			}
-			else {
+			} else {
 				echo '<input type="hidden" name="id" value="' . esc_attr( $consumer->ID ) . '" />';
 				wp_nonce_field( 'rest-oauth1-edit-' . $consumer->ID );
 				submit_button( __( 'Save Consumer', 'rest_oauth1' ) );
@@ -347,7 +346,7 @@ class WP_REST_OAuth1_Admin {
 			?>
 		</form>
 
-		<?php if ( ! empty( $consumer ) ): ?>
+		<?php if ( ! empty( $consumer ) ) : ?>
 			<form method="post" action="<?php echo esc_url( $regenerate_action ) ?>">
 				<h3><?php esc_html_e( 'OAuth Credentials', 'rest_oauth1' ) ?></h3>
 
@@ -382,30 +381,30 @@ class WP_REST_OAuth1_Admin {
 	}
 
 	public static function handle_delete() {
-		if ( empty( $_GET['id'] ) ) {
+		$id = filter_input( INPUT_GET, 'id' );
+		if ( empty( $id ) ) {
 			return;
 		}
 
-		$id = $_GET['id'];
 		check_admin_referer( 'rest-oauth1-delete:' . $id );
 
 		if ( ! current_user_can( 'delete_post', $id ) ) {
 			wp_die(
-				'<h1>' . __( 'Cheatin&#8217; uh?', 'rest_oauth1' ) . '</h1>' .
-				'<p>' . __( 'You are not allowed to delete this application.', 'rest_oauth1' ) . '</p>',
+				'<h1>' . esc_html__( 'Cheatin&#8217; uh?', 'rest_oauth1' ) . '</h1>' .
+				'<p>' . esc_html__( 'You are not allowed to delete this application.', 'rest_oauth1' ) . '</p>',
 				403
 			);
 		}
 
 		$client = WP_REST_OAuth1_Client::get( $id );
 		if ( is_wp_error( $client ) ) {
-			wp_die( $client );
+			wp_die( esc_html( $client ) );
 			return;
 		}
 
 		if ( ! $client->delete() ) {
 			$message = 'Invalid consumer ID';
-			wp_die( $message );
+			wp_die( esc_html( $message ) );
 			return;
 		}
 
@@ -414,17 +413,17 @@ class WP_REST_OAuth1_Admin {
 	}
 
 	public static function handle_regenerate() {
-		if ( empty( $_GET['id'] ) ) {
+		$id = filter_input( INPUT_GET, 'id' );
+		if ( empty( $id ) ) {
 			return;
 		}
 
-		$id = $_GET['id'];
 		check_admin_referer( 'rest-oauth1-regenerate:' . $id );
 
 		if ( ! current_user_can( 'edit_post', $id ) ) {
 			wp_die(
-				'<h1>' . __( 'Cheatin&#8217; uh?', 'rest_oauth1' ) . '</h1>' .
-				'<p>' . __( 'You are not allowed to edit this application.', 'rest_oauth1' ) . '</p>',
+				'<h1>' . esc_html__( 'Cheatin&#8217; uh?', 'rest_oauth1' ) . '</h1>' .
+				'<p>' . esc_html__( 'You are not allowed to edit this application.', 'rest_oauth1' ) . '</p>',
 				403
 			);
 		}
