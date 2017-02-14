@@ -163,7 +163,7 @@ class WP_REST_OAuth1_UI {
 		$callback = add_query_arg( $args, $callback );
 
 		// Offsite, so skip safety check
-		wp_safe_redirect( $callback );
+		wp_redirect( $callback ); // @codingStandardsIgnoreLine.
 
 		return null;
 	}
