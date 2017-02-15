@@ -232,8 +232,8 @@ class WP_REST_OAuth1_Admin {
 		// Are we editing?
 		$consumer = null;
 		$form_action = self::get_url( 'action=add' );
-		if ( ! empty( filter_input( INPUT_REQUEST, 'id' ) ) ) {
-			$id = absint( filter_input( INPUT_REQUEST, 'id' ) );
+		if ( ! empty( filter_input( INPUT_GET, 'id' ) ) ) {
+			$id = absint( filter_input( INPUT_GET, 'id' ) );
 			$consumer = WP_REST_OAuth1_Client::get( $id );
 			if ( is_wp_error( $consumer ) || empty( $consumer ) ) {
 				wp_die( esc_html__( 'Invalid consumer ID.', 'rest_oauth1' ) );
@@ -245,7 +245,7 @@ class WP_REST_OAuth1_Admin {
 
 		// Handle form submission
 		$messages = array();
-		if ( ! empty( filter_input( INPUT_REQUEST, 'submit' ) ) ) {
+		if ( ! empty( filter_input( INPUT_POST, 'submit' ) ) ) {
 			$messages = self::handle_edit_submit( $consumer );
 		}
 		$did_action = filter_input( INPUT_GET, 'did_action' );

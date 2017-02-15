@@ -57,12 +57,12 @@ class WP_REST_OAuth1_UI {
 	 */
 	public function render_page() {
 		// Check required fields
-		if ( empty( filter_input( INPUT_REQUEST, 'oauth_token' ) ) ) {
+		if ( empty( filter_input( INPUT_GET, 'oauth_token' ) ) ) {
 			return new WP_Error( 'json_oauth1_missing_param', sprintf( __( 'Missing parameter %s', 'rest_oauth1' ), 'oauth_token' ), array( 'status' => 400 ) );
 		}
 
 		// Set up fields
-		$token_key = wp_unslash( filter_input( INPUT_REQUEST, 'oauth_token' ) );
+		$token_key = wp_unslash( filter_input( INPUT_GET, 'oauth_token' ) );
 		$scope = '*';
 		if ( ! empty( filter_input( INPUT_REQUEST, 'wp_scope' ) ) ) {
 			$scope = wp_unslash( filter_input( INPUT_REQUEST, 'wp_scope' ) );
