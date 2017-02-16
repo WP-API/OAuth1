@@ -145,7 +145,7 @@ class WP_REST_OAuth1 {
 					__( 'Missing OAuth parameters %s', 'rest_oauth1' ),
 					count( $errors )
 				),
-				implode(', ', $errors )
+				implode( ', ', $errors )
 			);
 			return new WP_Error( 'json_oauth1_missing_parameter', $message, array( 'status' => 401 ) );
 		}
@@ -235,9 +235,6 @@ class WP_REST_OAuth1 {
 	 * @return mixed Response data (typically WP_Error or an array). May exit.
 	 */
 	public function dispatch( $route ) {
-		// if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
-		// 	return new WP_Error( 'oauth1_invalid_method', __( 'Invalid request method for OAuth endpoint' ), array( 'status' => 405 ) );
-		// }
 
 		switch ( $route ) {
 			case 'authorize':
@@ -280,7 +277,8 @@ class WP_REST_OAuth1 {
 	 *
 	 * @param string $token Token object
 	 * @param string $consumer_key Consumer ID
-	 * @return array Array of consumer object, user object
+	 *
+	 * @return array|WP_Error Array of consumer object, user object
 	 */
 	public function check_token( $token, $consumer_key ) {
 		$this->should_attempt = false;
@@ -365,8 +363,8 @@ class WP_REST_OAuth1 {
 		}
 
 		$data = array(
-			'oauth_token' => self::urlencode_rfc3986($key),
-			'oauth_token_secret' => self::urlencode_rfc3986($data['secret']),
+			'oauth_token' => self::urlencode_rfc3986( $key ),
+			'oauth_token_secret' => self::urlencode_rfc3986( $data['secret'] ),
 			'oauth_callback_confirmed' => 'true',
 		);
 		return $data;
@@ -404,14 +402,17 @@ class WP_REST_OAuth1 {
 		}
 
 		$parsed_url = wp_parse_url( $url );
-		if ( ! $parsed_url || empty( $parsed_url['host'] ) )
+		if ( ! $parsed_url || empty( $parsed_url['host'] ) ) {
 			return false;
+		}
 
-		if ( isset( $parsed_url['user'] ) || isset( $parsed_url['pass'] ) )
+		if ( isset( $parsed_url['user'] ) || isset( $parsed_url['pass'] ) ) {
 			return false;
+		}
 
-		if ( false !== strpbrk( $parsed_url['host'], ':#?[]' ) )
+		if ( false !== strpbrk( $parsed_url['host'], ':#?[]' ) ) {
 			return false;
+		}
 
 		return true;
 	}
@@ -482,7 +483,7 @@ class WP_REST_OAuth1 {
 		 * @param string $url Supplied callback URL.
 		 * @param WP_Post $consumer Consumer post; stored callback saved as `consumer` meta value.
 		 */
-		return apply_filters( 'rest_oauth.check_callback', $valid, $url, $consumer );
+		return apply_filters( 'rest_oauth.check_callback', $valid, $url, $consumer ); // @codingStandardsIgnoreLine
 	}
 
 	/**
@@ -647,7 +648,7 @@ class WP_REST_OAuth1 {
 
 			case 'POST':
 			case 'PUT':
-				$params = wp_unslash( $_POST ); // WPCS: input var ok.
+				$params = wp_unslash( $_POST ); // @codingStandardsIgnoreLine
 				break;
 			default:
 				return new WP_Error( 'rest_oauth1_unknown_http_method',
@@ -658,7 +659,7 @@ class WP_REST_OAuth1 {
 
 		$params = array_merge( $params, $oauth_params );
 
-		$request_path = parse_url( filter_input( INPUT_SERVER, 'REQUEST_URI' ), PHP_URL_PATH );
+		$request_path = wp_parse_url( filter_input( INPUT_SERVER, 'REQUEST_URI' ), PHP_URL_PATH );
 		$wp_base = get_home_url( null, '/', 'relative' );
 		if ( substr( $request_path, 0, strlen( $wp_base ) ) === $wp_base ) {
 			$request_path = substr( $request_path, strlen( $wp_base ) );
@@ -673,8 +674,9 @@ class WP_REST_OAuth1 {
 		array_walk_recursive( $params, array( $this, 'normalize_parameters' ) );
 
 		// sort parameters
-		if ( ! uksort( $params, 'strcmp' ) )
+		if ( ! uksort( $params, 'strcmp' ) ) {
 			return new WP_Error( 'json_oauth1_failed_parameter_sort', __( 'Invalid Signature - failed to sort parameters', 'rest_oauth1' ), array( 'status' => 401 ) );
+		}
 
 		$query_string = $this->create_signature_string( $params );
 
@@ -682,11 +684,11 @@ class WP_REST_OAuth1 {
 		$string_to_sign = $http_method . '&' . $base_request_uri . '&' . $query_string;
 		$key_parts = array(
 			$consumer->secret,
-			( $token ? $token['secret'] : '' )
+			( $token ? $token['secret'] : '' ),
 		);
 		$key = implode( '&', $key_parts );
 
-		switch ($params['oauth_signature_method']) {
+		switch ( $params['oauth_signature_method'] ) {
 			case 'HMAC-SHA1':
 				$hash_algorithm = 'sha1';
 				break;
@@ -737,7 +739,7 @@ class WP_REST_OAuth1 {
 					$param_key = $key . '%5B' . $param_key . '%5D'; // Handle multi-dimensional array
 				}
 				$string = $param_key . '=' . $param_value; // join with equals sign
-				$query_params[] = self::urlencode_rfc3986($string );
+				$query_params[] = self::urlencode_rfc3986( $string );
 			}
 		}
 		return $query_params;
@@ -772,16 +774,19 @@ class WP_REST_OAuth1 {
 	public function check_oauth_timestamp_and_nonce( $consumer, $timestamp, $nonce ) {
 		$valid_window = apply_filters( 'json_oauth1_timestamp_window', 15 * MINUTE_IN_SECONDS );
 
-		if ( ( $timestamp < time() - $valid_window ) ||  ( $timestamp > time() + $valid_window ) )
+		if ( ( $timestamp < time() - $valid_window ) ||  ( $timestamp > time() + $valid_window ) ) {
 			return new WP_Error( 'json_oauth1_invalid_timestamp', __( 'Invalid timestamp', 'rest_oauth1' ), array( 'status' => 401 ) );
+		}
 
 		$used_nonces = $consumer->nonces;
 
-		if ( empty( $used_nonces ) )
+		if ( empty( $used_nonces ) ) {
 			$used_nonces = array();
+		}
 
-		if ( in_array( $nonce, $used_nonces, true ) )
+		if ( in_array( $nonce, $used_nonces, true ) ) {
 			return new WP_Error( 'json_oauth1_nonce_already_used', __( 'Invalid nonce - nonce has already been used', 'rest_oauth1' ), array( 'status' => 401 ) );
+		}
 
 		$used_nonces[ $timestamp ] = $nonce;
 
@@ -792,8 +797,9 @@ class WP_REST_OAuth1 {
 		foreach ( $used_nonces as $nonce_timestamp => $nonce ) {
 
 			// If the nonce timestamp is expired
-			if ( $nonce_timestamp < $current_time - $valid_window )
+			if ( $nonce_timestamp < $current_time - $valid_window ) {
 				unset( $used_nonces[ $nonce_timestamp ] );
+			}
 		}
 
 		update_user_meta( $consumer->ID, 'nonces', $used_nonces );

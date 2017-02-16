@@ -181,9 +181,9 @@ abstract class WP_REST_Client {
 		$data['post_content'] = $params['description'];
 		$data['post_type'] = 'json_consumer';
 
-		$ID = wp_insert_post( $data );
-		if ( is_wp_error( $ID ) ) {
-			return $ID;
+		$id = wp_insert_post( $data );
+		if ( is_wp_error( $id ) ) {
+			return $id;
 		}
 
 		$class = function_exists( 'get_called_class' ) ? get_called_class() : self::get_called_class();
@@ -200,13 +200,13 @@ abstract class WP_REST_Client {
 		 * @param int $ID Post ID we created.
 		 * @param array $params Parameters passed to create.
 		 */
-		$meta = apply_filters( 'json_consumer_meta', $meta, $ID, $params );
+		$meta = apply_filters( 'json_consumer_meta', $meta, $id, $params );
 
 		foreach ( $meta as $key => $value ) {
-			update_post_meta( $ID, $key, $value );
+			update_post_meta( $id, $key, $value );
 		}
 
-		$post = get_post( $ID );
+		$post = get_post( $id );
 		return new $class( $post );
 	}
 
@@ -232,9 +232,11 @@ abstract class WP_REST_Client {
 	protected static function get_called_class() {
 		// PHP 5.2 only
 		$backtrace = debug_backtrace();
-		// [0] WP_REST_Client::get_called_class()
-		// [1] WP_REST_Client::function()
-		if ( 'call_user_func' ===  $backtrace[2]['function'] ) {
+		/**
+		 * [0] WP_REST_Client::get_called_class()
+		 * [1] WP_REST_Client::function()
+		 */
+		if ( 'call_user_func' === $backtrace[2]['function'] ) {
 			return $backtrace[2]['args'][0][0];
 		}
 		return $backtrace[2]['class'];

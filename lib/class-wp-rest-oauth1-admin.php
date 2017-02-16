@@ -15,16 +15,12 @@ class WP_REST_OAuth1_Admin {
 		$hook = add_users_page(
 			// Page title
 			__( 'Registered OAuth Applications', 'rest_oauth1' ),
-
 			// Menu title
 			_x( 'Applications', 'menu title', 'rest_oauth1' ),
-
 			// Capability
 			'list_users',
-
 			// Menu slug
 			self::BASE_SLUG,
-
 			// Callback
 			array( get_class(), 'dispatch' )
 		);
