@@ -62,11 +62,11 @@ $url = add_query_arg( 'oauth_token', $token_key, $url );
 		<?php echo get_avatar( $current_user->ID, '78' ); ?>
 
 		<p><?php
-			printf( // WPCS: XSS ok.
-				__( 'Howdy <strong>%1$s</strong>,<br/> "%2$s" would like to connect to %3$s.' ),
-				$current_user->user_login,
-				$consumer->post_title,
-				get_bloginfo( 'name' )
+			printf(
+				esc_html__( 'Howdy <strong>%1$s</strong>,<br/> "%2$s" would like to connect to %3$s.' ),
+				esc_html( $current_user->user_login ),
+				esc_html( $consumer->post_title ),
+				esc_html( get_bloginfo( 'name' ) )
 			)
 		?></p>
 
@@ -90,7 +90,7 @@ $url = add_query_arg( 'oauth_token', $token_key, $url );
 <a href="<?php echo esc_url( wp_login_url( $url, true ) ); ?>"><?php esc_html_e( 'Switch user' ) ?></a>
 <?php
 if ( get_option( 'users_can_register' ) ) :
-	$registration_url = sprintf( '<a href="%s">%s</a>', esc_url( wp_registration_url() ), __( 'Register' ) );
+	$registration_url = sprintf( esc_html( '<a href="%s">%s</a>' ), esc_url( wp_registration_url() ), __( 'Register' ) );
 	/**
 	 * Filter the registration URL below the login form.
 	 *

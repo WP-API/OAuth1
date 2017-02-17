@@ -141,9 +141,10 @@ class WP_REST_OAuth1 {
 		if ( ! empty( $errors ) ) {
 			$message = sprintf(
 				_n(
-					__( 'Missing OAuth parameter %s', 'rest_oauth1' ),
-					__( 'Missing OAuth parameters %s', 'rest_oauth1' ),
-					count( $errors )
+					'Missing OAuth parameter %s',
+					'Missing OAuth parameters %s',
+					count( $errors ),
+					'rest_oauth1'
 				),
 				implode( ', ', $errors )
 			);
@@ -483,7 +484,7 @@ class WP_REST_OAuth1 {
 		 * @param string $url Supplied callback URL.
 		 * @param WP_Post $consumer Consumer post; stored callback saved as `consumer` meta value.
 		 */
-		return apply_filters( 'rest_oauth.check_callback', $valid, $url, $consumer ); // @codingStandardsIgnoreLine
+		return apply_filters( 'rest_oauth_check_callback', $valid, $url, $consumer );
 	}
 
 	/**
@@ -659,7 +660,7 @@ class WP_REST_OAuth1 {
 
 		$params = array_merge( $params, $oauth_params );
 
-		$request_path = wp_parse_url( filter_input( INPUT_SERVER, 'REQUEST_URI' ), PHP_URL_PATH );
+			$request_path = wp_parse_url( filter_input( INPUT_SERVER, 'REQUEST_URI' ), PHP_URL_PATH );
 		$wp_base = get_home_url( null, '/', 'relative' );
 		if ( substr( $request_path, 0, strlen( $wp_base ) ) === $wp_base ) {
 			$request_path = substr( $request_path, strlen( $wp_base ) );
