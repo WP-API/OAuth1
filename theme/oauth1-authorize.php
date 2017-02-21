@@ -90,7 +90,7 @@ $url = add_query_arg( 'oauth_token', $token_key, $url );
 <a href="<?php echo esc_url( wp_login_url( $url, true ) ); ?>"><?php esc_html_e( 'Switch user' ) ?></a>
 <?php
 if ( get_option( 'users_can_register' ) ) :
-	$registration_url = sprintf( esc_html( '<a href="%s">%s</a>' ), esc_url( wp_registration_url() ), __( 'Register' ) );
+	$registration_url = sprintf( '<a href="%s">%s</a>', esc_url( wp_registration_url() ), esc_html__( 'Register' ) );
 	/**
 	 * Filter the registration URL below the login form.
 	 *
