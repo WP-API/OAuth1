@@ -6,6 +6,8 @@ This plugin uses the OAuth 1.0a protocol to allow delegated authorization; that 
 
 This plugin only supports WordPress >= 4.4.
 
+The latest stable version is also available from the [WordPress Plugin Directory](https://wordpress.org/plugins/rest-api-oauth1/).
+
 ## New to OAuth
 
 We strongly recommend you use an existing OAuth library. You'll be best off if you understand the authorization process, but leave the actual implementation to well-tested libraries, as there are a lot of edge cases.

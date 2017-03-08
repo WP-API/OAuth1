@@ -18,10 +18,13 @@ function rest_oauth1_profile_section( $user ) {
 	global $wpdb;
 
 	$results = $wpdb->get_col( "SELECT option_value FROM {$wpdb->options} WHERE option_name LIKE 'oauth1_access_%'", 0 );
-	$results = array_map( 'unserialize', $results );
-	$approved = array_filter( $results, function ( $row ) use ( $user ) {
-		return $row['user'] === $user->ID;
-	} );
+	$approved = array();
+	foreach ( $results as $result ) {
+		$row = unserialize( $result );
+		if ( $row['user'] === $user->ID ) {
+			$approved[] = $row;
+		}
+	}
 
 	$authenticator = new WP_REST_OAuth1();
 
@@ -46,7 +49,7 @@ function rest_oauth1_profile_section( $user ) {
 								?>
 								<tr>
 									<td><?php echo esc_html( $application->post_title ) ?></td>
-									<td><button class="button" name="oauth_revoke" value="<?php echo esc_attr( $row['key'] ) ?>"><?php esc_html_e( 'Revoke', 'rest_oauth1' ) ?></button>
+									<td><button class="button" name="rest_oauth1_revoke" value="<?php echo esc_attr( $row['key'] ) ?>"><?php esc_html_e( 'Revoke', 'rest_oauth1' ) ?></button>
 								</tr>
 
 							<?php endforeach ?>

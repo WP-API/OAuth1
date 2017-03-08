@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP REST API - OAuth 1.0a Server
  * Description: Authenticate with your site via OAuth 1.0a
- * Version: 0.2.1
+ * Version: 0.3.0
  * Author: WP REST API Team
  * Author URI: http://wp-api.org/
  *
@@ -107,6 +107,13 @@ add_action( 'init', 'rest_oauth1_force_reauthentication', 100 );
 function rest_oauth1_loaded() {
 	if ( empty( $GLOBALS['wp']->query_vars['rest_oauth1'] ) )
 		return;
+
+	rest_send_cors_headers( null );
+	header( 'Access-Control-Allow-Headers: Authorization' );
+
+	if ( $_SERVER['REQUEST_METHOD'] === 'OPTIONS' ) {
+		die();
+	}
 
 	$authenticator = new WP_REST_OAuth1();
 	$response = $authenticator->dispatch( $GLOBALS['wp']->query_vars['rest_oauth1'] );

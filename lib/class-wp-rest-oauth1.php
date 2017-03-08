@@ -397,7 +397,7 @@ class WP_REST_OAuth1 {
 	 * @param string $url URL for the callback.
 	 * @return bool True for a valid callback URL, false otherwise.
 	 */
-	protected function validate_callback( $url ) {
+	public static function validate_callback( $url ) {
 		if ( strpos( $url, ':' ) === false ) {
 			return false;
 		}
@@ -634,7 +634,7 @@ class WP_REST_OAuth1 {
 	 * @param array $params the request parameters
 	 * @return boolean|WP_Error True on success, error otherwise
 	 */
-	protected function check_oauth_signature( $consumer, $oauth_params, $token = null ) {
+	public function check_oauth_signature( $consumer, $oauth_params, $token = null ) {
 
 		$http_method = strtoupper( $_SERVER['REQUEST_METHOD'] );
 
@@ -649,6 +649,10 @@ class WP_REST_OAuth1 {
 			case 'PUT':
 				$params = wp_unslash( $_POST );
 				break;
+			default:
+				return new WP_Error( 'rest_oauth1_unknown_http_method',
+					sprintf( __( 'Unknown http method: %s', 'rest_oauth1' ), $http_method ),
+					array( 'status' => 401 ) );
 		}
 
 		$params = array_merge( $params, $oauth_params );
@@ -658,7 +662,7 @@ class WP_REST_OAuth1 {
 		if ( substr( $request_path, 0, strlen( $wp_base ) ) === $wp_base ) {
 			$request_path = substr( $request_path, strlen( $wp_base ) );
 		}
-		$base_request_uri = rawurlencode( get_home_url( null, $request_path ) );
+		$base_request_uri = self::urlencode_rfc3986( get_home_url( null, $request_path ) );
 
 		// get the signature provided by the consumer and remove it from the parameters prior to checking the signature
 		$consumer_signature = rawurldecode( $params['oauth_signature'] );
@@ -726,7 +730,7 @@ class WP_REST_OAuth1 {
 	public function join_with_equals_sign( $params, $query_params = array(), $key = '' ) {
 		foreach ( $params as $param_key => $param_value ) {
 			if ( $key ) {
-				$param_key = $key . '[' . $param_key . ']'; // Handle multi-dimensional array
+				$param_key = $key . '%5B' . $param_key . '%5D'; // Handle multi-dimensional array
 			}
 			if ( is_array( $param_value ) ) {
 				$query_params = $this->join_with_equals_sign( $param_value, $query_params, $param_key );
@@ -748,8 +752,8 @@ class WP_REST_OAuth1 {
 	 * @param string $value
 	 */
 	protected function normalize_parameters( &$key, &$value ) {
-		$key = rawurlencode( rawurldecode( $key ) );
-		$value = rawurlencode( rawurldecode( $value ) );
+		$key = self::urlencode_rfc3986( rawurldecode( $key ) );
+		$value = self::urlencode_rfc3986( rawurldecode( $value ) );
 	}
 
 	/**
@@ -764,7 +768,7 @@ class WP_REST_OAuth1 {
 	 * @param string $nonce a unique (for the given user) 32 alphanumeric string, consumer-generated
 	 * @return boolean|WP_Error True on success, error otherwise
 	 */
-	protected function check_oauth_timestamp_and_nonce( $consumer, $timestamp, $nonce ) {
+	public function check_oauth_timestamp_and_nonce( $consumer, $timestamp, $nonce ) {
 		$valid_window = apply_filters( 'json_oauth1_timestamp_window', 15 * MINUTE_IN_SECONDS );
 
 		if ( ( $timestamp < time() - $valid_window ) ||  ( $timestamp > time() + $valid_window ) )
@@ -779,10 +783,15 @@ class WP_REST_OAuth1 {
 			return new WP_Error( 'json_oauth1_nonce_already_used', __( 'Invalid nonce - nonce has already been used', 'rest_oauth1' ), array( 'status' => 401 ) );
 
 		$used_nonces[ $timestamp ] = $nonce;
-
+		
+		// Get the current time
+		$current_time = time();
+		
 		// Remove expired nonces
 		foreach ( $used_nonces as $nonce_timestamp => $nonce ) {
-			if ( $nonce_timestamp < $valid_window )
+			
+			// If the nonce timestamp is expired
+			if ( $nonce_timestamp < $current_time - $valid_window )
 				unset( $used_nonces[ $nonce_timestamp ] );
 		}
 

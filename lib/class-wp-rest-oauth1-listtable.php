@@ -13,12 +13,18 @@ class WP_REST_OAuth1_ListTable extends WP_List_Table {
 					'value' => 'oauth1',
 				),
 			),
-
 			'paged' => $paged,
 		);
 
-		$query = new WP_Query();
-		$this->items = $query->query( $args );
+		$query = new WP_Query( $args );
+		$this->items = $query->posts;
+
+		$pagination_args = array(
+			'total_items' => $query->found_posts,
+			'total_pages' => $query->max_num_pages,
+			'per_page' => $query->get('posts_per_page')
+		);
+		$this->set_pagination_args( $pagination_args );
 	}
 
 	/**
