@@ -587,24 +587,40 @@ class WP_REST_OAuth1 {
 		}
 
 		// Issue access token
-		$key = apply_filters( 'json_oauth1_access_token_key', wp_generate_password( self::TOKEN_KEY_LENGTH, false ) );
-		$data = array(
-			'key' => $key,
-			'secret' => wp_generate_password( self::TOKEN_SECRET_LENGTH, false ),
-			'consumer' => $consumer->ID,
-			'user' => $token['user'],
-		);
-		$data = apply_filters( 'json_oauth1_access_token_data', $data );
-		add_option( 'oauth1_access_' . $key, $data, null, 'no' );
+		$access_token = self::create_access_token( $consumer, $token['user'] );
 
 		// Delete the request token
 		$this->remove_request_token( $params['oauth_token'] );
 
 		// Return the new token's data
 		$data = array(
-			'oauth_token' => self::urlencode_rfc3986( $key ),
-			'oauth_token_secret' => self::urlencode_rfc3986( $data['secret'] ),
+			'oauth_token' => self::urlencode_rfc3986( $access_token['key'] ),
+			'oauth_token_secret' => self::urlencode_rfc3986( $access_token['secret'] ),
 		);
+		return $data;
+	}
+
+	/**
+	 * Creates new access token
+   *
+	 * This function is invoked by WP_REST_OAuth1::generate_access_token() and
+	 * handles the actual creation and storage of the access token.
+	 *
+	 * @param WP_Post $consumer
+   * @param int $user_id
+	 * @return array Array of token data on success
+	 */
+	public static function create_access_token( $consumer, $user_id ) {
+		$key = apply_filters( 'json_oauth1_access_token_key', wp_generate_password( self::TOKEN_KEY_LENGTH, false ) );
+		$data = array(
+			'key' => $key,
+			'secret' => wp_generate_password( self::TOKEN_SECRET_LENGTH, false ),
+			'consumer' => $consumer->ID,
+			'user' => $user_id,
+		);
+		$data = apply_filters( 'json_oauth1_access_token_data', $data );
+		add_option( 'oauth1_access_' . $key, $data, null, 'no' );
+
 		return $data;
 	}
 
@@ -783,13 +799,13 @@ class WP_REST_OAuth1 {
 			return new WP_Error( 'json_oauth1_nonce_already_used', __( 'Invalid nonce - nonce has already been used', 'rest_oauth1' ), array( 'status' => 401 ) );
 
 		$used_nonces[ $timestamp ] = $nonce;
-		
+
 		// Get the current time
 		$current_time = time();
-		
+
 		// Remove expired nonces
 		foreach ( $used_nonces as $nonce_timestamp => $nonce ) {
-			
+
 			// If the nonce timestamp is expired
 			if ( $nonce_timestamp < $current_time - $valid_window )
 				unset( $used_nonces[ $nonce_timestamp ] );
