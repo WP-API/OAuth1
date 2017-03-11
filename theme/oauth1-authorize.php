@@ -10,6 +10,11 @@ $current_user = wp_get_current_user();
 $url = site_url( 'wp-login.php?action=oauth1_authorize', 'login_post' );
 $url = add_query_arg( 'oauth_token', $token_key, $url );
 
+// Filterable Prefs
+$pref_show_avatar 	= apply_filters( 'json_oauth1.theme.authorize.show_avatar', true, $consumer );
+$pref_title 		= apply_filters( 'json_oauth1.theme.authorize.title', sprintf( __('Connect %1$s'), $consumer->post_title ), $consumer );
+$pref_description	= apply_filters( 'json_oauth1.theme.authorize.description', sprintf( __( '<strong>%1$s</strong>,<br/> "%2$s" would like to connect to %3$s.' ), $current_user->user_login, $consumer->post_title, get_bloginfo( 'name' ) ), $consumer );
+
 ?>
 
 <style>
@@ -55,22 +60,19 @@ $url = add_query_arg( 'oauth_token', $token_key, $url );
 
 <form name="oauth1_authorize_form" id="oauth1_authorize_form" action="<?php echo esc_url( $url ); ?>" method="post">
 
-	<h2 class="login-title"><?php echo esc_html( sprintf( __('Connect %1$s'), $consumer->post_title ) ) ?></h2>
+	<h2 class="login-title"><?php echo esc_html( $pref_title ) ?></h2>
+
+	<?php do_action( 'json_oauth1.theme.authorize.before_login_info', $consumer ); ?>
 
 	<div class="login-info">
 
-		<?php echo get_avatar( $current_user->ID, '78' ); ?>
+		<?php if ( $pref_show_avatar ): ?><?php echo get_avatar( $current_user->ID, '78' ); ?><?php endif; ?>
 
-		<p><?php
-			printf(
-				__( 'Howdy <strong>%1$s</strong>,<br/> "%2$s" would like to connect to %3$s.' ),
-				$current_user->user_login,
-				$consumer->post_title,
-				get_bloginfo( 'name' )
-			)
-		?></p>
+		<p><?php echo $pref_description; ?></p>
 
 	</div>
+
+	<?php do_action( 'json_oauth1.theme.authorize.after_login_info', $consumer ); ?>
 
 	<?php
 	/**
