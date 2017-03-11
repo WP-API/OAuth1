@@ -7,7 +7,7 @@ class WP_REST_OAuth1_ListTable extends WP_List_Table {
 		$args = array(
 			'post_type' => 'json_consumer',
 			'post_status' => 'any',
-			'meta_query' => array(
+			'meta_query' => array( // WPCS: tax_query ok.
 				array(
 					'key' => 'type',
 					'value' => 'oauth1',
@@ -22,7 +22,7 @@ class WP_REST_OAuth1_ListTable extends WP_List_Table {
 		$pagination_args = array(
 			'total_items' => $query->found_posts,
 			'total_pages' => $query->max_num_pages,
-			'per_page' => $query->get('posts_per_page')
+			'per_page' => $query->get( 'posts_per_page' ),
 		);
 		$this->set_pagination_args( $pagination_args );
 	}
