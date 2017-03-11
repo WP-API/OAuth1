@@ -100,7 +100,7 @@ class WP_REST_OAuth1_Admin {
 
 		?>
 		<div class="wrap">
-			<h2>
+			<h1>
 				<?php
 				esc_html_e( 'Registered Applications', 'rest_oauth1' );
 
@@ -110,7 +110,7 @@ class WP_REST_OAuth1_Admin {
 				<?php
 				endif;
 				?>
-			</h2>
+			</h1>
 			<?php
 			if ( ! empty( $_GET['deleted'] ) ) {
 				echo '<div id="message" class="updated"><p>' . esc_html__( 'Deleted application.', 'rest_oauth1' ) . '</p></div>';
@@ -135,22 +135,25 @@ class WP_REST_OAuth1_Admin {
 
 	protected static function validate_parameters( $params ) {
 		$valid = array();
+		$error = new WP_Error();
 
 		if ( empty( $params['name'] ) ) {
-			return new WP_Error( 'rest_oauth1_missing_name', __( 'Consumer name is required', 'rest_oauth1' ) );
+			$error->add( 'rest_oauth1_missing_name', __( 'Application name is required', 'rest_oauth1' ) );
 		}
 		$valid['name'] = wp_filter_post_kses( $params['name'] );
 
 		if ( empty( $params['description'] ) ) {
-			return new WP_Error( 'rest_oauth1_missing_description', __( 'Consumer description is required', 'rest_oauth1' ) );
+			$error->add( 'rest_oauth1_missing_description', __( 'Application description is required', 'rest_oauth1' ) );
 		}
 		$valid['description'] = wp_filter_post_kses( $params['description'] );
 
 		if ( empty( $params['callback'] ) ) {
-			return new WP_Error( 'rest_oauth1_missing_description', __( 'Consumer callback is required and must be a valid URL.', 'rest_oauth1' ) );
+			$error->add( 'rest_oauth1_missing_callback', __( 'Application callback is required and must be a valid URL.', 'rest_oauth1' ) );
 		}
-		if ( ! empty( $params['callback'] ) ) {
-			$valid['callback'] = $params['callback'];
+		$valid['callback'] = $params['callback'];
+
+		if ( count( $error->get_error_codes() ) > 0 ) {
+			return $error;
 		}
 
 		return $valid;
@@ -175,7 +178,7 @@ class WP_REST_OAuth1_Admin {
 		// Check that the parameters are correct first
 		$params = self::validate_parameters( wp_unslash( $_POST ) );
 		if ( is_wp_error( $params ) ) {
-			$messages[] = $params->get_error_message();
+			$messages = array_merge( $messages, $params->get_error_messages() );
 			return $messages;
 		}
 
@@ -237,7 +240,7 @@ class WP_REST_OAuth1_Admin {
 			$id = absint( $_REQUEST['id'] );
 			$consumer = WP_REST_OAuth1_Client::get( $id );
 			if ( is_wp_error( $consumer ) || empty( $consumer ) ) {
-				wp_die( __( 'Invalid consumer ID.', 'rest_oauth1' ) );
+				wp_die( __( 'Invalid application ID.', 'rest_oauth1' ) );
 			}
 
 			$form_action = self::get_url( array( 'action' => 'edit', 'id' => $id ) );
@@ -288,7 +291,7 @@ class WP_REST_OAuth1_Admin {
 	?>
 
 	<div class="wrap">
-		<h2 id="edit-site"><?php echo esc_html( $title ) ?></h2>
+		<h1 id="edit-site"><?php echo esc_html( $title ) ?></h1>
 
 		<?php
 		if ( ! empty( $messages ) ) {
@@ -301,13 +304,14 @@ class WP_REST_OAuth1_Admin {
 			<table class="form-table">
 				<tr>
 					<th scope="row">
-						<label for="oauth-name"><?php echo esc_html_x( 'Consumer Name', 'field name', 'rest_oauth1' ) ?></label>
+						<label for="oauth-name"><?php echo esc_html_x( 'Application Name', 'field name', 'rest_oauth1' ) ?></label>
 					</th>
 					<td>
 						<input type="text" class="regular-text"
+							required="required" aria-describedby="oauth-name-description"
 							name="name" id="oauth-name"
 							value="<?php echo esc_attr( $data['name'] ) ?>" />
-						<p class="description"><?php esc_html_e( 'This is shown to users during authorization and in their profile.', 'rest_oauth1' ) ?></p>
+						<p class="description" id="oauth-name-description"><?php esc_html_e( 'This is shown to users during authorization and in their profile.', 'rest_oauth1' ) ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -316,6 +320,7 @@ class WP_REST_OAuth1_Admin {
 					</th>
 					<td>
 						<textarea class="regular-text" name="description" id="oauth-description"
+							required="required"
 							cols="30" rows="5" style="width: 500px"><?php echo esc_textarea( $data['description'] ) ?></textarea>
 					</td>
 				</tr>
@@ -325,9 +330,10 @@ class WP_REST_OAuth1_Admin {
 					</th>
 					<td>
 						<input type="text" class="regular-text"
+							required="required" aria-describedby="oauth-callback-description"
 							name="callback" id="oauth-callback"
 							value="<?php echo esc_attr( $data['callback'] ) ?>" />
-						<p class="description"><?php esc_html_e( "Your application's callback URL. The callback passed with the request token must match the scheme, host, port, and path of this URL.", 'rest_oauth1' ) ?></p>
+						<p class="description" id="oauth-callback-description"><?php esc_html_e( "Your application's callback URL. The callback passed with the request token must match the scheme, host, port, and path of this URL.", 'rest_oauth1' ) ?></p>
 					</td>
 				</tr>
 			</table>
@@ -336,12 +342,12 @@ class WP_REST_OAuth1_Admin {
 
 			if ( empty( $consumer ) ) {
 				wp_nonce_field( 'rest-oauth1-add' );
-				submit_button( __( 'Add Consumer', 'rest_oauth1' ) );
+				submit_button( __( 'Create Application', 'rest_oauth1' ) );
 			}
 			else {
 				echo '<input type="hidden" name="id" value="' . esc_attr( $consumer->ID ) . '" />';
 				wp_nonce_field( 'rest-oauth1-edit-' . $consumer->ID );
-				submit_button( __( 'Save Consumer', 'rest_oauth1' ) );
+				submit_button( __( 'Update Application', 'rest_oauth1' ) );
 			}
 
 			?>
@@ -404,7 +410,7 @@ class WP_REST_OAuth1_Admin {
 		}
 
 		if ( ! $client->delete() ) {
-			$message = 'Invalid consumer ID';
+			$message = __( 'Invalid application ID' );
 			wp_die( $message );
 			return;
 		}

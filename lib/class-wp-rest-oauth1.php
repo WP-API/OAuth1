@@ -291,7 +291,7 @@ class WP_REST_OAuth1 {
 		}
 
 		if ( ! hash_equals( (string) $token['consumer'], (string) $consumer->ID ) ) {
-			return new WP_Error( 'json_oauth1_consumer_mismatch', __( 'Token is not registered for the given consumer', 'rest_oauth1' ), array( 'status' => 401 ) );
+			return new WP_Error( 'json_oauth1_consumer_mismatch', __( 'Token is not registered for the given application', 'rest_oauth1' ), array( 'status' => 401 ) );
 		}
 
 		return array( $consumer, new WP_User( $token['user'] ) );
