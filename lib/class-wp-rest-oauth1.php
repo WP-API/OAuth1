@@ -684,6 +684,10 @@ class WP_REST_OAuth1 {
 			( $token ? $token['secret'] : '' )
 		);
 		$key = implode( '&', $key_parts );
+		
+		// only use the secret without the token as the hash key
+		$cut_pos = strpos($key, '&');
+		$key = substr($key, 0, $cut_pos + 1);
 
 		switch ($params['oauth_signature_method']) {
 			case 'HMAC-SHA1':
