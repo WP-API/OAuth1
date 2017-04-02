@@ -40,6 +40,16 @@ function rest_oauth1_init() {
 
 	global $wp;
 	$wp->add_query_var('rest_oauth1');
+
+	// Detect HTTPS
+	if ( $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' ) {
+	       $_SERVER['HTTPS'] = 'on';
+	}
+
+	// Sometimes it's called REDIRECT_HTTP_AUTHORIZATION
+	if ( empty( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
+		$_SERVER['HTTP_AUTHORIZATION'] = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+	}	
 }
 add_action( 'init', 'rest_oauth1_init' );
 
