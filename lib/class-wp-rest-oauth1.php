@@ -48,7 +48,7 @@ class WP_REST_OAuth1 {
 		$params = array();
 		if ( preg_match_all( '/(oauth_[a-z_-]*)=(:?"([^"]*)"|([^,]*))/', $header, $matches ) ) {
 			foreach ($matches[1] as $i => $h) {
-				$params[$h] = urldecode( empty($matches[3][$i]) ? $matches[4][$i] : $matches[3][$i] );
+				$params[$h] = rawurldecode( empty($matches[3][$i]) ? $matches[4][$i] : $matches[3][$i] );
 			}
 			if (isset($params['realm'])) {
 				unset($params['realm']);
@@ -344,13 +344,14 @@ class WP_REST_OAuth1 {
 
 		// Generate token
 		$key = apply_filters( 'json_oauth1_request_token_key', wp_generate_password( self::TOKEN_KEY_LENGTH, false ) );
+		$callback = $params['oauth_callback'];
 		$data = array(
 			'key'        => $key,
 			'secret'     => wp_generate_password( self::TOKEN_SECRET_LENGTH, false ),
 			'consumer'   => $consumer->ID,
 			'authorized' => false,
 			'expiration' => time() + 24 * HOUR_IN_SECONDS,
-			'callback'   => null,
+			'callback'   => $callback,
 			'verifier'   => null,
 			'user'       => null,
 		);
@@ -543,8 +544,7 @@ class WP_REST_OAuth1 {
 	/**
 	 * Generate a new access token
 	 *
-	 * @param string $oauth_consumer_key Consumer key
-	 * @param string $oauth_token Request token key
+	 * @param string $params request parameters
 	 * @return WP_Error|array OAuth token data on success, error otherwise
 	 */
 	public function generate_access_token( $params ) {
@@ -630,8 +630,10 @@ class WP_REST_OAuth1 {
 	 * Verify that the consumer-provided request signature matches our generated signature, this ensures the consumer
 	 * has a valid key/secret
 	 *
-	 * @param WP_User $user
-	 * @param array $params the request parameters
+	 * @param WP_User $consumer
+	 * @param array $oauth_params the request parameters
+	 * @param array $token the request token
+	 *
 	 * @return boolean|WP_Error True on success, error otherwise
 	 */
 	public function check_oauth_signature( $consumer, $oauth_params, $token = null ) {
@@ -663,14 +665,11 @@ class WP_REST_OAuth1 {
 		if ( substr( $request_path, 0, strlen( $wp_base ) ) === $wp_base ) {
 			$request_path = substr( $request_path, strlen( $wp_base ) );
 		}
-		$base_request_uri = self::urlencode_rfc3986( get_home_url( null, $request_path ) );
+		$base_request_uri = get_home_url( null, $request_path );
 
 		// get the signature provided by the consumer and remove it from the parameters prior to checking the signature
 		$consumer_signature = rawurldecode( $params['oauth_signature'] );
 		unset( $params['oauth_signature'] );
-
-		// normalize parameter key/values
-		array_walk_recursive( $params, array( $this, 'normalize_parameters' ) );
 
 		// sort parameters
 		if ( ! uksort( $params, 'strcmp' ) )
@@ -679,7 +678,7 @@ class WP_REST_OAuth1 {
 		$query_string = $this->create_signature_string( $params );
 
 		$token = (array) $token;
-		$string_to_sign = $http_method . '&' . $base_request_uri . '&' . $query_string;
+		$string_to_sign = $http_method . '&' . self::urlencode_rfc3986( $base_request_uri ) . '&' . self::urlencode_rfc3986( $query_string );
 		$key_parts = array(
 			$consumer->secret,
 			( $token ? $token['secret'] : '' )
@@ -716,7 +715,7 @@ class WP_REST_OAuth1 {
 	 * @return string         Signature string
 	 */
 	public function create_signature_string( $params ) {
-		return implode( '%26', $this->join_with_equals_sign( $params ) ); // join with ampersand
+		return implode( '&', $this->join_with_equals_sign( $params ) ); // join with ampersand
 	}
 
 	/**
@@ -736,25 +735,11 @@ class WP_REST_OAuth1 {
 			if ( is_array( $param_value ) ) {
 				$query_params = $this->join_with_equals_sign( $param_value, $query_params, $param_key );
 			} else {
-				$string = $param_key . '=' . $param_value; // join with equals sign
-				$query_params[] = self::urlencode_rfc3986( $string );
+				$string = self::urlencode_rfc3986( $param_key ) . '=' . self::urlencode_rfc3986( $param_value ); // join with equals sign
+				$query_params[] = $string;
 			}
 		}
 		return $query_params;
-	}
-
-	/**
-	 * Normalize each parameter by assuming each parameter may have already been encoded, so attempt to decode, and then
-	 * re-encode according to RFC 3986
-	 *
-	 * @since 2.1
-	 * @see rawurlencode()
-	 * @param string $key
-	 * @param string $value
-	 */
-	protected function normalize_parameters( &$key, &$value ) {
-		$key = self::urlencode_rfc3986( rawurldecode( $key ) );
-		$value = self::urlencode_rfc3986( rawurldecode( $value ) );
 	}
 
 	/**
