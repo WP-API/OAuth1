@@ -88,7 +88,11 @@ class WP_REST_OAuth1 {
 	}
 
 	public function get_parameters( $require_token = true, $extra = array() ) {
-		$params = array_merge( $_GET, $_POST );
+		if ( strpos( $_SERVER['CONTENT_TYPE'], 'application/x-www-form-urlencoded' ) === 0 ) {
+			$params = array_merge( $_GET, $_POST );
+		} else {
+			$params = array_merge( $_GET );
+		}
 		$params = wp_unslash( $params );
 
 		$header = $this->get_authorization_header();
@@ -647,7 +651,11 @@ class WP_REST_OAuth1 {
 
 			case 'POST':
 			case 'PUT':
-				$params = wp_unslash( $_POST );
+				if ( strpos( $_SERVER['CONTENT_TYPE'], 'application/x-www-form-urlencoded' ) === 0 ) {
+					$params = wp_unslash( $_POST );
+				} else {
+					$params = array();
+				}
 				break;
 			default:
 				return new WP_Error( 'rest_oauth1_unknown_http_method',
