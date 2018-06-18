@@ -61,6 +61,18 @@ function rest_oauth1_setup_authentication() {
 		'delete_with_user' => true,
 		'query_var' => false,
 	) );
+
+	register_post_type( 'oauth1_access_token', array(
+		'labels' => array(
+			'name' => __( 'Access Token', 'rest_oauth1' ),
+			'singular_name' => __( 'Access Tokens', 'rest_oauth1' ),
+		),
+		'public' => false,
+		'hierarchical' => false,
+		'rewrite' => false,
+		'delete_with_user' => true,
+		'query_var' => false,
+	) );
 }
 add_action( 'init', 'rest_oauth1_setup_authentication' );
 

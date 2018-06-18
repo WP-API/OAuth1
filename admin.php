@@ -17,19 +17,20 @@ add_action( 'edit_user_profile_update', 'rest_oauth1_profile_save', 10, 1 );
 function rest_oauth1_profile_section( $user ) {
 	global $wpdb;
 
-	$results = $wpdb->get_col( "SELECT option_value FROM {$wpdb->options} WHERE option_name LIKE 'oauth1_access_%'", 0 );
-	$approved = array();
-	foreach ( $results as $result ) {
-		$row = unserialize( $result );
-		if ( $row['user'] === $user->ID ) {
-			$approved[] = $row;
-		}
-	}
+	$post_list     = get_posts( array(
+		'author'           => $user->ID,
+		'post_type'        => 'oauth1_access_token',
+		'posts_per_page'   => 100,
+		'suppress_filters' => false,
 
+    ) );
+	$approved      = array();
 	$authenticator = new WP_REST_OAuth1();
-
+	foreach ( $post_list as $result ) {
+		$approved[] = $authenticator->get_access_token( $result->post_name );
+	}
 	?>
-		<table class="form-table">
+    <table class="form-table">
 			<tbody>
 			<tr>
 				<th scope="row"><?php _e( 'Authorized Applications', 'rest_oauth1' ) ?></th>
