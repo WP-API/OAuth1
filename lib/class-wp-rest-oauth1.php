@@ -533,11 +533,36 @@ class WP_REST_OAuth1 {
 	 */
 	public function get_access_token( $oauth_token ) {
 		$data = get_option( 'oauth1_access_' . $oauth_token, null );
-		if ( empty( $data ) ) {
+		if ( ! empty( $data ) ) {
+			$this->create_access_token( $data['key'], $data['consumer'], $data['user'], $data['secret'] );
+		}
+
+		$post = get_page_by_path( $oauth_token, ARRAY_A, 'oauth1_access_token' );
+
+		if ( ! $post ) {
 			return null;
 		}
 
-		return $data;
+		$map = [
+			'post_name'    => 'key',
+			'post_content' => 'secret',
+			'post_parent'  => 'consumer',
+			'post_author'  => 'user',
+			'ID'           => 'post_id',
+		];
+
+
+		$token = [];
+
+		foreach ( $map as $new_key => $old_key ) {
+			$token[ $old_key ] = $post[ $new_key ];
+		}
+		$post_meta = get_post_meta( $post->ID );
+		foreach ( $post_meta as $meta_key => $meta_value ) {
+			$token[ $old_key ] = array_shift( $meta_value );
+		}
+
+		return $token;
 	}
 
 	/**
@@ -588,14 +613,12 @@ class WP_REST_OAuth1 {
 
 		// Issue access token
 		$key = apply_filters( 'json_oauth1_access_token_key', wp_generate_password( self::TOKEN_KEY_LENGTH, false ) );
-		$data = array(
-			'key' => $key,
-			'secret' => wp_generate_password( self::TOKEN_SECRET_LENGTH, false ),
-			'consumer' => $consumer->ID,
-			'user' => $token['user'],
-		);
-		$data = apply_filters( 'json_oauth1_access_token_data', $data );
-		add_option( 'oauth1_access_' . $key, $data, null, 'no' );
+
+		$access_token = $this->create_access_token( $key, $consumer->ID, $token['user'] );
+
+		if ( is_wp_error( $access_token ) ) {
+			return $access_token;
+		}
 
 		// Delete the request token
 		$this->remove_request_token( $params['oauth_token'] );
@@ -606,6 +629,32 @@ class WP_REST_OAuth1 {
 			'oauth_token_secret' => self::urlencode_rfc3986( $data['secret'] ),
 		);
 		return $data;
+	}
+
+	/**
+	 * @param $key
+	 * @param $consumer
+	 * @param $user
+	 */
+	public function create_access_token( $key, $consumer, $user, $password = false, $meta = [] ) {
+		$password = ( $password ) ? $password : wp_generate_password( self::TOKEN_SECRET_LENGTH, false );
+		$data     = [
+			'post_name'    => $key,
+			'post_content' => $password,
+			'post_parent'  => $consumer,
+			'post_author'  => $user,
+			'post_type'    => 'oauth1_access_token',
+		];
+
+		$post_id = wp_insert_post( $data );
+		if ( is_wp_error( $post_id ) ) {
+			return $post_id;
+		}
+		$meta_keys = apply_filters( 'json_oauth1_access_token_data', $meta );
+		foreach ( $meta_keys as $meta_key => $meta_value ) {
+			add_post_meta( $post_id, $meta_key, $meta_value );
+		}
+		return true;
 	}
 
 	/**
@@ -620,7 +669,7 @@ class WP_REST_OAuth1 {
 			return new WP_Error( 'json_oauth1_invalid_token', __( 'Access token does not exist', 'rest_oauth1' ), array( 'status' => 401 ) );
 		}
 
-		delete_option( 'oauth1_access_' . $key );
+		wp_delete_post( $data['post_id'], true );
 		do_action( 'json_oauth1_revoke_token', $data, $key );
 
 		return true;
