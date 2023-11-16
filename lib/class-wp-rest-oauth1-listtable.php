@@ -1,28 +1,34 @@
 <?php
 
+/**
+ * Extend WP_List_Table for custom list view for json consumer.
+ */
 class WP_REST_OAuth1_ListTable extends WP_List_Table {
+	/**
+	 * Prepare items.
+	 */
 	public function prepare_items() {
 		$paged = $this->get_pagenum();
 
 		$args = array(
-			'post_type' => 'json_consumer',
+			'post_type'   => 'json_consumer',
 			'post_status' => 'any',
-			'meta_query' => array(
+			'meta_query'  => array(
 				array(
-					'key' => 'type',
+					'key'   => 'type',
 					'value' => 'oauth1',
 				),
 			),
-			'paged' => $paged,
+			'paged'       => $paged,
 		);
 
-		$query = new WP_Query( $args );
+		$query       = new WP_Query( $args );
 		$this->items = $query->posts;
 
 		$pagination_args = array(
 			'total_items' => $query->found_posts,
 			'total_pages' => $query->max_num_pages,
-			'per_page' => $query->get('posts_per_page')
+			'per_page'    => $query->get( 'posts_per_page' ),
 		);
 		$this->set_pagination_args( $pagination_args );
 	}
@@ -46,24 +52,36 @@ class WP_REST_OAuth1_ListTable extends WP_List_Table {
 		return $c;
 	}
 
+	/**
+	 * Column checkbox.
+	 *
+	 * @param WP_Post $item Post object
+	 * @return void
+	 */
 	public function column_cb( $item ) {
 		?>
 		<label class="screen-reader-text"
-			for="cb-select-<?php echo esc_attr( $item->ID ) ?>"><?php esc_html_e( 'Select consumer', 'rest_oauth1' ); ?></label>
+			for="cb-select-<?php echo esc_attr( $item->ID ); ?>"><?php esc_html_e( 'Select consumer', 'rest_oauth1' ); ?></label>
 
-		<input id="cb-select-<?php echo esc_attr( $item->ID ) ?>" type="checkbox"
-			name="consumers[]" value="<?php echo esc_attr( $item->ID ) ?>" />
+		<input id="cb-select-<?php echo esc_attr( $item->ID ); ?>" type="checkbox"
+			name="consumers[]" value="<?php echo esc_attr( $item->ID ); ?>" />
 
 		<?php
 	}
 
+	/**
+	 * Column Name.
+	 *
+	 * @param WP_Post $item Post object
+	 * @return string
+	 */
 	protected function column_name( $item ) {
 		$title = get_the_title( $item->ID );
 		if ( empty( $title ) ) {
 			$title = '<em>' . esc_html__( 'Untitled', 'rest_oauth1' ) . '</em>';
 		}
 
-		$edit_link = add_query_arg(
+		$edit_link   = add_query_arg(
 			array(
 				'page'   => 'rest-oauth1-apps',
 				'action' => 'edit',
@@ -81,8 +99,8 @@ class WP_REST_OAuth1_ListTable extends WP_List_Table {
 		);
 		$delete_link = wp_nonce_url( $delete_link, 'rest-oauth1-delete:' . $item->ID );
 
-		$actions = array(
-			'edit' => sprintf( '<a href="%s">%s</a>', esc_url( $edit_link ), esc_html__( 'Edit', 'rest_oauth1' ) ),
+		$actions     = array(
+			'edit'   => sprintf( '<a href="%s">%s</a>', esc_url( $edit_link ), esc_html__( 'Edit', 'rest_oauth1' ) ),
 			'delete' => sprintf( '<a href="%s">%s</a>', esc_url( $delete_link ), esc_html__( 'Delete', 'rest_oauth1' ) ),
 		);
 		$action_html = $this->row_actions( $actions );
@@ -90,6 +108,12 @@ class WP_REST_OAuth1_ListTable extends WP_List_Table {
 		return $title . ' ' . $action_html;
 	}
 
+	/**
+	 * Column description.
+	 *
+	 * @param WP_Post $item Post object
+	 * @return string
+	 */
 	protected function column_description( $item ) {
 		return $item->post_content;
 	}

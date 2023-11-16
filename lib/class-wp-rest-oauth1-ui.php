@@ -8,6 +8,9 @@
  * @subpackage JSON API
  */
 
+/**
+ * Authorization page handler
+ */
 class WP_REST_OAuth1_UI {
 	/**
 	 * Request token for the current authorization request
@@ -58,19 +61,27 @@ class WP_REST_OAuth1_UI {
 	public function render_page() {
 		// Check required fields
 		if ( empty( $_REQUEST['oauth_token'] ) ) {
-			return new WP_Error( 'json_oauth1_missing_param', sprintf( __( 'Missing parameter %s', 'rest_oauth1' ), 'oauth_token' ), array( 'status' => 400 ) );
+			return new WP_Error(
+				'json_oauth1_missing_param',
+				sprintf(
+				/* translators: %s: oauth_token **/
+					__( 'Missing parameter %s', 'rest_oauth1' ),
+					'oauth_token'
+				),
+				array( 'status' => 400 )
+			);
 		}
 
 		// Set up fields
 		$token_key = wp_unslash( $_REQUEST['oauth_token'] );
-		$scope = '*';
+		$scope     = '*';
 		if ( ! empty( $_REQUEST['wp_scope'] ) ) {
 			$scope = wp_unslash( $_REQUEST['wp_scope'] );
 		}
 
 		$authenticator = new WP_REST_OAuth1();
-		$errors = array();
-		$this->token = $authenticator->get_request_token( $token_key );
+		$errors        = array();
+		$this->token   = $authenticator->get_request_token( $token_key );
 		if ( is_wp_error( $this->token ) ) {
 			return $this->token;
 		}
@@ -87,7 +98,8 @@ class WP_REST_OAuth1_UI {
 		}
 
 		// Fetch consumer
-		$this->consumer = $consumer = get_post( $this->token['consumer'] );
+		$consumer       = get_post( $this->token['consumer'] );
+		$this->consumer = $consumer;
 
 		if ( ! empty( $_POST['wp-submit'] ) ) {
 			check_admin_referer( 'json_oauth1_authorize' );
@@ -111,7 +123,7 @@ class WP_REST_OAuth1_UI {
 
 		$file = locate_template( 'oauth1-authorize.php' );
 		if ( empty( $file ) ) {
-			$file = dirname( dirname( __FILE__ ) ) . '/theme/oauth1-authorize.php';
+			$file = __DIR__ . '/../theme/oauth1-authorize.php';
 		}
 
 		include $file;
@@ -139,7 +151,12 @@ class WP_REST_OAuth1_UI {
 		if ( empty( $this->token['callback'] ) || $this->token['callback'] === 'oob' ) {
 			// No callback registered, display verification code to the user
 			login_header( __( 'Access Token', 'rest_oauth1' ) );
-			echo '<p>' . sprintf( __( 'Your verification token is <code>%s</code>', 'rest_oauth1' ), $verifier ) . '</p>';
+			echo '<p>' . sprintf(
+				/* translators: %s: verifier **/
+				__( 'Your verification token is <code>%s</code>', 'rest_oauth1' ),
+				$verifier
+			) .
+				'</p>';
 			login_footer();
 
 			return null;
@@ -153,13 +170,13 @@ class WP_REST_OAuth1_UI {
 			return new WP_Error( 'json_oauth1_invalid_callback', __( 'The callback URL is invalid', 'rest_oauth1' ), array( 'status' => 400 ) );
 		}
 
-		$args = array(
-			'oauth_token' => $this->token['key'],
+		$args     = array(
+			'oauth_token'    => $this->token['key'],
 			'oauth_verifier' => $verifier,
-			'wp_scope' => '*',
+			'wp_scope'       => '*',
 		);
-		$args = apply_filters( 'json_oauth1_callback_args', $args, $this->token );
-		$args = urlencode_deep( $args );
+		$args     = apply_filters( 'json_oauth1_callback_args', $args, $this->token );
+		$args     = urlencode_deep( $args );
 		$callback = add_query_arg( $args, $callback );
 
 		// Offsite, so skip safety check
@@ -169,9 +186,9 @@ class WP_REST_OAuth1_UI {
 	}
 
 	/**
-	 * Display an error using login page wrapper
+	 * Display an error using login page wrapper.
 	 *
-	 * @param WP_Error $error Error object
+	 * @param WP_Error $error Error object.
 	 */
 	public function display_error( WP_Error $error ) {
 		login_header( __( 'Error', 'rest_oauth1' ), '', $error );

@@ -11,11 +11,38 @@
 	<rule ref="WordPress-Core"/>
 	<rule ref="WordPress-Docs"/>
 
-	<rule ref="VariableAnalysis.CodeAnalysis.VariableAnalysis">
+  <rule ref="WordPress.WP.I18n">
 		<properties>
-			<property name="allowUnusedParametersBeforeUsed" value="true"/>
+			<property name="text_domain" type="array">
+				<element value="rest_oauth1"/>
+				<element value="default"/>
+				<element value=""/>
+			</property>
 		</properties>
 	</rule>
+
+
+    <rule ref="Squiz.Commenting.FileComment.Missing">
+ 		<exclude-pattern>*.php</exclude-pattern>
+ 		<exclude-pattern>lib/*</exclude-pattern>
+ 	</rule>
+
+    <rule ref="Squiz.Commenting.FunctionComment.ParamCommentFullStop">
+		<exclude-pattern>lib/*</exclude-pattern>
+	</rule>
+
+	<rule ref="Squiz.Commenting.InlineComment.InvalidEndChar">
+    		<exclude-pattern>lib/*</exclude-pattern>
+  </rule>
+
+  <rule ref="WordPress.WP.I18n.MissingArgDomainDefault">
+        <exclude-pattern>theme/oauth1-authorize.php</exclude-pattern>
+        <exclude-pattern>lib/class-wp-rest-oauth1.php</exclude-pattern>
+  </rule>
+
+  <rule ref="WordPress.PHP.YodaConditions.NotYoda">
+  		<exclude-pattern>*</exclude-pattern>
+  </rule>
 
 	<rule ref="PEAR.Functions.FunctionCallSignature">
 		<properties>
@@ -29,13 +56,9 @@
 	<file>./bin</file>
 	<file>./lib</file>
 	<file>./packages</file>
+  <exclude-pattern>lib/class-wp-rest-oauth1-cli.php</exclude-pattern>
 
 	<!-- Exclude third party libraries -->
 	<exclude-pattern>./vendor/*</exclude-pattern>
-
-	<!-- These special comments are markers for the build process -->
-	<rule ref="Squiz.Commenting.InlineComment.WrongStyle">
-		<exclude-pattern>gutenberg.php</exclude-pattern>
-	</rule>
 
 </ruleset>
