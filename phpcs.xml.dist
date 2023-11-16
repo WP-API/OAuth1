@@ -21,13 +21,20 @@
 		</properties>
 	</rule>
 
+	<rule ref="VariableAnalysis.CodeAnalysis.VariableAnalysis">
+		<properties>
+			<property name="allowUnusedParametersBeforeUsed" value="true"/>
+		</properties>
+		<exclude-pattern>theme/*.php</exclude-pattern>
+		<exclude-pattern>lib/class-wp-rest-oauth1-ui.php</exclude-pattern>
+	</rule>
 
-    <rule ref="Squiz.Commenting.FileComment.Missing">
+	<rule ref="Squiz.Commenting.FileComment.Missing">
  		<exclude-pattern>*.php</exclude-pattern>
  		<exclude-pattern>lib/*</exclude-pattern>
  	</rule>
 
-    <rule ref="Squiz.Commenting.FunctionComment.ParamCommentFullStop">
+	<rule ref="Squiz.Commenting.FunctionComment.ParamCommentFullStop">
 		<exclude-pattern>lib/*</exclude-pattern>
 	</rule>
 

@@ -200,7 +200,7 @@ class WP_REST_OAuth1_Admin {
 		}
 
 		if ( empty( $consumer ) ) {
-			$authenticator = new WP_REST_OAuth1();
+			new WP_REST_OAuth1();
 
 			// Create the consumer
 			$data     = array(

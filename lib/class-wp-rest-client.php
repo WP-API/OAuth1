@@ -227,7 +227,7 @@ abstract class WP_REST_Client {
 	 * @param array $params Parameters used to create the post.
 	 * @return array Metadata to actually save.
 	 */
-	protected static function add_extra_meta( $meta, $params ) {
+	protected static function add_extra_meta( $meta, $params ) { //phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		return $meta;
 	}
 
