@@ -9,5 +9,14 @@
             "homepage": "http://wp-api.org/"
         }
     ],
-    "require": {}
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "require-dev": {
+        "wp-coding-standards/wpcs": "^3.0",
+        "phpcompatibility/phpcompatibility-wp": "^2.1",
+        "sirbrillig/phpcs-variable-analysis": "^2.8"
+    }
 }
