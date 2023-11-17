@@ -55,7 +55,7 @@ class WP_REST_OAuth1_ListTable extends WP_List_Table {
 	/**
 	 * Column checkbox.
 	 *
-	 * @param WP_Post $item Post object
+	 * @param WP_Post $item Post object.
 	 * @return void
 	 */
 	public function column_cb( $item ) {
@@ -72,7 +72,7 @@ class WP_REST_OAuth1_ListTable extends WP_List_Table {
 	/**
 	 * Column Name.
 	 *
-	 * @param WP_Post $item Post object
+	 * @param WP_Post $item Post object.
 	 * @return string
 	 */
 	protected function column_name( $item ) {
@@ -111,7 +111,7 @@ class WP_REST_OAuth1_ListTable extends WP_List_Table {
 	/**
 	 * Column description.
 	 *
-	 * @param WP_Post $item Post object
+	 * @param WP_Post $item Post object.
 	 * @return string
 	 */
 	protected function column_description( $item ) {

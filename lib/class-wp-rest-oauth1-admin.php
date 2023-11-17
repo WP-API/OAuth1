@@ -25,15 +25,15 @@ class WP_REST_OAuth1_Admin {
 		include_once __DIR__ . '/class-wp-rest-oauth1-listtable.php';
 
 		$hook = add_users_page(
-			// Page title
+			// Page title.
 			__( 'Registered OAuth Applications', 'rest_oauth1' ),
-			// Menu title
+			// Menu title.
 			_x( 'Applications', 'menu title', 'rest_oauth1' ),
-			// Capability
+			// Capability.
 			'list_users',
-			// Menu slug
+			// Menu slug.
 			self::BASE_SLUG,
-			// Callback
+			// Callback.
 			array( get_class(), 'dispatch' )
 		);
 
@@ -192,7 +192,7 @@ class WP_REST_OAuth1_Admin {
 			check_admin_referer( 'rest-oauth1-edit-' . $consumer->ID );
 		}
 
-		// Check that the parameters are correct first
+		// Check that the parameters are correct first.
 		$params = self::validate_parameters( wp_unslash( $_POST ) );
 		if ( is_wp_error( $params ) ) {
 			$messages[] = $params->get_error_message();
@@ -202,7 +202,7 @@ class WP_REST_OAuth1_Admin {
 		if ( empty( $consumer ) ) {
 			new WP_REST_OAuth1();
 
-			// Create the consumer
+			// Create the consumer.
 			$data     = array(
 				'name'        => $params['name'],
 				'description' => $params['description'],
@@ -213,7 +213,7 @@ class WP_REST_OAuth1_Admin {
 			$consumer = WP_REST_OAuth1_Client::create( $data );
 			$result   = $consumer;
 		} else {
-			// Update the existing consumer post
+			// Update the existing consumer post.
 			$data   = array(
 				'name'        => $params['name'],
 				'description' => $params['description'],
@@ -230,7 +230,7 @@ class WP_REST_OAuth1_Admin {
 			return $messages;
 		}
 
-		// Success, redirect to alias page
+		// Success, redirect to alias page.
 		$location = self::get_url(
 			array(
 				'action'     => 'edit',
@@ -243,7 +243,7 @@ class WP_REST_OAuth1_Admin {
 	}
 
 	/**
-	 * Output alias editing page
+	 * Output alias editing page.
 	 */
 	public static function render_edit_page() {
 		if ( ! current_user_can( 'edit_users' ) ) {
@@ -274,7 +274,7 @@ class WP_REST_OAuth1_Admin {
 			);
 		}
 
-		// Handle form submission
+		// Handle form submission.
 		$messages = array();
 		if ( ! empty( $_POST['submit'] ) ) {
 			$messages = self::handle_edit_submit( $consumer );

@@ -59,7 +59,7 @@ class WP_REST_OAuth1_UI {
 	 * @return null|WP_Error Null on success, error otherwise
 	 */
 	public function render_page() {
-		// Check required fields
+		// Check required fields.
 		if ( empty( $_REQUEST['oauth_token'] ) ) {
 			return new WP_Error(
 				'json_oauth1_missing_param',
@@ -72,7 +72,7 @@ class WP_REST_OAuth1_UI {
 			);
 		}
 
-		// Set up fields
+		// Set up fields.
 		$token_key = wp_unslash( $_REQUEST['oauth_token'] );
 		$scope     = '*';
 		if ( ! empty( $_REQUEST['wp_scope'] ) ) {
@@ -97,7 +97,7 @@ class WP_REST_OAuth1_UI {
 			return $this->handle_callback_redirect( $this->token['verifier'] );
 		}
 
-		// Fetch consumer
+		// Fetch consumer.
 		$consumer       = get_post( $this->token['consumer'] );
 		$this->consumer = $consumer;
 
@@ -144,12 +144,12 @@ class WP_REST_OAuth1_UI {
 	/**
 	 * Handle redirecting the user after authorization
 	 *
-	 * @param string $verifier Verification code
+	 * @param string $verifier Verification code.
 	 * @return null|WP_Error Null on success, error otherwise
 	 */
 	public function handle_callback_redirect( $verifier ) {
 		if ( empty( $this->token['callback'] ) || $this->token['callback'] === 'oob' ) {
-			// No callback registered, display verification code to the user
+			// No callback registered, display verification code to the user.
 			login_header( __( 'Access Token', 'rest_oauth1' ) );
 			echo '<p>' . sprintf(
 				/* translators: %s: verifier **/
@@ -164,7 +164,7 @@ class WP_REST_OAuth1_UI {
 
 		$callback = $this->token['callback'];
 
-		// Ensure the URL is safe to access
+		// Ensure the URL is safe to access.
 		$authenticator = new WP_REST_OAuth1();
 		if ( ! $authenticator->check_callback( $callback, $this->token['consumer'] ) ) {
 			return new WP_Error( 'json_oauth1_invalid_callback', __( 'The callback URL is invalid', 'rest_oauth1' ), array( 'status' => 400 ) );
@@ -179,7 +179,7 @@ class WP_REST_OAuth1_UI {
 		$args     = urlencode_deep( $args );
 		$callback = add_query_arg( $args, $callback );
 
-		// Offsite, so skip safety check
+		// Offsite, so skip safety check.
 		wp_redirect( $callback );
 
 		return null;

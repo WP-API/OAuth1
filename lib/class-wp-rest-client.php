@@ -78,7 +78,7 @@ abstract class WP_REST_Client {
 				return $result;
 			}
 
-			// Reload the post property
+			// Reload the post property.
 			$this->post = get_post( $this->post->ID );
 		}
 
@@ -168,7 +168,7 @@ abstract class WP_REST_Client {
 	/**
 	 * Create a new client.
 	 *
-	 * @param array $params {
+	 * @param array $params { .
 	 *     @type string $name Client name
 	 *     @type string $description Client description
 	 *     @type array $meta Metadata for the client (map of key => value)
@@ -197,7 +197,7 @@ abstract class WP_REST_Client {
 		$meta         = $params['meta'];
 		$meta['type'] = call_user_func( array( $class, 'get_type' ) );
 
-		// Allow types to add their own meta too
+		// Allow types to add their own meta too.
 		$meta = $class::add_extra_meta( $meta, $params );
 
 		/**
@@ -237,7 +237,7 @@ abstract class WP_REST_Client {
 	 * @return string Class name.
 	 */
 	protected static function get_called_class() {
-		// PHP 5.2 only
+		// PHP 5.2 only.
 		$backtrace = debug_backtrace();
 		// [0] WP_REST_Client::get_called_class()
 		// [1] WP_REST_Client::function()
