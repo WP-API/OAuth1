@@ -277,9 +277,9 @@ class WP_REST_OAuth1 {
 	/**
 	 * Check a token against the database
 	 *
-	 * @param string $token Token object
+	 * @param array $token Token object
 	 * @param string $consumer_key Consumer ID
-	 * @return array Array of consumer object, user object
+	 * @return array|WP_Error Array of consumer object, user object or WP_Error on error.
 	 */
 	public function check_token( $token, $consumer_key ) {
 		$this->should_attempt = false;
@@ -363,12 +363,11 @@ class WP_REST_OAuth1 {
 			}
 		}
 
-		$data = array(
+		return array(
 			'oauth_token' => self::urlencode_rfc3986($key),
 			'oauth_token_secret' => self::urlencode_rfc3986($data['secret']),
 			'oauth_callback_confirmed' => 'true',
 		);
-		return $data;
 	}
 
 	public function set_request_token_callback( $key, $callback ) {
@@ -601,11 +600,10 @@ class WP_REST_OAuth1 {
 		$this->remove_request_token( $params['oauth_token'] );
 
 		// Return the new token's data
-		$data = array(
+		return array(
 			'oauth_token' => self::urlencode_rfc3986( $key ),
 			'oauth_token_secret' => self::urlencode_rfc3986( $data['secret'] ),
 		);
-		return $data;
 	}
 
 	/**

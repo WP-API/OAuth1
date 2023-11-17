@@ -17,7 +17,7 @@ add_action( 'edit_user_profile_update', 'rest_oauth1_profile_save', 10, 1 );
 function rest_oauth1_profile_section( $user ) {
 	global $wpdb;
 
-	$results = $wpdb->get_col( "SELECT option_value FROM {$wpdb->options} WHERE option_name LIKE 'oauth1_access_%'", 0 );
+	$results = $wpdb->get_col( "SELECT option_value FROM $wpdb->options WHERE option_name LIKE 'oauth1_access_%'", 0 );
 	$approved = array();
 	foreach ( $results as $result ) {
 		$row = unserialize( $result );

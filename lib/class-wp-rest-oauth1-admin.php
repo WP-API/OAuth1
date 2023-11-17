@@ -74,22 +74,13 @@ class WP_REST_OAuth1_Admin {
 				$wp_list_table = new WP_REST_OAuth1_ListTable();
 
 				$wp_list_table->prepare_items();
-
-				return;
+                return null;
 		}
 
 	}
 
 	public static function dispatch() {
-		switch ( self::current_action() ) {
-			case 'add':
-			case 'edit':
-			case 'delete':
-				return;
-
-			default:
-				return self::render();
-		}
+		return self::render();
 	}
 
 	/**
@@ -149,9 +140,9 @@ class WP_REST_OAuth1_Admin {
 		if ( empty( $params['callback'] ) ) {
 			return new WP_Error( 'rest_oauth1_missing_description', __( 'Consumer callback is required and must be a valid URL.', 'rest_oauth1' ) );
 		}
-		if ( ! empty( $params['callback'] ) ) {
-			$valid['callback'] = $params['callback'];
-		}
+
+        $valid['callback'] = $params['callback'];
+
 
 		return $valid;
 	}
@@ -232,6 +223,7 @@ class WP_REST_OAuth1_Admin {
 
 		// Are we editing?
 		$consumer = null;
+        $regenerate_action = '';
 		$form_action = self::get_url('action=add');
 		if ( ! empty( $_REQUEST['id'] ) ) {
 			$id = absint( $_REQUEST['id'] );
@@ -400,13 +392,11 @@ class WP_REST_OAuth1_Admin {
 		$client = WP_REST_OAuth1_Client::get( $id );
 		if ( is_wp_error( $client ) ) {
 			wp_die( $client );
-			return;
 		}
 
 		if ( ! $client->delete() ) {
 			$message = 'Invalid consumer ID';
 			wp_die( $message );
-			return;
 		}
 
 		wp_safe_redirect( self::get_url( 'deleted=1' ) );
@@ -430,7 +420,10 @@ class WP_REST_OAuth1_Admin {
 		}
 
 		$client = WP_REST_OAuth1_Client::get( $id );
-		$client->regenerate_secret();
+		$result = $client->regenerate_secret();
+        if( is_wp_error ($result) ) {
+            wp_die( $result );
+        }
 
 		wp_safe_redirect( self::get_url( array( 'action' => 'edit', 'id' => $id, 'did_action' => 'regenerate' ) ) );
 		exit;

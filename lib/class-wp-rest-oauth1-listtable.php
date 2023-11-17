@@ -1,7 +1,7 @@
 <?php
 
 class WP_REST_OAuth1_ListTable extends WP_List_Table {
-	public function prepare_items() {
+    public function prepare_items() {
 		$paged = $this->get_pagenum();
 
 		$args = array(
@@ -37,13 +37,11 @@ class WP_REST_OAuth1_ListTable extends WP_List_Table {
 	 *               and the value is the description.
 	 */
 	public function get_columns() {
-		$c = array(
+		return array(
 			'cb'          => '<input type="checkbox" />',
 			'name'        => __( 'Name', 'rest_oauth1' ),
 			'description' => __( 'Description', 'rest_oauth1' ),
 		);
-
-		return $c;
 	}
 
 	public function column_cb( $item ) {

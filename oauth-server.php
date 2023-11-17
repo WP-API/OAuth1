@@ -181,7 +181,15 @@ add_action( 'init', 'rest_oauth1_load_authorize_page' );
 function rest_oauth1_activation( $network_wide ) {
 	if ( function_exists( 'is_multisite' ) && is_multisite() && $network_wide ) {
 
-		$mu_blogs = wp_get_sites();
+        if( function_exists('get_sites')){
+            $blogs = get_sites();
+            $mu_blogs = array();
+            foreach ( $blogs as $mu_blog ) {
+                $mu_blogs[] = $mu_blog->to_array();
+            }
+        } else {
+            $mu_blogs = wp_get_sites();
+        }
 
 		foreach ( $mu_blogs as $mu_blog ) {
 
@@ -206,7 +214,15 @@ register_activation_hook( __FILE__, 'rest_oauth1_activation' );
 function rest_oauth1_deactivation( $network_wide ) {
 	if ( function_exists( 'is_multisite' ) && is_multisite() && $network_wide ) {
 
-		$mu_blogs = wp_get_sites();
+        if( function_exists('get_sites')){
+            $blogs = get_sites();
+            $mu_blogs = array();
+            foreach ( $blogs as $mu_blog ) {
+                $mu_blogs[] = $mu_blog->to_array();
+            }
+        } else {
+            $mu_blogs = wp_get_sites();
+        }
 
 		foreach ( $mu_blogs as $mu_blog ) {
 

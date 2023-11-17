@@ -1,4 +1,9 @@
 <?php
+/**
+ * @global string $errors
+ * @global string $token_key
+ * @global WP_Post $consumer
+ */
 login_header(
 	__('Authorize', 'oauth'),
 	'',

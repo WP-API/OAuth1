@@ -1,12 +1,20 @@
 <?php
 
 abstract class WP_REST_Client {
-	/**
+
+    /**
+     * Post object.
+     *
+     * @var WP_Post
+     */
+    private $post;
+
+    /**
 	 * Get the client type.
 	 *
 	 * Must be overridden in subclass.
 	 *
-	 * @return string
+	 * @return string | WP_Error
 	 */
 	protected static function get_type() {
 		return new WP_Error( 'rest_client_missing_type', __( 'Overridden class must implement get_type', 'rest_oauth1' ) );
@@ -191,7 +199,7 @@ abstract class WP_REST_Client {
 		$meta['type'] = call_user_func( array( $class, 'get_type' ) );
 
 		// Allow types to add their own meta too
-		$meta = $class::add_extra_meta( $meta, $params );
+		$meta = self::add_extra_meta( $meta, $params );
 
 		/**
 		 * Add extra meta to the consumer on creation.
