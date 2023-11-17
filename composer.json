@@ -14,14 +14,14 @@
       "issues": "https://github.com/WP-API/OAuth1/issues"
     },
     "config": {
-  		"process-timeout": 0,
-  		"platform": {
-  			"php": "5.4"
-  		},
-  		"allow-plugins": {
-            "composer/installers": true
-        }
-  	},
+      "process-timeout": 0,
+      "platform": {
+        "php": "5.4"
+       },
+       "allow-plugins": {
+        "composer/installers": true
+       }
+    },
     "require": {
       "php": "^5.4 || ^7.0 || ^8.0",
       "composer/installers": "~1.0"
