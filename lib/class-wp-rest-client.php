@@ -127,8 +127,7 @@ abstract class WP_REST_Client {
 			return new WP_Error( 'rest_oauth1_invalid_id', __( 'Client ID is not valid.', 'rest_oauth1' ), array( 'status' => 404 ) );
 		}
 
-		$class = function_exists( 'get_called_class' ) ? get_called_class() : self::get_called_class();
-		return new $class( $post );
+		return new static( $post );
 	}
 
 	/**
@@ -139,8 +138,7 @@ abstract class WP_REST_Client {
 	 * @return WP_Post|WP_Error
 	 */
 	public static function get_by_key( $key ) {
-		$class = function_exists( 'get_called_class' ) ? get_called_class() : self::get_called_class();
-		$type = call_user_func( array( $class, 'get_type' ) );
+		$type = self::get_type();
 
 		$query = new WP_Query();
 		$consumers = $query->query( array(
@@ -174,7 +172,7 @@ abstract class WP_REST_Client {
 	 *     @type string $description Client description
 	 *     @type array $meta Metadata for the client (map of key => value)
 	 * }
-	 * @return WP_Post|WP_Error
+	 * @return WP_REST_Client|WP_Error
 	 */
 	public static function create( $params ) {
 		$default = array(
@@ -194,9 +192,8 @@ abstract class WP_REST_Client {
 			return $ID;
 		}
 
-		$class = function_exists( 'get_called_class' ) ? get_called_class() : self::get_called_class();
 		$meta = $params['meta'];
-		$meta['type'] = call_user_func( array( $class, 'get_type' ) );
+		$meta['type'] = self::get_type();
 
 		// Allow types to add their own meta too
 		$meta = self::add_extra_meta( $meta, $params );
@@ -215,7 +212,7 @@ abstract class WP_REST_Client {
 		}
 
 		$post = get_post( $ID );
-		return new $class( $post );
+		return new static( $post );
 	}
 
 	/**
@@ -235,9 +232,11 @@ abstract class WP_REST_Client {
 	/**
 	 * Shim for get_called_class() for PHP 5.2
 	 *
+     * @deprecated 0.3.1
 	 * @return string Class name.
 	 */
 	protected static function get_called_class() {
+        _deprecated_function( __METHOD__, '0.3.1', 'get_called_class()' );
 		// PHP 5.2 only
 		$backtrace = debug_backtrace();
 		// [0] WP_REST_Client::get_called_class()
