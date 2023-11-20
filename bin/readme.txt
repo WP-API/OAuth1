@@ -1,8 +1,9 @@
 === WordPress REST API - OAuth 1.0a Server ===
-Contributors: rmccue, rachelbaker, danielbachhuber, joehoyle
+Contributors: rmccue, rachelbaker, danielbachhuber, joehoyle, spacedmonkey
 Tags: json, rest, api, rest-api
 Requires at least: 4.4
-Tested up to: 4.7-alpha
+Requires PHP: 5.4
+Tested up to: 6.4
 Stable tag: {{TAG}}
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
