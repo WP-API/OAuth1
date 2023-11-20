@@ -12,7 +12,9 @@ class WP_REST_OAuth1_Admin {
 		 */
 		include_once dirname( __FILE__ ) . '/class-wp-rest-oauth1-listtable.php';
 
-		$hook = add_users_page(
+        $class = get_class();
+
+		$hook  = add_users_page(
 			// Page title
 			__( 'Registered OAuth Applications', 'rest_oauth1' ),
 
@@ -26,10 +28,10 @@ class WP_REST_OAuth1_Admin {
 			self::BASE_SLUG,
 
 			// Callback
-			array( get_class(), 'dispatch' )
+			array( $class, 'dispatch' )
 		);
 
-		add_action( 'load-' . $hook, array( get_class(), 'load' ) );
+		add_action( 'load-' . $hook, array( $class, 'load' ) );
 	}
 
 	/**
@@ -76,7 +78,6 @@ class WP_REST_OAuth1_Admin {
 				$wp_list_table->prepare_items();
                 return null;
 		}
-
 	}
 
 	public static function dispatch() {
@@ -424,8 +425,11 @@ class WP_REST_OAuth1_Admin {
 		}
 
 		$client = WP_REST_OAuth1_Client::get( $id );
+        if( is_wp_error( $client) ) {
+            wp_die( $client );
+        }
 		$result = $client->regenerate_secret();
-        if( is_wp_error ($result) ) {
+        if( is_wp_error( $result) ) {
             wp_die( $result );
         }
 
