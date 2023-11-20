@@ -160,7 +160,7 @@ class WP_REST_OAuth1 {
 	 *
 	 * @link http://tools.ietf.org/html/rfc5849 OAuth 1.0a Specification
 	 *
-	 * @param WP_User|null Already authenticated user (will be passed through), or null to perform OAuth authentication
+	 * @param WP_User|null $user Already authenticated user (will be passed through), or null to perform OAuth authentication
 	 * @return WP_User|null|WP_Error Authenticated user on success, null if no OAuth data supplied, error otherwise
 	 */
 	public function authenticate( $user ) {
@@ -213,7 +213,7 @@ class WP_REST_OAuth1 {
 	/**
 	 * Report authentication errors to the JSON API
 	 *
-	 * @param WP_Error|mixed $result Error from another authentication handler, null if we should handle it, or another value if not
+	 * @param WP_Error|mixed $value Error from another authentication handler, null if we should handle it, or another value if not
 	 * @return WP_Error|boolean|null {@see WP_JSON_Server::check_authentication}
 	 */
 	public function get_authentication_errors( $value ) {
@@ -542,8 +542,7 @@ class WP_REST_OAuth1 {
 	/**
 	 * Generate a new access token
 	 *
-	 * @param string $oauth_consumer_key Consumer key
-	 * @param string $oauth_token Request token key
+	 * @param array $params Request parameters.
 	 * @return WP_Error|array OAuth token data on success, error otherwise
 	 */
 	public function generate_access_token( $params ) {
@@ -628,8 +627,8 @@ class WP_REST_OAuth1 {
 	 * Verify that the consumer-provided request signature matches our generated signature, this ensures the consumer
 	 * has a valid key/secret
 	 *
-	 * @param WP_User $user
-	 * @param array $params the request parameters
+	 * @param WP_Post $consumer REST Client.
+	 * @param array $oauth_params the request parameters
 	 * @return boolean|WP_Error True on success, error otherwise
 	 */
 	public function check_oauth_signature( $consumer, $oauth_params, $token = null ) {
@@ -761,7 +760,7 @@ class WP_REST_OAuth1 {
 	 * valid within 15 minutes of the current time, and a nonce is valid if it
 	 * has not been used within the last 15 minutes.
 	 *
-	 * @param WP_User $consumer
+	 * @param WP_Post $consumer Post client.
 	 * @param int $timestamp the unix timestamp for when the request was made
 	 * @param string $nonce a unique (for the given user) 32 alphanumeric string, consumer-generated
 	 * @return boolean|WP_Error True on success, error otherwise

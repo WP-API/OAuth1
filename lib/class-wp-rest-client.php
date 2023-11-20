@@ -104,13 +104,11 @@ abstract class WP_REST_Client {
 		return true;
 	}
 
-	/**
-	 * Delete a client.
-	 *
-	 * @param string $type Client type.
-	 * @param int $id Client post ID.
-	 * @return bool True if delete, false otherwise.
-	 */
+    /**
+     * Delete a client.
+     *
+     * @return bool True if delete, false otherwise.
+     */
 	public function delete() {
 		return (bool) wp_delete_post( $this->post->ID, true );
 	}
@@ -130,13 +128,12 @@ abstract class WP_REST_Client {
 		return new static( $post );
 	}
 
-	/**
-	 * Get a client by key.
-	 *
-	 * @param string $type Client type.
-	 * @param string $key Client key.
-	 * @return WP_Post|WP_Error
-	 */
+    /**
+     * Get a client by key.
+     *
+     * @param string $key Client key.
+     * @return WP_Post|WP_Error
+     */
 	public static function get_by_key( $key ) {
 		$type = self::get_type();
 
@@ -163,17 +160,16 @@ abstract class WP_REST_Client {
 		return $consumers[0];
 	}
 
-	/**
-	 * Create a new client.
-	 *
-	 * @param string $type Client type.
-	 * @param array $params {
-	 *     @type string $name Client name
-	 *     @type string $description Client description
-	 *     @type array $meta Metadata for the client (map of key => value)
-	 * }
-	 * @return WP_REST_Client|WP_Error
-	 */
+    /**
+     * Create a new client.
+     *
+     * @param array $params {
+     *          @type string $name Client name
+     *          @type string $description Client description
+     *          @type array $meta Metadata for the client (map of key => value)
+     * }
+     * @return WP_REST_Client|WP_Error
+     */
 	public static function create( $params ) {
 		$default = array(
 			'name' => '',

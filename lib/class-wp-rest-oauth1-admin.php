@@ -62,21 +62,19 @@ class WP_REST_OAuth1_Admin {
 		switch ( self::current_action() ) {
 			case 'add':
 			case 'edit':
-				return self::render_edit_page();
-
+                self::render_edit_page();
+                break;
 			case 'delete':
-				return self::handle_delete();
-
+				self::handle_delete();
+                break;
 			case 'regenerate':
-				return self::handle_regenerate();
-
+				self::handle_regenerate();
+                break;
 			default:
 				global $wp_list_table;
 
 				$wp_list_table = new WP_REST_OAuth1_ListTable();
-
 				$wp_list_table->prepare_items();
-                return null;
 		}
 	}
 
@@ -85,7 +83,7 @@ class WP_REST_OAuth1_Admin {
             return;
         }
 
-         return self::render();
+         self::render();
 	}
 
 	/**
@@ -176,7 +174,7 @@ class WP_REST_OAuth1_Admin {
 		}
 
 		if ( empty( $consumer ) ) {
-			$authenticator = new WP_REST_OAuth1();
+			(new WP_REST_OAuth1());
 
 			// Create the consumer
 			$data = array(

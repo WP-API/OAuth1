@@ -26,7 +26,7 @@ function rest_oauth1_profile_section( $user ) {
 		}
 	}
 
-	$authenticator = new WP_REST_OAuth1();
+    (new WP_REST_OAuth1());
 
 	?>
 		<table class="form-table">
