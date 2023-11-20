@@ -51,6 +51,7 @@ rm "composer.json"
 rm "book.json"
 rm -r "bin"
 rm -r "docs"
+rm -r ".github"
 
 # Add any new files
 svn status | grep -v "^.[ \t]*\..*" | grep "^?" | awk '{print $2}' | xargs svn add

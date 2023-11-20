@@ -7,6 +7,8 @@
 ## https://docs.npmjs.com/misc/faq#should-i-check-my-node_modules-folder-into-git
 node_modules
 vendor
+composer.lock
+.idea
 
 # Book build output
 _book
