@@ -80,7 +80,11 @@ class WP_REST_OAuth1_Admin {
 	}
 
 	public static function dispatch() {
-		return self::render();
+        if ( in_array( self::current_action(), array( 'add', 'edit', 'delete' ), true ) ) {
+            return;
+        }
+
+         return self::render();
 	}
 
 	/**
