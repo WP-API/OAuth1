@@ -56,7 +56,6 @@ class WP_REST_OAuth1_ListTable extends WP_List_Table {
 	 * Column checkbox.
 	 *
 	 * @param WP_Post $item Post object.
-	 * @return void
 	 */
 	public function column_cb( $item ) {
 		?>

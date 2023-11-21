@@ -89,18 +89,15 @@ class WP_REST_OAuth1_Admin {
 
 	/**
 	 * Render callback.
-	 *
-	 * @return void|null
 	 */
 	public static function dispatch() {
 		switch ( self::current_action() ) {
 			case 'add':
 			case 'edit':
 			case 'delete':
-				return;
-
+				break;
 			default:
-				return self::render();
+				self::render();
 		}
 	}
 
