@@ -134,7 +134,9 @@ abstract class WP_REST_Client {
 			return new WP_Error( 'rest_oauth1_invalid_id', __( 'Client ID is not valid.', 'rest_oauth1' ), array( 'status' => 404 ) );
 		}
 
-		return new static( $post );
+		$class = get_called_class();
+
+		return new $class( $post );
 	}
 
 	/**
@@ -144,7 +146,7 @@ abstract class WP_REST_Client {
 	 * @return WP_Post|WP_Error
 	 */
 	public static function get_by_key( $key ) {
-		$type = self::get_type();
+		$type  = call_user_func( array( get_called_class(), 'get_type' ) );
 
 		$query     = new WP_Query();
 		$consumers = $query->query(
@@ -165,8 +167,7 @@ abstract class WP_REST_Client {
 		);
 
 		if ( empty( $consumers ) || empty( $consumers[0] ) ) {
-			$code = is_user_logged_in() ? 403 : 401;
-			return new WP_Error( 'json_consumer_notfound', __( 'Consumer Key is invalid', 'rest_oauth1' ), array( 'status' => $code ) );
+			return new WP_Error( 'json_consumer_notfound', __( 'Consumer Key is invalid', 'rest_oauth1' ), array( 'status' => 401 ) );
 		}
 
 		return $consumers[0];
@@ -201,7 +202,8 @@ abstract class WP_REST_Client {
 		}
 
 		$meta         = $params['meta'];
-		$meta['type'] = self::get_type();
+		$class        = get_called_class();
+		$meta['type'] = call_user_func( array( $class, 'get_type' ) );
 
 		// Allow types to add their own meta too.
 		$meta = self::add_extra_meta( $meta, $params );
@@ -220,7 +222,7 @@ abstract class WP_REST_Client {
 		}
 
 		$post = get_post( $id );
-		return new static( $post );
+		return new $class( $post );
 	}
 
 	/**
