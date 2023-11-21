@@ -347,7 +347,7 @@ class WP_REST_OAuth1_Admin {
 						<label for="oauth-callback"><?php echo esc_html_x( 'Callback', 'field name', 'rest_oauth1' ); ?></label>
 					</th>
 					<td>
-						<input type="text" class="regular-text"
+						<input type="url" class="regular-text"
 							name="callback" id="oauth-callback"
 							value="<?php echo esc_attr( $data['callback'] ); ?>" />
 						<p class="description"><?php esc_html_e( "Your application's callback URL. The callback passed with the request token must match the scheme, host, port, and path of this URL.", 'rest_oauth1' ); ?></p>
