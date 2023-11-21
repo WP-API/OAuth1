@@ -705,7 +705,7 @@ class WP_REST_OAuth1 {
 		unset( $params['oauth_signature'] );
 
 		// normalize parameter key/values.
-		array_walk_recursive( $params, array( $this, 'normalize_parameters' ) );
+		$params = $this->normalize_parameter( $params );
 
 		// sort parameters.
 		if ( ! uksort( $params, 'strcmp' ) ) {
@@ -783,12 +783,35 @@ class WP_REST_OAuth1 {
 	 * Normalize each parameter by assuming each parameter may have already been encoded, so attempt to decode, and then
 	 * re-encode according to RFC 3986
 	 *
+	 * @see rawurlencode()
+	 * @param array $params Parameters to normalize.
+	 */
+	protected function normalize_parameter( array $params ) {
+		$new_params = array();
+		foreach ( $params as $key => $value ) {
+			$new_key = self::urlencode_rfc3986( rawurldecode( $key ) );
+			if ( is_array( $value ) ) {
+				$new_value = $this->normalize_parameter( $value );
+			} else {
+				$new_value = self::urlencode_rfc3986( rawurldecode( $value ) );
+			}
+			$new_params[ $new_key ] = $new_value;
+		}
+
+		return $new_params;
+	}
+
+	/**
+	 * Normalize each parameter by assuming each parameter may have already been encoded, so attempt to decode, and then
+	 * re-encode according to RFC 3986
+	 *
 	 * @since 2.1
 	 * @see rawurlencode()
 	 * @param string $key Key, passed by reference.
 	 * @param string $value Value, passed by reference.
 	 */
 	protected function normalize_parameters( &$key, &$value ) {
+		_deprecated_function( __METHOD__, '0.3.1', 'WP_REST_OAuth1::normalize_parameter()' );
 		$key   = self::urlencode_rfc3986( rawurldecode( $key ) );
 		$value = self::urlencode_rfc3986( rawurldecode( $value ) );
 	}
