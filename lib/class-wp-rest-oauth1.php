@@ -205,8 +205,8 @@ class WP_REST_OAuth1 {
 
 		// Fetch user by token key.
 		$token = $this->get_access_token( $params['oauth_token'] );
-		if ( is_wp_error( $token ) ) {
-			$this->auth_status = $token;
+		if ( empty( $token ) ) {
+			$this->auth_status = new WP_Error( 'json_oauth1_invalid_token', __( 'Access token does not exist', 'rest_oauth1' ), array( 'status' => 401 ) );;
 			return null;
 		}
 
