@@ -1,7 +1,22 @@
 <?php
 
+/**
+ * Class that extends WP_REST_Client that implements OAuth1.
+ *
+ * @see   WP_REST_Client
+ */
 class WP_REST_OAuth1_Client extends WP_REST_Client {
+	/**
+	 * Consumer key length.
+	 *
+	 * @var int
+	 */
 	const CONSUMER_KEY_LENGTH = 12;
+	/**
+	 * Consumer secret length.
+	 *
+	 * @var int
+	 */
 	const CONSUMER_SECRET_LENGTH = 48;
 
 	/**
@@ -41,7 +56,7 @@ class WP_REST_OAuth1_Client extends WP_REST_Client {
 	 */
 	protected static function add_extra_meta( $meta, $params ) {
 		if ( empty( $meta['key'] ) && empty( $meta['secret'] ) ) {
-			$meta['key'] = wp_generate_password( self::CONSUMER_KEY_LENGTH, false );
+			$meta['key']    = wp_generate_password( self::CONSUMER_KEY_LENGTH, false );
 			$meta['secret'] = wp_generate_password( self::CONSUMER_SECRET_LENGTH, false );
 		}
 		return parent::add_extra_meta( $meta, $params );

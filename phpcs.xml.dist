@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<ruleset name="WordPress Coding Standards for OAuth1">
+	<description>Sniffs for WordPress plugins, with minor modifications for OAuth1</description>
+
+    <config name="minimum_supported_wp_version" value="4.4" />
+
+	<!-- Check for cross-version support for PHP 5.4 and higher. -->
+	<config name="testVersion" value="5.4-"/>
+	<rule ref="PHPCompatibilityWP">
+		<include-pattern>*\.php$</include-pattern>
+	</rule>
+
+    <rule ref="WordPress-Core"/>
+	<rule ref="WordPress-Docs">
+        <exclude-pattern>lib/class-wp-rest-oauth1-cli.php</exclude-pattern>
+     </rule>
+
+    <rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="rest_oauth1"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="VariableAnalysis.CodeAnalysis.VariableAnalysis">
+		<properties>
+			<property name="allowUnusedParametersBeforeUsed" value="true"/>
+		</properties>
+		<exclude-pattern>theme/*.php</exclude-pattern>
+		<exclude-pattern>lib/class-wp-rest-oauth1-ui.php</exclude-pattern>
+	</rule>
+
+	<rule ref="Squiz.Commenting.FileComment.Missing">
+ 		<exclude-pattern>*.php</exclude-pattern>
+ 		<exclude-pattern>lib/*</exclude-pattern>
+    </rule>
+
+    <rule ref="PEAR.Functions.FunctionCallSignature">
+		<properties>
+			<property name="allowMultipleArguments" value="false"/>
+		</properties>
+	</rule>
+
+	<arg value="ps"/>
+	<arg name="extensions" value="php"/>
+	<file>.</file>
+
+    <!-- Strip the filepaths down to the relevant bit. -->
+    <arg name="basepath" value="./" />
+
+    <!-- Check up to 20 files simultaneously. -->
+    <arg name="parallel" value="20" />
+
+	<!-- Exclude third party libraries -->
+	<exclude-pattern>./vendor/*</exclude-pattern>
+</ruleset>
