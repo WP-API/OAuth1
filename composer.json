@@ -1,13 +1,40 @@
 {
     "name": "wp-api/oauth1",
     "description": "OAuth 1.0a Server for WordPress",
+    "homepage": "https://oauth1.wp-api.org/",
     "type": "wordpress-plugin",
-    "license": "GPL2+",
+    "license": "GPL-2.0-or-later",
     "authors": [
         {
             "name": "WP-API Team",
             "homepage": "https://wp-api.org/"
         }
     ],
-    "require": {}
+    "support": {
+      "issues": "https://github.com/WP-API/OAuth1/issues"
+    },
+    "config": {
+      "process-timeout": 0,
+      "platform": {
+        "php": "5.4"
+       },
+       "allow-plugins": {
+        "dealerdirect/phpcodesniffer-composer-installer": true,
+        "composer/installers": true
+       }
+    },
+    "require": {
+      "php": "^5.4 || ^7.0 || ^8.0",
+      "composer/installers": "~1.0"
+    },
+    "require-dev": {
+        "wp-coding-standards/wpcs": "^3.0",
+        "phpcompatibility/phpcompatibility-wp": "^2.1",
+        "sirbrillig/phpcs-variable-analysis": "^2.8"
+    },
+    "scripts": {
+      "format": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcbf --report=summary,source",
+      "lint": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs --report=summary,source",
+      "lint:errors": "@lint -n"
+    }
 }

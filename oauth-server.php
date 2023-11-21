@@ -19,15 +19,15 @@
  * Thanks for being fantastic. <3
  */
 
-include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1.php' );
-include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1-ui.php' );
-include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-client.php' );
-include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1-client.php' );
+require_once __DIR__ . '/lib/class-wp-rest-oauth1.php';
+require_once __DIR__ . '/lib/class-wp-rest-oauth1-ui.php';
+require_once __DIR__ . '/lib/class-wp-rest-client.php';
+require_once __DIR__ . '/lib/class-wp-rest-oauth1-client.php';
 
-include_once( dirname( __FILE__ ) . '/admin.php' );
+require_once __DIR__ . '/admin.php';
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
-	include_once( dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1-cli.php' );
+	include_once __DIR__ . '/lib/class-wp-rest-oauth1-cli.php';
 
 	WP_CLI::add_command( 'oauth1', 'WP_REST_OAuth1_CLI' );
 }
@@ -39,28 +39,37 @@ function rest_oauth1_init() {
 	rest_oauth1_register_rewrites();
 
 	global $wp;
-	$wp->add_query_var('rest_oauth1');
+	$wp->add_query_var( 'rest_oauth1' );
 }
 add_action( 'init', 'rest_oauth1_init' );
 
+/**
+ * Register rewrite rules.
+ */
 function rest_oauth1_register_rewrites() {
-	add_rewrite_rule( '^oauth1/authorize/?$','index.php?rest_oauth1=authorize','top' );
-	add_rewrite_rule( '^oauth1/request/?$','index.php?rest_oauth1=request','top' );
-	add_rewrite_rule( '^oauth1/access/?$','index.php?rest_oauth1=access','top' );
+	add_rewrite_rule( '^oauth1/authorize/?$', 'index.php?rest_oauth1=authorize', 'top' );
+	add_rewrite_rule( '^oauth1/request/?$', 'index.php?rest_oauth1=request', 'top' );
+	add_rewrite_rule( '^oauth1/access/?$', 'index.php?rest_oauth1=access', 'top' );
 }
 
+/**
+ * Setup authentication.
+ */
 function rest_oauth1_setup_authentication() {
-	register_post_type( 'json_consumer', array(
-		'labels' => array(
-			'name' => __( 'Consumer', 'rest_oauth1' ),
-			'singular_name' => __( 'Consumers', 'rest_oauth1' ),
-		),
-		'public' => false,
-		'hierarchical' => false,
-		'rewrite' => false,
-		'delete_with_user' => true,
-		'query_var' => false,
-	) );
+	register_post_type(
+		'json_consumer',
+		array(
+			'labels'           => array(
+				'name'          => __( 'Consumer', 'rest_oauth1' ),
+				'singular_name' => __( 'Consumers', 'rest_oauth1' ),
+			),
+			'public'           => false,
+			'hierarchical'     => false,
+			'rewrite'          => false,
+			'delete_with_user' => true,
+			'query_var'        => false,
+		)
+	);
 }
 add_action( 'init', 'rest_oauth1_setup_authentication' );
 
@@ -93,7 +102,7 @@ function rest_oauth1_force_reauthentication() {
 		return;
 	}
 
-	// Force reauthentication
+	// Force reauthentication.
 	global $current_user;
 	$current_user = null;
 
@@ -105,25 +114,25 @@ add_action( 'init', 'rest_oauth1_force_reauthentication', 100 );
  * Load the JSON API
  */
 function rest_oauth1_loaded() {
-	if ( empty( $GLOBALS['wp']->query_vars['rest_oauth1'] ) )
+	if ( empty( $GLOBALS['wp']->query_vars['rest_oauth1'] ) ) {
 		return;
+	}
 
 	rest_send_cors_headers( null );
 	header( 'Access-Control-Allow-Headers: Authorization' );
 
-	if ( $_SERVER['REQUEST_METHOD'] === 'OPTIONS' ) {
+	if ( 'OPTIONS' === $_SERVER['REQUEST_METHOD'] ) {
 		die();
 	}
 
 	$authenticator = new WP_REST_OAuth1();
-	$response = $authenticator->dispatch( $GLOBALS['wp']->query_vars['rest_oauth1'] );
+	$response      = $authenticator->dispatch( $GLOBALS['wp']->query_vars['rest_oauth1'] );
 
 	if ( is_wp_error( $response ) ) {
 		$error_data = $response->get_error_data();
 		if ( is_array( $error_data ) && isset( $error_data['status'] ) ) {
 			$status = $error_data['status'];
-		}
-		else {
+		} else {
 			$status = 500;
 		}
 
@@ -137,7 +146,7 @@ function rest_oauth1_loaded() {
 
 	echo $response;
 
-	// Finish off our request
+	// Finish off our request.
 	die();
 }
 add_action( 'template_redirect', 'rest_oauth1_loaded', -100 );
@@ -145,7 +154,7 @@ add_action( 'template_redirect', 'rest_oauth1_loaded', -100 );
 /**
  * Register v2 API routes
  *
- * @param object $response_object WP_REST_Response Object
+ * @param object $response_object WP_REST_Response Object.
  * @return object Filtered WP_REST_Response object
  */
 function rest_oauth1_register_routes( $response_object ) {
@@ -154,10 +163,10 @@ function rest_oauth1_register_routes( $response_object ) {
 	}
 
 	$response_object->data['authentication']['oauth1'] = array(
-		'request' => home_url( 'oauth1/request' ),
+		'request'   => home_url( 'oauth1/request' ),
 		'authorize' => home_url( 'oauth1/authorize' ),
-		'access' => home_url( 'oauth1/access' ),
-		'version' => '0.1',
+		'access'    => home_url( 'oauth1/access' ),
+		'version'   => '0.1',
 	);
 	return $response_object;
 }
@@ -177,19 +186,21 @@ add_action( 'init', 'rest_oauth1_load_authorize_page' );
 
 /**
  * Register routes and flush the rewrite rules on activation.
+ *
+ * @param boolean $network_wide Network activate.
  */
 function rest_oauth1_activation( $network_wide ) {
 	if ( function_exists( 'is_multisite' ) && is_multisite() && $network_wide ) {
 
-        if( function_exists('get_sites')){
-            $blogs = get_sites();
-            $mu_blogs = array();
-            foreach ( $blogs as $mu_blog ) {
-                $mu_blogs[] = $mu_blog->to_array();
-            }
-        } else {
-            $mu_blogs = wp_get_sites();
-        }
+		if ( function_exists( 'get_sites' ) ) {
+			$blogs    = get_sites();
+			$mu_blogs = array();
+			foreach ( $blogs as $mu_blog ) {
+				$mu_blogs[] = $mu_blog->to_array();
+			}
+		} else {
+			$mu_blogs = wp_get_sites();
+		}
 
 		foreach ( $mu_blogs as $mu_blog ) {
 
@@ -210,19 +221,21 @@ register_activation_hook( __FILE__, 'rest_oauth1_activation' );
 
 /**
  * Flush the rewrite rules on deactivation
+ *
+ * @param boolean $network_wide Network activate.
  */
 function rest_oauth1_deactivation( $network_wide ) {
 	if ( function_exists( 'is_multisite' ) && is_multisite() && $network_wide ) {
 
-        if( function_exists('get_sites')){
-            $blogs = get_sites();
-            $mu_blogs = array();
-            foreach ( $blogs as $mu_blog ) {
-                $mu_blogs[] = $mu_blog->to_array();
-            }
-        } else {
-            $mu_blogs = wp_get_sites();
-        }
+		if ( function_exists( 'get_sites' ) ) {
+			$blogs    = get_sites();
+			$mu_blogs = array();
+			foreach ( $blogs as $mu_blog ) {
+				$mu_blogs[] = $mu_blog->to_array();
+			}
+		} else {
+			$mu_blogs = wp_get_sites();
+		}
 
 		foreach ( $mu_blogs as $mu_blog ) {
 

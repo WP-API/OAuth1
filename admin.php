@@ -3,7 +3,7 @@
  * Administration UI and utilities
  */
 
-require dirname( __FILE__ ) . '/lib/class-wp-rest-oauth1-admin.php';
+require __DIR__ . '/lib/class-wp-rest-oauth1-admin.php';
 
 add_action( 'admin_menu', array( 'WP_REST_OAuth1_Admin', 'register' ) );
 
@@ -11,13 +11,18 @@ add_action( 'personal_options', 'rest_oauth1_profile_section', 50 );
 
 add_action( 'all_admin_notices', 'rest_oauth1_profile_messages' );
 
-add_action( 'personal_options_update',  'rest_oauth1_profile_save', 10, 1 );
+add_action( 'personal_options_update', 'rest_oauth1_profile_save', 10, 1 );
 add_action( 'edit_user_profile_update', 'rest_oauth1_profile_save', 10, 1 );
 
+/**
+ * Add a section to user profile.
+ *
+ * @param WP_User $user User object.
+ */
 function rest_oauth1_profile_section( $user ) {
 	global $wpdb;
 
-	$results = $wpdb->get_col( "SELECT option_value FROM $wpdb->options WHERE option_name LIKE 'oauth1_access_%'" );
+	$results  = $wpdb->get_col( "SELECT option_value FROM $wpdb->options WHERE option_name LIKE 'oauth1_access_%'" );
 	$approved = array();
 	foreach ( $results as $result ) {
 		$row = unserialize( $result );
@@ -26,15 +31,15 @@ function rest_oauth1_profile_section( $user ) {
 		}
 	}
 
-    (new WP_REST_OAuth1());
+	( new WP_REST_OAuth1() );
 
 	?>
 		<table class="form-table">
 			<tbody>
 			<tr>
-				<th scope="row"><?php _e( 'Authorized Applications', 'rest_oauth1' ) ?></th>
+				<th scope="row"><?php _e( 'Authorized Applications', 'rest_oauth1' ); ?></th>
 				<td>
-					<?php if ( ! empty( $approved ) ): ?>
+					<?php if ( ! empty( $approved ) ) : ?>
 						<table class="widefat">
 							<thead>
 							<tr>
@@ -43,20 +48,20 @@ function rest_oauth1_profile_section( $user ) {
 							</tr>
 							</thead>
 							<tbody>
-							<?php foreach ( $approved as $row ): ?>
+							<?php foreach ( $approved as $row ) : ?>
 								<?php
-								$application = get_post($row['consumer']);
+								$application = get_post( $row['consumer'] );
 								?>
 								<tr>
-									<td><?php echo esc_html( $application->post_title ) ?></td>
-									<td><button class="button" name="rest_oauth1_revoke" value="<?php echo esc_attr( $row['key'] ) ?>"><?php esc_html_e( 'Revoke', 'rest_oauth1' ) ?></button>
+									<td><?php echo esc_html( $application->post_title ); ?></td>
+									<td><button class="button" name="rest_oauth1_revoke" value="<?php echo esc_attr( $row['key'] ); ?>"><?php esc_html_e( 'Revoke', 'rest_oauth1' ); ?></button>
 								</tr>
 
 							<?php endforeach ?>
 							</tbody>
 						</table>
-					<?php else: ?>
-						<p class="description"><?php esc_html_e( 'No applications authorized.', 'rest_oauth1' ) ?></p>
+					<?php else : ?>
+						<p class="description"><?php esc_html_e( 'No applications authorized.', 'rest_oauth1' ); ?></p>
 					<?php endif ?>
 				</td>
 			</tr>
@@ -65,9 +70,12 @@ function rest_oauth1_profile_section( $user ) {
 	<?php
 }
 
+/**
+ * REST oauth profile message callback.
+ */
 function rest_oauth1_profile_messages() {
 	global $pagenow;
-	if ( $pagenow !== 'profile.php' && $pagenow !== 'user-edit.php' ) {
+	if ( 'profile.php' !== $pagenow && 'user-edit.php' !== $pagenow ) {
 		return;
 	}
 
@@ -79,6 +87,11 @@ function rest_oauth1_profile_messages() {
 	}
 }
 
+/**
+ * REST oauth profile save callback.
+ *
+ * @param int $user_id User ID.
+ */
 function rest_oauth1_profile_save( $user_id ) {
 	if ( empty( $_POST['rest_oauth1_revoke'] ) ) {
 		return;
@@ -91,10 +104,9 @@ function rest_oauth1_profile_save( $user_id ) {
 	$result = $authenticator->revoke_access_token( $key );
 	if ( is_wp_error( $result ) ) {
 		$redirect = add_query_arg( 'rest_oauth1_revocation_failed', true, get_edit_user_link( $user_id ) );
-	}
-	else {
+	} else {
 		$redirect = add_query_arg( 'rest_oauth1_revoked', $key, get_edit_user_link( $user_id ) );
 	}
-	wp_redirect($redirect);
+	wp_redirect( $redirect );
 	exit;
 }
