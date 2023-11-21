@@ -93,7 +93,7 @@ class WP_REST_OAuth1_UI {
 			}
 		}
 
-		if ( $this->token['authorized'] === true ) {
+		if ( true === $this->token['authorized'] ) {
 			return $this->handle_callback_redirect( $this->token['verifier'] );
 		}
 
@@ -148,7 +148,7 @@ class WP_REST_OAuth1_UI {
 	 * @return null|WP_Error Null on success, error otherwise
 	 */
 	public function handle_callback_redirect( $verifier ) {
-		if ( empty( $this->token['callback'] ) || $this->token['callback'] === 'oob' ) {
+		if ( empty( $this->token['callback'] ) || 'oob' === $this->token['callback'] ) {
 			// No callback registered, display verification code to the user.
 			login_header( __( 'Access Token', 'rest_oauth1' ) );
 			echo '<p>' . sprintf(

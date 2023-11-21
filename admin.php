@@ -75,7 +75,7 @@ function rest_oauth1_profile_section( $user ) {
  */
 function rest_oauth1_profile_messages() {
 	global $pagenow;
-	if ( $pagenow !== 'profile.php' && $pagenow !== 'user-edit.php' ) {
+	if ( 'profile.php' !== $pagenow && 'user-edit.php' !== $pagenow ) {
 		return;
 	}
 

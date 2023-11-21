@@ -241,7 +241,7 @@ class WP_REST_OAuth1 {
 	 * @return WP_Error|boolean|null {@see WP_JSON_Server::check_authentication}
 	 */
 	public function get_authentication_errors( $value ) {
-		if ( $value !== null ) {
+		if ( null !== $value ) {
 			return $value;
 		}
 
@@ -454,7 +454,7 @@ class WP_REST_OAuth1 {
 	 */
 	public function check_callback( $url, $consumer_id ) {
 		$consumer = get_post( $consumer_id );
-		if ( empty( $consumer ) || $consumer->post_type !== 'json_consumer' || $consumer->type !== $this->type ) {
+		if ( empty( $consumer ) || 'json_consumer' !== $consumer->post_type || $consumer->type !== $this->type ) {
 			return false;
 		}
 
@@ -464,7 +464,7 @@ class WP_REST_OAuth1 {
 		}
 
 		// Out-of-band isn't a URL, but is still valid.
-		if ( $registered === 'oob' || $url === 'oob' ) {
+		if ( 'oob' === $registered || 'oob' === $url ) {
 			// Ensure both the registered URL and requested are 'oob'.
 			return ( $registered === $url );
 		}
@@ -600,7 +600,7 @@ class WP_REST_OAuth1 {
 		}
 
 		// Check verification.
-		if ( $token['authorized'] !== true ) {
+		if ( true !== $token['authorized'] ) {
 			return new WP_Error( 'json_oauth1_unauthorized_token', __( 'OAuth token has not been authorized', 'rest_oauth1' ), array( 'status' => 401 ) );
 		}
 
