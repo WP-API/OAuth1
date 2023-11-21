@@ -419,10 +419,11 @@ class WP_REST_OAuth1_Admin {
 		check_admin_referer( 'rest-oauth1-delete:' . $id );
 
 		if ( ! current_user_can( 'delete_post', $id ) ) {
+			$code = is_user_logged_in() ? 403 : 401;
 			wp_die(
-				'<h1>' . __( 'Cheatin&#8217; uh?', 'rest_oauth1' ) . '</h1>' .
+				'<h1>' . __( 'An error has occurred.', 'rest_oauth1' ) . '</h1>' .
 				'<p>' . __( 'You are not allowed to delete this application.', 'rest_oauth1' ) . '</p>',
-				403
+				$code
 			);
 		}
 
@@ -454,10 +455,11 @@ class WP_REST_OAuth1_Admin {
 		check_admin_referer( 'rest-oauth1-regenerate:' . $id );
 
 		if ( ! current_user_can( 'edit_post', $id ) ) {
+			$code = is_user_logged_in() ? 403 : 401;
 			wp_die(
-				'<h1>' . __( 'Cheatin&#8217; uh?', 'rest_oauth1' ) . '</h1>' .
+				'<h1>' . __( 'An error has occurred.', 'rest_oauth1' ) . '</h1>' .
 				'<p>' . __( 'You are not allowed to edit this application.', 'rest_oauth1' ) . '</p>',
-				403
+				$code
 			);
 		}
 

@@ -159,7 +159,8 @@ abstract class WP_REST_Client {
 		);
 
 		if ( empty( $consumers ) || empty( $consumers[0] ) ) {
-			return new WP_Error( 'json_consumer_notfound', __( 'Consumer Key is invalid', 'rest_oauth1' ), array( 'status' => 401 ) );
+			$code = is_user_logged_in() ? 403 : 401;
+			return new WP_Error( 'json_consumer_notfound', __( 'Consumer Key is invalid', 'rest_oauth1' ), array( 'status' => $code ) );
 		}
 
 		return $consumers[0];
