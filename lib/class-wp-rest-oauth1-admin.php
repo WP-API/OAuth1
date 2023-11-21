@@ -113,12 +113,12 @@ class WP_REST_OAuth1_Admin {
 				<?php
 				esc_html_e( 'Registered Applications', 'rest_oauth1' );
 
-				if ( current_user_can( 'create_users' ) ) :
+				if ( current_user_can( 'create_users' ) ) {
 					?>
 					<a href="<?php echo esc_url( self::get_url( 'action=add' ) ); ?>"
 						class="add-new-h2"><?php echo esc_html_x( 'Add New', 'application', 'rest_oauth1' ); ?></a>
 					<?php
-				endif;
+				}
 				?>
 			</h2>
 			<?php
@@ -373,7 +373,7 @@ class WP_REST_OAuth1_Admin {
 			?>
 		</form>
 
-		<?php if ( ! empty( $consumer ) ) : ?>
+		<?php if ( ! empty( $consumer ) ) { ?>
 			<form method="post" action="<?php echo esc_url( $regenerate_action ); ?>">
 				<h3><?php esc_html_e( 'OAuth Credentials', 'rest_oauth1' ); ?></h3>
 
@@ -401,7 +401,7 @@ class WP_REST_OAuth1_Admin {
 				submit_button( __( 'Regenerate Secret', 'rest_oauth1' ), 'delete' );
 				?>
 			</form>
-		<?php endif ?>
+		<?php } ?>
 	</div>
 
 		<?php
