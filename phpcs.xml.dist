@@ -44,10 +44,13 @@
 
 	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
+	<file>.</file>
 
-	<file>./bin</file>
-	<file>./lib</file>
-	<file>./packages</file>
+    <!-- Strip the filepaths down to the relevant bit. -->
+    <arg name="basepath" value="./" />
+
+    <!-- Check up to 20 files simultaneously. -->
+    <arg name="parallel" value="20" />
 
 	<!-- Exclude third party libraries -->
 	<exclude-pattern>./vendor/*</exclude-pattern>
