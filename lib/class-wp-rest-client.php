@@ -146,7 +146,7 @@ abstract class WP_REST_Client {
 	 * @return WP_Post|WP_Error
 	 */
 	public static function get_by_key( $key ) {
-		$type  = call_user_func( array( get_called_class(), 'get_type' ) );
+		$type = call_user_func( array( get_called_class(), 'get_type' ) );
 
 		$query     = new WP_Query();
 		$consumers = $query->query(
@@ -206,7 +206,7 @@ abstract class WP_REST_Client {
 		$meta['type'] = call_user_func( array( $class, 'get_type' ) );
 
 		// Allow types to add their own meta too.
-		$meta = self::add_extra_meta( $meta, $params );
+		$meta = call_user_func( array( $class, 'add_extra_meta' ), $meta, $params );
 
 		/**
 		 * Add extra meta to the consumer on creation.
