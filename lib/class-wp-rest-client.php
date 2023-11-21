@@ -204,7 +204,7 @@ abstract class WP_REST_Client {
 		 * Add extra meta to the consumer on creation.
 		 *
 		 * @param array $meta Metadata map of key => value
-		 * @param int $ID Post ID we created.
+		 * @param int $id Post ID we created.
 		 * @param array $params Parameters passed to create.
 		 */
 		$meta = apply_filters( 'json_consumer_meta', $meta, $id, $params );
