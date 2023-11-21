@@ -531,7 +531,7 @@ class WP_REST_OAuth1 {
 
 		if ( empty( $user ) ) {
 			$user = get_current_user_id();
-		} elseif ( is_a( $user, 'WP_User' ) ) {
+		} elseif ( $user instanceof WP_User ) {
 			$user = $user->ID;
 		}
 
