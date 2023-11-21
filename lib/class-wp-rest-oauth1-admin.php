@@ -89,18 +89,15 @@ class WP_REST_OAuth1_Admin {
 
 	/**
 	 * Render callback.
-	 *
-	 * @return void|null
 	 */
 	public static function dispatch() {
 		switch ( self::current_action() ) {
 			case 'add':
 			case 'edit':
 			case 'delete':
-				return;
-
+				break;
 			default:
-				return self::render();
+				self::render();
 		}
 	}
 
@@ -116,12 +113,12 @@ class WP_REST_OAuth1_Admin {
 				<?php
 				esc_html_e( 'Registered Applications', 'rest_oauth1' );
 
-				if ( current_user_can( 'create_users' ) ) :
+				if ( current_user_can( 'create_users' ) ) {
 					?>
 					<a href="<?php echo esc_url( self::get_url( 'action=add' ) ); ?>"
 						class="add-new-h2"><?php echo esc_html_x( 'Add New', 'application', 'rest_oauth1' ); ?></a>
 					<?php
-				endif;
+				}
 				?>
 			</h2>
 			<?php
@@ -376,7 +373,7 @@ class WP_REST_OAuth1_Admin {
 			?>
 		</form>
 
-		<?php if ( ! empty( $consumer ) ) : ?>
+		<?php if ( ! empty( $consumer ) ) { ?>
 			<form method="post" action="<?php echo esc_url( $regenerate_action ); ?>">
 				<h3><?php esc_html_e( 'OAuth Credentials', 'rest_oauth1' ); ?></h3>
 
@@ -404,7 +401,7 @@ class WP_REST_OAuth1_Admin {
 				submit_button( __( 'Regenerate Secret', 'rest_oauth1' ), 'delete' );
 				?>
 			</form>
-		<?php endif ?>
+		<?php } ?>
 	</div>
 
 		<?php
@@ -422,10 +419,11 @@ class WP_REST_OAuth1_Admin {
 		check_admin_referer( 'rest-oauth1-delete:' . $id );
 
 		if ( ! current_user_can( 'delete_post', $id ) ) {
+			$code = is_user_logged_in() ? 403 : 401;
 			wp_die(
-				'<h1>' . __( 'Cheatin&#8217; uh?', 'rest_oauth1' ) . '</h1>' .
+				'<h1>' . __( 'An error has occurred.', 'rest_oauth1' ) . '</h1>' .
 				'<p>' . __( 'You are not allowed to delete this application.', 'rest_oauth1' ) . '</p>',
-				403
+				$code
 			);
 		}
 
@@ -457,10 +455,11 @@ class WP_REST_OAuth1_Admin {
 		check_admin_referer( 'rest-oauth1-regenerate:' . $id );
 
 		if ( ! current_user_can( 'edit_post', $id ) ) {
+			$code = is_user_logged_in() ? 403 : 401;
 			wp_die(
-				'<h1>' . __( 'Cheatin&#8217; uh?', 'rest_oauth1' ) . '</h1>' .
+				'<h1>' . __( 'An error has occurred.', 'rest_oauth1' ) . '</h1>' .
 				'<p>' . __( 'You are not allowed to edit this application.', 'rest_oauth1' ) . '</p>',
-				403
+				$code
 			);
 		}
 

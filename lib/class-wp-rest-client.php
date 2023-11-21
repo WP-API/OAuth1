@@ -122,7 +122,7 @@ abstract class WP_REST_Client {
 	 */
 	public static function get( $id ) {
 		$post = get_post( $id );
-		if ( empty( $id ) || empty( $post ) || $post->post_type !== 'json_consumer' ) {
+		if ( empty( $id ) || empty( $post ) || 'json_consumer' !== $post->post_type ) {
 			return new WP_Error( 'rest_oauth1_invalid_id', __( 'Client ID is not valid.', 'rest_oauth1' ), array( 'status' => 404 ) );
 		}
 
@@ -159,7 +159,8 @@ abstract class WP_REST_Client {
 		);
 
 		if ( empty( $consumers ) || empty( $consumers[0] ) ) {
-			return new WP_Error( 'json_consumer_notfound', __( 'Consumer Key is invalid', 'rest_oauth1' ), array( 'status' => 401 ) );
+			$code = is_user_logged_in() ? 403 : 401;
+			return new WP_Error( 'json_consumer_notfound', __( 'Consumer Key is invalid', 'rest_oauth1' ), array( 'status' => $code ) );
 		}
 
 		return $consumers[0];
@@ -204,7 +205,7 @@ abstract class WP_REST_Client {
 		 * Add extra meta to the consumer on creation.
 		 *
 		 * @param array $meta Metadata map of key => value
-		 * @param int $ID Post ID we created.
+		 * @param int $id Post ID we created.
 		 * @param array $params Parameters passed to create.
 		 */
 		$meta = apply_filters( 'json_consumer_meta', $meta, $id, $params );

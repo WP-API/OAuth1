@@ -2,7 +2,7 @@
 <ruleset name="WordPress Coding Standards for OAuth1">
 	<description>Sniffs for WordPress plugins, with minor modifications for OAuth1</description>
 
-  <config name="minimum_supported_wp_version" value="4.4" />
+    <config name="minimum_supported_wp_version" value="4.4" />
 
 	<!-- Check for cross-version support for PHP 5.4 and higher. -->
 	<config name="testVersion" value="5.4-"/>
@@ -10,17 +10,16 @@
 		<include-pattern>*\.php$</include-pattern>
 	</rule>
 
-	<rule ref="WordPress-Core"/>
-	<rule ref="WordPress-Docs">
-    <exclude-pattern>lib/class-wp-rest-oauth1-cli.php</exclude-pattern>
-  </rule>
 
-  <rule ref="WordPress.WP.I18n">
+  <rule ref="WordPress-Core"/>
+	<rule ref="WordPress-Docs">
+        <exclude-pattern>lib/class-wp-rest-oauth1-cli.php</exclude-pattern>
+     </rule>
+
+    <rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
 				<element value="rest_oauth1"/>
-				<element value="default"/>
-				<element value=""/>
 			</property>
 		</properties>
 	</rule>
@@ -36,16 +35,6 @@
 	<rule ref="Squiz.Commenting.FileComment.Missing">
  		<exclude-pattern>*.php</exclude-pattern>
  		<exclude-pattern>lib/*</exclude-pattern>
- 	</rule>
-
-  <rule ref="WordPress.WP.I18n.MissingArgDomainDefault">
-    <exclude-pattern>theme/oauth1-authorize.php</exclude-pattern>
-    <exclude-pattern>lib/class-wp-rest-oauth1.php</exclude-pattern>
-  </rule>
-
-  <rule ref="WordPress.PHP.YodaConditions.NotYoda">
-  		<exclude-pattern>*</exclude-pattern>
-  </rule>
 
 	<rule ref="PEAR.Functions.FunctionCallSignature">
 		<properties>
@@ -56,11 +45,14 @@
 	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
 
-	<file>./bin</file>
-	<file>./lib</file>
-	<file>./packages</file>
+	<file>.</file>
+
+    <!-- Strip the filepaths down to the relevant bit. -->
+    <arg name="basepath" value="./" />
+
+    <!-- Check up to 20 files simultaneously. -->
+    <arg name="parallel" value="20" />
 
 	<!-- Exclude third party libraries -->
 	<exclude-pattern>./vendor/*</exclude-pattern>
-
 </ruleset>
