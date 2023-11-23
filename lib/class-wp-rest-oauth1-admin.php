@@ -192,8 +192,6 @@ class WP_REST_OAuth1_Admin {
 		}
 
 		if ( empty( $consumer ) ) {
-			( new WP_REST_OAuth1() );
-
 			// Create the consumer.
 			$data     = array(
 				'name'        => $params['name'],

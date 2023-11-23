@@ -31,8 +31,6 @@ function rest_oauth1_profile_section( $user ) {
 		}
 	}
 
-	( new WP_REST_OAuth1() );
-
 	?>
 		<table class="form-table">
 			<tbody>
@@ -51,6 +49,9 @@ function rest_oauth1_profile_section( $user ) {
 							<?php foreach ( $approved as $row ) : ?>
 								<?php
 								$application = get_post( $row['consumer'] );
+								if ( ! $application ) {
+									continue;
+								}
 								?>
 								<tr>
 									<td><?php echo esc_html( $application->post_title ); ?></td>

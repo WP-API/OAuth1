@@ -16,7 +16,7 @@ abstract class WP_REST_Client {
 	 *
 	 * @var WP_Post
 	 */
-	private $post;
+	protected $post;
 
 	/**
 	 * Get the client type.
