@@ -128,6 +128,9 @@ function rest_oauth1_loaded() {
 	$authenticator = new WP_REST_OAuth1();
 	$response      = $authenticator->dispatch( $GLOBALS['wp']->query_vars['rest_oauth1'] );
 
+	nocache_headers();
+	header( 'Content-Type: application/x-www-form-urlencoded; charset=utf-8' );
+
 	if ( is_wp_error( $response ) ) {
 		$error_data = $response->get_error_data();
 		if ( is_array( $error_data ) && isset( $error_data['status'] ) ) {
@@ -141,7 +144,6 @@ function rest_oauth1_loaded() {
 		die();
 	}
 
-	header( 'Content-Type: application/x-www-form-urlencoded; charset=utf-8' );
 	$response = http_build_query( $response, '', '&' );
 
 	echo $response;
