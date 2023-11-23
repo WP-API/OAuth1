@@ -159,7 +159,7 @@ class WP_REST_OAuth1_Admin {
 		$valid['description'] = wp_filter_post_kses( $params['description'] );
 
 		if ( empty( $params['callback'] ) ) {
-			return new WP_Error( 'rest_oauth1_missing_description', __( 'Consumer callback is required and must be a valid URL.', 'rest_oauth1' ) );
+			return new WP_Error( 'rest_oauth1_missing_callback', __( 'Consumer callback is required and must be a valid URL.', 'rest_oauth1' ) );
 		}
 
 		$valid['callback'] = $params['callback'];
