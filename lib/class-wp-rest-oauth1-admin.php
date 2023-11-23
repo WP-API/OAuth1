@@ -170,7 +170,7 @@ class WP_REST_OAuth1_Admin {
 	/**
 	 * Handle submission of the add page
 
-	 * @param WP_User $consumer Consumer user.
+	 * @param WP_REST_Client $consumer Consumer user.
 	 *
 	 * @return array|null List of errors. Issues a redirect and exits on success.
 	 */
@@ -429,8 +429,12 @@ class WP_REST_OAuth1_Admin {
 		}
 
 		if ( ! $client->delete() ) {
-			$message = 'Invalid consumer ID';
-			wp_die( $message );
+			$code = is_user_logged_in() ? 403 : 401;
+			wp_die(
+				'<h1>' . __( 'An error has occurred.', 'rest_oauth1' ) . '</h1>' .
+				'<p>' . __( 'Invalid consumer ID', 'rest_oauth1' ) . '</p>',
+				$code
+			);
 		}
 
 		wp_safe_redirect( self::get_url( 'deleted=1' ) );
