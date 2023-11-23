@@ -247,6 +247,10 @@ abstract class WP_REST_Client {
 	 */
 	protected static function get_called_class() {
 		_deprecated_function( __METHOD__, '0.3.1', 'get_called_class()' );
+		if ( function_exists( 'get_called_class' ) ) {
+			return get_called_class();
+		}
+
 		// PHP 5.2 only.
 		$backtrace = debug_backtrace();
 		// [0] WP_REST_Client::get_called_class()
