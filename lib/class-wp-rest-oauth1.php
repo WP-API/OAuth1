@@ -246,6 +246,8 @@ class WP_REST_OAuth1 {
 			return $value;
 		}
 
+		$this->authenticate( null );
+
 		return $this->auth_status;
 	}
 

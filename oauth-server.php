@@ -88,7 +88,6 @@ function rest_oauth1_load() {
 	global $wp_json_authentication_oauth1;
 
 	$wp_json_authentication_oauth1 = new WP_REST_OAuth1();
-	add_filter( 'determine_current_user', array( $wp_json_authentication_oauth1, 'authenticate' ) );
 	add_filter( 'rest_authentication_errors', array( $wp_json_authentication_oauth1, 'get_authentication_errors' ) );
 }
 add_action( 'init', 'rest_oauth1_load' );
