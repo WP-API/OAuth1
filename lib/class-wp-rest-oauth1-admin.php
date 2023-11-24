@@ -146,25 +146,28 @@ class WP_REST_OAuth1_Admin {
 	 * @return array|WP_Error
 	 */
 	protected static function validate_parameters( $params ) {
-		$valid = array();
-
+		$error = new WP_Error();
 		if ( empty( $params['name'] ) ) {
-			return new WP_Error( 'rest_oauth1_missing_name', __( 'Consumer name is required', 'rest_oauth1' ) );
+			$error->add( 'rest_oauth1_missing_name', __( 'Consumer name is required', 'rest_oauth1' ) );
 		}
-		$valid['name'] = wp_filter_post_kses( $params['name'] );
 
 		if ( empty( $params['description'] ) ) {
-			return new WP_Error( 'rest_oauth1_missing_description', __( 'Consumer description is required', 'rest_oauth1' ) );
+			$error->add( 'rest_oauth1_missing_description', __( 'Consumer description is required', 'rest_oauth1' ) );
 		}
-		$valid['description'] = wp_filter_post_kses( $params['description'] );
 
 		if ( empty( $params['callback'] ) ) {
-			return new WP_Error( 'rest_oauth1_missing_callback', __( 'Consumer callback is required and must be a valid URL.', 'rest_oauth1' ) );
+			$error->add( 'rest_oauth1_missing_callback', __( 'Consumer callback is required and must be a valid URL.', 'rest_oauth1' ) );
 		}
 
-		$valid['callback'] = $params['callback'];
+		if ( count( $error->get_error_codes() ) > 0 ) {
+			return $error;
+		}
 
-		return $valid;
+		return array(
+			'name'        => wp_filter_post_kses( $params['name'] ),
+			'description' => wp_filter_post_kses( $params['description'] ),
+			'callback'    => $params['description'],
+		);
 	}
 
 	/**
@@ -175,7 +178,6 @@ class WP_REST_OAuth1_Admin {
 	 * @return array|null List of errors. Issues a redirect and exits on success.
 	 */
 	protected static function handle_edit_submit( $consumer ) {
-		$messages = array();
 		if ( empty( $consumer ) ) {
 			$did_action = 'add';
 			check_admin_referer( 'rest-oauth1-add' );
@@ -187,8 +189,7 @@ class WP_REST_OAuth1_Admin {
 		// Check that the parameters are correct first.
 		$params = self::validate_parameters( wp_unslash( $_POST ) );
 		if ( is_wp_error( $params ) ) {
-			$messages[] = $params->get_error_message();
-			return $messages;
+			return $params->get_error_messages();
 		}
 
 		if ( empty( $consumer ) ) {
@@ -215,9 +216,7 @@ class WP_REST_OAuth1_Admin {
 		}
 
 		if ( is_wp_error( $result ) ) {
-			$messages[] = $result->get_error_message();
-
-			return $messages;
+			return $result->get_error_messages();
 		}
 
 		// Success, redirect to alias page.
@@ -265,23 +264,29 @@ class WP_REST_OAuth1_Admin {
 			);
 		}
 
-		// Handle form submission.
-		$messages = array();
+		// Handle type of notice.
+		$notice_type = 'info';
+		$messages    = array();
 		if ( ! empty( $_POST['submit'] ) ) {
-			$messages = self::handle_edit_submit( $consumer );
+			$messages    = self::handle_edit_submit( $consumer );
+			$notice_type = 'error';
 		}
 		if ( ! empty( $_GET['did_action'] ) ) {
 			switch ( $_GET['did_action'] ) {
 				case 'edit':
-					$messages[] = __( 'Updated application.', 'rest_oauth1' );
+					$messages[]  = __( 'Updated application.', 'rest_oauth1' );
+					$notice_type = 'info';
+
 					break;
 
 				case 'regenerate':
-					$messages[] = __( 'Regenerated secret.', 'rest_oauth1' );
+					$messages[]  = __( 'Regenerated secret.', 'rest_oauth1' );
+					$notice_type = 'success';
 					break;
 
 				default:
-					$messages[] = __( 'Successfully created application.', 'rest_oauth1' );
+					$messages[]  = __( 'Successfully created application.', 'rest_oauth1' );
+					$notice_type = 'success';
 					break;
 			}
 		}
@@ -313,7 +318,7 @@ class WP_REST_OAuth1_Admin {
 		<?php
 		if ( ! empty( $messages ) ) {
 			foreach ( $messages as $msg ) {
-				echo '<div id="message" class="updated"><p>' . esc_html( $msg ) . '</p></div>';
+				echo '<div id="message" class="notice is-dismissible notice-' . $notice_type . '"><p>' . esc_html( $msg ) . '</p></div>';
 			}
 		}
 		?>
