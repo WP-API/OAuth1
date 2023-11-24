@@ -22,7 +22,7 @@ add_action( 'edit_user_profile_update', 'rest_oauth1_profile_save', 10, 1 );
 function rest_oauth1_profile_section( $user ) {
 	global $wpdb;
 
-	$results  = $wpdb->get_col( "SELECT option_value FROM {$wpdb->options} WHERE option_name LIKE 'oauth1_access_%'", 0 );
+	$results  = $wpdb->get_col( "SELECT option_value FROM $wpdb->options WHERE option_name LIKE 'oauth1_access_%'" );
 	$approved = array();
 	foreach ( $results as $result ) {
 		$row = unserialize( $result );
@@ -30,8 +30,6 @@ function rest_oauth1_profile_section( $user ) {
 			$approved[] = $row;
 		}
 	}
-
-	$authenticator = new WP_REST_OAuth1(); // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 	?>
 		<table class="form-table">
@@ -51,6 +49,9 @@ function rest_oauth1_profile_section( $user ) {
 							<?php foreach ( $approved as $row ) : ?>
 								<?php
 								$application = get_post( $row['consumer'] );
+								if ( ! $application ) {
+									continue;
+								}
 								?>
 								<tr>
 									<td><?php echo esc_html( $application->post_title ); ?></td>

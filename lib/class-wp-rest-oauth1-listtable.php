@@ -43,13 +43,11 @@ class WP_REST_OAuth1_ListTable extends WP_List_Table {
 	 *               and the value is the description.
 	 */
 	public function get_columns() {
-		$c = array(
+		return array(
 			'cb'          => '<input type="checkbox" />',
 			'name'        => __( 'Name', 'rest_oauth1' ),
 			'description' => __( 'Description', 'rest_oauth1' ),
 		);
-
-		return $c;
 	}
 
 	/**

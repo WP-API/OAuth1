@@ -24,6 +24,8 @@ class WP_REST_OAuth1_Admin {
 		 */
 		include_once __DIR__ . '/class-wp-rest-oauth1-listtable.php';
 
+		$class = get_class();
+
 		$hook = add_users_page(
 			// Page title.
 			__( 'Registered OAuth Applications', 'rest_oauth1' ),
@@ -34,10 +36,10 @@ class WP_REST_OAuth1_Admin {
 			// Menu slug.
 			self::BASE_SLUG,
 			// Callback.
-			array( get_class(), 'dispatch' )
+			array( $class, 'dispatch' )
 		);
 
-		add_action( 'load-' . $hook, array( get_class(), 'load' ) );
+		add_action( 'load-' . $hook, array( $class, 'load' ) );
 	}
 
 	/**
@@ -68,22 +70,19 @@ class WP_REST_OAuth1_Admin {
 		switch ( self::current_action() ) {
 			case 'add':
 			case 'edit':
-				return self::render_edit_page();
-
+				self::render_edit_page();
+				break;
 			case 'delete':
-				return self::handle_delete();
-
+				self::handle_delete();
+				break;
 			case 'regenerate':
-				return self::handle_regenerate();
-
+				self::handle_regenerate();
+				break;
 			default:
 				global $wp_list_table;
 
 				$wp_list_table = new WP_REST_OAuth1_ListTable();
-
 				$wp_list_table->prepare_items();
-
-				return;
 		}
 	}
 
@@ -91,14 +90,11 @@ class WP_REST_OAuth1_Admin {
 	 * Render callback.
 	 */
 	public static function dispatch() {
-		switch ( self::current_action() ) {
-			case 'add':
-			case 'edit':
-			case 'delete':
-				break;
-			default:
-				self::render();
+		if ( in_array( self::current_action(), array( 'add', 'edit', 'delete' ), true ) ) {
+			return;
 		}
+
+		self::render();
 	}
 
 	/**
@@ -163,11 +159,10 @@ class WP_REST_OAuth1_Admin {
 		$valid['description'] = wp_filter_post_kses( $params['description'] );
 
 		if ( empty( $params['callback'] ) ) {
-			return new WP_Error( 'rest_oauth1_missing_description', __( 'Consumer callback is required and must be a valid URL.', 'rest_oauth1' ) );
+			return new WP_Error( 'rest_oauth1_missing_callback', __( 'Consumer callback is required and must be a valid URL.', 'rest_oauth1' ) );
 		}
-		if ( ! empty( $params['callback'] ) ) {
-			$valid['callback'] = $params['callback'];
-		}
+
+		$valid['callback'] = $params['callback'];
 
 		return $valid;
 	}
@@ -175,7 +170,7 @@ class WP_REST_OAuth1_Admin {
 	/**
 	 * Handle submission of the add page
 
-	 * @param WP_User $consumer Consumer user.
+	 * @param WP_REST_Client $consumer Consumer user.
 	 *
 	 * @return array|null List of errors. Issues a redirect and exits on success.
 	 */
@@ -197,8 +192,6 @@ class WP_REST_OAuth1_Admin {
 		}
 
 		if ( empty( $consumer ) ) {
-			new WP_REST_OAuth1();
-
 			// Create the consumer.
 			$data     = array(
 				'name'        => $params['name'],
@@ -248,8 +241,9 @@ class WP_REST_OAuth1_Admin {
 		}
 
 		// Are we editing?
-		$consumer    = null;
-		$form_action = self::get_url( 'action=add' );
+		$consumer          = null;
+		$regenerate_action = '';
+		$form_action       = self::get_url( 'action=add' );
 		if ( ! empty( $_REQUEST['id'] ) ) {
 			$id       = absint( $_REQUEST['id'] );
 			$consumer = WP_REST_OAuth1_Client::get( $id );
@@ -430,13 +424,15 @@ class WP_REST_OAuth1_Admin {
 		$client = WP_REST_OAuth1_Client::get( $id );
 		if ( is_wp_error( $client ) ) {
 			wp_die( $client );
-			return;
 		}
 
 		if ( ! $client->delete() ) {
-			$message = 'Invalid consumer ID';
-			wp_die( $message );
-			return;
+			$code = is_user_logged_in() ? 403 : 401;
+			wp_die(
+				'<h1>' . __( 'An error has occurred.', 'rest_oauth1' ) . '</h1>' .
+				'<p>' . __( 'Invalid consumer ID', 'rest_oauth1' ) . '</p>',
+				$code
+			);
 		}
 
 		wp_safe_redirect( self::get_url( 'deleted=1' ) );
@@ -464,7 +460,13 @@ class WP_REST_OAuth1_Admin {
 		}
 
 		$client = WP_REST_OAuth1_Client::get( $id );
-		$client->regenerate_secret();
+		if ( is_wp_error( $client ) ) {
+			wp_die( $client );
+		}
+		$result = $client->regenerate_secret();
+		if ( is_wp_error( $result ) ) {
+			wp_die( $result );
+		}
 
 		wp_safe_redirect(
 			self::get_url(

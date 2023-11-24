@@ -1,4 +1,15 @@
 <?php
+/**
+ * Template file for OAuth1 screen.
+ *
+ * @package WordPress
+ * @subpackage JSON API
+ *
+ * @global string $errors
+ * @global string $token_key
+ * @global WP_Post $consumer
+ */
+
 login_header(
 	__( 'Authorize', 'rest_oauth1' ),
 	'',

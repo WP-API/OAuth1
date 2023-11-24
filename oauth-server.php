@@ -128,6 +128,9 @@ function rest_oauth1_loaded() {
 	$authenticator = new WP_REST_OAuth1();
 	$response      = $authenticator->dispatch( $GLOBALS['wp']->query_vars['rest_oauth1'] );
 
+	nocache_headers();
+	header( 'Content-Type: application/x-www-form-urlencoded; charset=utf-8' );
+
 	if ( is_wp_error( $response ) ) {
 		$error_data = $response->get_error_data();
 		if ( is_array( $error_data ) && isset( $error_data['status'] ) ) {
@@ -141,7 +144,6 @@ function rest_oauth1_loaded() {
 		die();
 	}
 
-	header( 'Content-Type: application/x-www-form-urlencoded; charset=utf-8' );
 	$response = http_build_query( $response, '', '&' );
 
 	echo $response;
@@ -192,7 +194,15 @@ add_action( 'init', 'rest_oauth1_load_authorize_page' );
 function rest_oauth1_activation( $network_wide ) {
 	if ( function_exists( 'is_multisite' ) && is_multisite() && $network_wide ) {
 
-		$mu_blogs = wp_get_sites();
+		if ( function_exists( 'get_sites' ) ) {
+			$blogs    = get_sites();
+			$mu_blogs = array();
+			foreach ( $blogs as $mu_blog ) {
+				$mu_blogs[] = $mu_blog->to_array();
+			}
+		} else {
+			$mu_blogs = wp_get_sites();
+		}
 
 		foreach ( $mu_blogs as $mu_blog ) {
 
@@ -219,7 +229,15 @@ register_activation_hook( __FILE__, 'rest_oauth1_activation' );
 function rest_oauth1_deactivation( $network_wide ) {
 	if ( function_exists( 'is_multisite' ) && is_multisite() && $network_wide ) {
 
-		$mu_blogs = wp_get_sites();
+		if ( function_exists( 'get_sites' ) ) {
+			$blogs    = get_sites();
+			$mu_blogs = array();
+			foreach ( $blogs as $mu_blog ) {
+				$mu_blogs[] = $mu_blog->to_array();
+			}
+		} else {
+			$mu_blogs = wp_get_sites();
+		}
 
 		foreach ( $mu_blogs as $mu_blog ) {
 

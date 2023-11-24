@@ -10,12 +10,20 @@
  * REST Client.
  */
 abstract class WP_REST_Client {
+
+	/**
+	 * Post object.
+	 *
+	 * @var WP_Post
+	 */
+	protected $post;
+
 	/**
 	 * Get the client type.
 	 *
 	 * Must be overridden in subclass.
 	 *
-	 * @return string
+	 * @return string | WP_Error
 	 */
 	protected static function get_type() {
 		return new WP_Error( 'rest_client_missing_type', __( 'Overridden class must implement get_type', 'rest_oauth1' ) );
@@ -126,7 +134,8 @@ abstract class WP_REST_Client {
 			return new WP_Error( 'rest_oauth1_invalid_id', __( 'Client ID is not valid.', 'rest_oauth1' ), array( 'status' => 404 ) );
 		}
 
-		$class = function_exists( 'get_called_class' ) ? get_called_class() : self::get_called_class();
+		$class = get_called_class();
+
 		return new $class( $post );
 	}
 
@@ -137,8 +146,7 @@ abstract class WP_REST_Client {
 	 * @return WP_Post|WP_Error
 	 */
 	public static function get_by_key( $key ) {
-		$class = function_exists( 'get_called_class' ) ? get_called_class() : self::get_called_class();
-		$type  = call_user_func( array( $class, 'get_type' ) );
+		$type = call_user_func( array( get_called_class(), 'get_type' ) );
 
 		$query     = new WP_Query();
 		$consumers = $query->query(
@@ -159,8 +167,7 @@ abstract class WP_REST_Client {
 		);
 
 		if ( empty( $consumers ) || empty( $consumers[0] ) ) {
-			$code = is_user_logged_in() ? 403 : 401;
-			return new WP_Error( 'json_consumer_notfound', __( 'Consumer Key is invalid', 'rest_oauth1' ), array( 'status' => $code ) );
+			return new WP_Error( 'json_consumer_notfound', __( 'Consumer Key is invalid', 'rest_oauth1' ), array( 'status' => 401 ) );
 		}
 
 		return $consumers[0];
@@ -170,11 +177,11 @@ abstract class WP_REST_Client {
 	 * Create a new client.
 	 *
 	 * @param array $params { .
-	 *     @type string $name Client name
-	 *     @type string $description Client description
-	 *     @type array $meta Metadata for the client (map of key => value)
+	 *          @type string $name Client name
+	 *          @type string $description Client description
+	 *          @type array $meta Metadata for the client (map of key => value)
 	 * }
-	 * @return WP_Post|WP_Error
+	 * @return WP_REST_Client|WP_Error
 	 */
 	public static function create( $params ) {
 		$default = array(
@@ -194,12 +201,12 @@ abstract class WP_REST_Client {
 			return $id;
 		}
 
-		$class        = function_exists( 'get_called_class' ) ? get_called_class() : self::get_called_class();
 		$meta         = $params['meta'];
+		$class        = get_called_class();
 		$meta['type'] = call_user_func( array( $class, 'get_type' ) );
 
 		// Allow types to add their own meta too.
-		$meta = $class::add_extra_meta( $meta, $params );
+		$meta = call_user_func( array( $class, 'add_extra_meta' ), $meta, $params );
 
 		/**
 		 * Add extra meta to the consumer on creation.
@@ -235,9 +242,15 @@ abstract class WP_REST_Client {
 	/**
 	 * Shim for get_called_class() for PHP 5.2
 	 *
+	 * @deprecated 0.4.0
 	 * @return string Class name.
 	 */
 	protected static function get_called_class() {
+		_deprecated_function( __METHOD__, '0.4.0', 'get_called_class()' );
+		if ( function_exists( 'get_called_class' ) ) {
+			return get_called_class();
+		}
+
 		// PHP 5.2 only.
 		$backtrace = debug_backtrace();
 		// [0] WP_REST_Client::get_called_class()

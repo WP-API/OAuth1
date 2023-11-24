@@ -127,6 +127,8 @@ class WP_REST_OAuth1_UI {
 		}
 
 		include $file;
+
+		return null;
 	}
 
 	/**
