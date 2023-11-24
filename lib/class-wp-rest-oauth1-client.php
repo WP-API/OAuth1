@@ -46,6 +46,8 @@ class WP_REST_OAuth1_Client extends WP_REST_Client {
 	/**
 	 * Delete a client.
 	 *
+	 * @since 0.4.0
+	 *
 	 * @return bool True if delete, false otherwise.
 	 */
 	public function delete() {

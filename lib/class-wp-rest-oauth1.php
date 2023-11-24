@@ -784,6 +784,8 @@ class WP_REST_OAuth1 {
 	 * Normalize each parameter by assuming each parameter may have already been encoded, so attempt to decode, and then
 	 * re-encode according to RFC 3986
 	 *
+	 * @since 0.4.0
+	 *
 	 * @see rawurlencode()
 	 * @param array $params Parameters to normalize.
 	 */
@@ -812,7 +814,7 @@ class WP_REST_OAuth1 {
 	 * @param string $value Value, passed by reference.
 	 */
 	protected function normalize_parameters( &$key, &$value ) {
-		_deprecated_function( __METHOD__, '0.3.1', 'WP_REST_OAuth1::normalize_parameter()' );
+		_deprecated_function( __METHOD__, '0.4.0', 'WP_REST_OAuth1::normalize_parameter()' );
 		$key   = self::urlencode_rfc3986( rawurldecode( $key ) );
 		$value = self::urlencode_rfc3986( rawurldecode( $value ) );
 	}

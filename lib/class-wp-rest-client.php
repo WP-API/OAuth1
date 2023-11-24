@@ -242,11 +242,11 @@ abstract class WP_REST_Client {
 	/**
 	 * Shim for get_called_class() for PHP 5.2
 	 *
-	 * @deprecated 0.3.1
+	 * @deprecated 0.4.0
 	 * @return string Class name.
 	 */
 	protected static function get_called_class() {
-		_deprecated_function( __METHOD__, '0.3.1', 'get_called_class()' );
+		_deprecated_function( __METHOD__, '0.4.0', 'get_called_class()' );
 		if ( function_exists( 'get_called_class' ) ) {
 			return get_called_class();
 		}
