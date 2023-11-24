@@ -50,7 +50,7 @@ class WP_REST_OAuth1_Client extends WP_REST_Client {
 	 */
 	public function delete() {
 		global $wpdb;
-		$results       = $wpdb->get_results( "SELECT * FROM $wpdb->options WHERE option_name LIKE 'oauth1_access_%'", ARRAY_A );
+		$results       = $wpdb->get_results( "SELECT * FROM $wpdb->options WHERE option_name LIKE 'oauth1_access_%' OR option_name LIKE 'oauth1_request_%'", ARRAY_A );
 		$delete_option = array();
 		foreach ( $results as $result ) {
 			$row = unserialize( $result['option_value'] );
