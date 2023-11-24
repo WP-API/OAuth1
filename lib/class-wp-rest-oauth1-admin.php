@@ -166,7 +166,7 @@ class WP_REST_OAuth1_Admin {
 		return array(
 			'name'        => wp_filter_post_kses( $params['name'] ),
 			'description' => wp_filter_post_kses( $params['description'] ),
-			'callback'    => $params['description'],
+			'callback'    => $params['callback'],
 		);
 	}
 
