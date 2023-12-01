@@ -109,7 +109,7 @@ function rest_oauth1_force_reauthentication() {
 
 	// Force reauthentication.
 	global $current_user;
-	$current_user = null; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+	$current_user = null;
 
 	wp_get_current_user();
 }

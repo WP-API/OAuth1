@@ -37,6 +37,7 @@
  	</rule>
 
  	<rule ref="WordPress.WP.GlobalVariablesOverride.Prohibited">
+        <exclude-pattern>oauth-server.php</exclude-pattern>
         <exclude-pattern>lib/class-wp-rest-oauth1-admin.php</exclude-pattern>
     </rule>
 
