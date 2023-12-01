@@ -1,0 +1,17 @@
+name: Asset update
+on:
+  push:
+    branches:
+      - master
+jobs:
+  master:
+    name: Push to main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: WordPress.org asset update
+        uses: 10up/action-wordpress-plugin-asset-update@stable
+        env:
+          SLUG: ${{ secrets.SLUG }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
