@@ -236,7 +236,7 @@ class WP_REST_OAuth1_Admin {
 	 */
 	public static function render_edit_page() {
 		if ( ! current_user_can( 'edit_users' ) ) {
-			wp_die( esc_html( __( 'You do not have permission to access this page.', 'rest_oauth1' ) ) );
+			wp_die( esc_html__( 'You do not have permission to access this page.', 'rest_oauth1' ) );
 		}
 
 		// Are we editing?
@@ -251,7 +251,7 @@ class WP_REST_OAuth1_Admin {
 			}
 
 			if ( empty( $consumer ) ) {
-				wp_die( esc_html( __( 'Invalid consumer ID.', 'rest_oauth1' ) ) );
+				wp_die( esc_html__( 'Invalid consumer ID.', 'rest_oauth1' ) );
 			}
 
 			$form_action       = self::get_url(
@@ -426,8 +426,8 @@ class WP_REST_OAuth1_Admin {
 			wp_die(
 				sprintf(
 					'<h1>%s</h1><p>%s</p>',
-					esc_html( __( 'You are not allowed to delete this application.', 'rest_oauth1' ) ),
-					esc_html( __( 'An error has occurred.', 'rest_oauth1' ) )
+					esc_html__( 'You are not allowed to delete this application.', 'rest_oauth1' ),
+					esc_html__( 'An error has occurred.', 'rest_oauth1' )
 				),
 				'',
 				array( 'response' => (int) $code )
@@ -444,8 +444,8 @@ class WP_REST_OAuth1_Admin {
 			wp_die(
 				sprintf(
 					'<h1>%s</h1><p>%s</p>',
-					esc_html( __( 'An error has occurred.', 'rest_oauth1' ) ),
-					esc_html( __( 'Invalid consumer ID', 'rest_oauth1' ) )
+					esc_html__( 'An error has occurred.', 'rest_oauth1' ),
+					esc_html__( 'Invalid consumer ID', 'rest_oauth1' )
 				),
 				'',
 				array( 'response' => (int) $code )
@@ -472,8 +472,8 @@ class WP_REST_OAuth1_Admin {
 			wp_die(
 				sprintf(
 					'<h1>%s</h1><p>%s</p>',
-					esc_html( __( 'An error has occurred.', 'rest_oauth1' ) ),
-					esc_html( __( 'You are not allowed to edit this application.', 'rest_oauth1' ) )
+					esc_html__( 'An error has occurred.', 'rest_oauth1' ),
+					esc_html__( 'You are not allowed to edit this application.', 'rest_oauth1' )
 				),
 				'',
 				array( 'response' => (int) $code )

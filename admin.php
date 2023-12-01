@@ -84,10 +84,10 @@ function rest_oauth1_profile_messages() {
 	}
 
 	if ( ! empty( $_GET['rest_oauth1_revoked'] ) ) {
-		printf( '<div id="message" class="updated"><p>%s</p></div>', esc_html( __( 'Token revoked.', 'rest_oauth1' ) ) );
+		printf( '<div id="message" class="updated"><p>%s</p></div>', esc_html__( 'Token revoked.', 'rest_oauth1' ) );
 	}
 	if ( ! empty( $_GET['rest_oauth1_revocation_failed'] ) ) {
-		printf( '<div id="message" class="updated"><p>%s</p></div>', esc_html( __( 'Unable to revoke token.', 'rest_oauth1' ) ) );
+		printf( '<div id="message" class="updated"><p>%s</p></div>', esc_html__( 'Unable to revoke token.', 'rest_oauth1' ) );
 	}
 }
 
