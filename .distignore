@@ -25,6 +25,7 @@ phpunit.xml.dist
 phpunit-multisite.xml.dist
 multisite.xml
 multisite.xml.dist
+README.md
 .phpcs.xml
 phpcs.xml
 .phpcs.xml.dist
