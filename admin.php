@@ -22,12 +22,15 @@ add_action( 'edit_user_profile_update', 'rest_oauth1_profile_save', 10, 1 );
 function rest_oauth1_profile_section( $user ) {
 	global $wpdb;
 
-	$results  = $wpdb->get_col( "SELECT option_value FROM $wpdb->options WHERE option_name LIKE 'oauth1_access_%'" );
+	$results  = $wpdb->get_col( "SELECT option_name FROM $wpdb->options WHERE option_name LIKE 'oauth1_access_%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 	$approved = array();
-	foreach ( $results as $result ) {
-		$row = unserialize( $result );
-		if ( $row['user'] === $user->ID ) {
-			$approved[] = $row;
+	foreach ( $results as $option_name ) {
+		$option = get_option( $option_name );
+		if ( ! is_array( $option ) || ! isset( $option['user'] ) ) {
+			continue;
+		}
+		if ( $option['user'] === $user->ID ) {
+			$approved[] = $option;
 		}
 	}
 
@@ -81,10 +84,10 @@ function rest_oauth1_profile_messages() {
 	}
 
 	if ( ! empty( $_GET['rest_oauth1_revoked'] ) ) {
-		echo '<div id="message" class="updated"><p>' . __( 'Token revoked.', 'rest_oauth1' ) . '</p></div>';
+		printf( '<div id="message" class="updated"><p>%s</p></div>', esc_html__( 'Token revoked.', 'rest_oauth1' ) );
 	}
 	if ( ! empty( $_GET['rest_oauth1_revocation_failed'] ) ) {
-		echo '<div id="message" class="updated"><p>' . __( 'Unable to revoke token.', 'rest_oauth1' ) . '</p></div>';
+		printf( '<div id="message" class="updated"><p>%s</p></div>', esc_html__( 'Unable to revoke token.', 'rest_oauth1' ) );
 	}
 }
 
@@ -98,7 +101,7 @@ function rest_oauth1_profile_save( $user_id ) {
 		return;
 	}
 
-	$key = wp_unslash( $_POST['rest_oauth1_revoke'] );
+	$key = sanitize_text_field( wp_unslash( $_POST['rest_oauth1_revoke'] ) );
 
 	$authenticator = new WP_REST_OAuth1();
 

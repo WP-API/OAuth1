@@ -145,13 +145,13 @@ function rest_oauth1_loaded() {
 		}
 
 		status_header( $status );
-		echo $response->get_error_message();
+		echo $response->get_error_message(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		die();
 	}
 
 	$response = http_build_query( $response, '', '&' );
 
-	echo $response;
+	echo $response;  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 	// Finish off our request.
 	die();

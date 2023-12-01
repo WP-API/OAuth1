@@ -252,9 +252,7 @@ abstract class WP_REST_Client {
 		}
 
 		// PHP 5.2 only.
-		$backtrace = debug_backtrace();
-		// [0] WP_REST_Client::get_called_class()
-		// [1] WP_REST_Client::function()
+		$backtrace = debug_backtrace(); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace
 		if ( 'call_user_func' === $backtrace[2]['function'] ) {
 			return $backtrace[2]['args'][0][0];
 		}
