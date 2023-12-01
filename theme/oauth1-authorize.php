@@ -16,7 +16,7 @@ login_header(
 	$errors
 );
 
-$current_user = wp_get_current_user();
+$this_user = wp_get_current_user();
 
 $url = site_url( 'wp-login.php?action=oauth1_authorize', 'login_post' );
 $url = add_query_arg( 'oauth_token', $token_key, $url );
@@ -77,16 +77,16 @@ $url = add_query_arg( 'oauth_token', $token_key, $url );
 
 	<div class="login-info">
 
-		<?php echo get_avatar( $current_user->ID, '78' ); ?>
+		<?php echo get_avatar( $this_user->ID, '78' ); ?>
 
 		<p>
 		<?php
 			printf(
 				// translators: 1: username. 2: consumer name.
-				__( 'Howdy <strong>%1$s</strong>,<br/> "%2$s" would like to connect to %3$s.', 'rest_oauth1' ),
-				$current_user->user_login,
-				$consumer->post_title,
-				get_bloginfo( 'name' )
+				wp_kses( __( 'Howdy <strong>%1$s</strong>,<br/> "%2$s" would like to connect to %3$s.', 'rest_oauth1' ), array( 'strong', 'br' ) ),
+				esc_html( $this_user->user_login ),
+				esc_html( $consumer->post_title ),
+				esc_html( get_bloginfo( 'name' ) )
 			)
 			?>
 		</p>
@@ -120,7 +120,7 @@ if ( get_option( 'users_can_register' ) ) :
 	 *
 	 * @param string $registration_url Registration URL.
 	 */
-	echo ' | ' . apply_filters( 'register', $registration_url );
+	echo ' | ' . esc_url( apply_filters( 'register', $registration_url ) );
 endif;
 ?>
 </p>

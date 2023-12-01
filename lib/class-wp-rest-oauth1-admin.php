@@ -236,7 +236,7 @@ class WP_REST_OAuth1_Admin {
 	 */
 	public static function render_edit_page() {
 		if ( ! current_user_can( 'edit_users' ) ) {
-			wp_die( __( 'You do not have permission to access this page.', 'rest_oauth1' ) );
+			wp_die( esc_html( __( 'You do not have permission to access this page.', 'rest_oauth1' ) ) );
 		}
 
 		// Are we editing?
@@ -246,8 +246,12 @@ class WP_REST_OAuth1_Admin {
 		if ( ! empty( $_REQUEST['id'] ) ) {
 			$id       = absint( $_REQUEST['id'] );
 			$consumer = WP_REST_OAuth1_Client::get( $id );
-			if ( is_wp_error( $consumer ) || empty( $consumer ) ) {
-				wp_die( __( 'Invalid consumer ID.', 'rest_oauth1' ) );
+			if ( is_wp_error( $consumer ) ) {
+				wp_die( $consumer ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			}
+
+			if ( empty( $consumer ) ) {
+				wp_die( esc_html( __( 'Invalid consumer ID.', 'rest_oauth1' ) ) );
 			}
 
 			$form_action       = self::get_url(
@@ -318,7 +322,7 @@ class WP_REST_OAuth1_Admin {
 		<?php
 		if ( ! empty( $messages ) ) {
 			foreach ( $messages as $msg ) {
-				echo '<div id="message" class="notice is-dismissible notice-' . $notice_type . '"><p>' . esc_html( $msg ) . '</p></div>';
+				printf( '<div id="message" class="notice is-dismissible notice-%s"><p>%s</p></div>', esc_attr( $notice_type ), esc_html( $msg ) );
 			}
 		}
 		?>
@@ -420,23 +424,31 @@ class WP_REST_OAuth1_Admin {
 		if ( ! current_user_can( 'delete_post', $id ) ) {
 			$code = is_user_logged_in() ? 403 : 401;
 			wp_die(
-				'<h1>' . __( 'An error has occurred.', 'rest_oauth1' ) . '</h1>' .
-				'<p>' . __( 'You are not allowed to delete this application.', 'rest_oauth1' ) . '</p>',
-				$code
+				sprintf(
+					'<h1>%s</h1><p>%s</p>',
+					esc_html( __( 'You are not allowed to delete this application.', 'rest_oauth1' ) ),
+					esc_html( __( 'An error has occurred.', 'rest_oauth1' ) )
+				),
+				'',
+				array( 'response' => (int) $code )
 			);
 		}
 
 		$client = WP_REST_OAuth1_Client::get( $id );
 		if ( is_wp_error( $client ) ) {
-			wp_die( $client );
+			wp_die( $client ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		if ( ! $client->delete() ) {
 			$code = is_user_logged_in() ? 403 : 401;
 			wp_die(
-				'<h1>' . __( 'An error has occurred.', 'rest_oauth1' ) . '</h1>' .
-				'<p>' . __( 'Invalid consumer ID', 'rest_oauth1' ) . '</p>',
-				$code
+				sprintf(
+					'<h1>%s</h1><p>%s</p>',
+					esc_html( __( 'An error has occurred.', 'rest_oauth1' ) ),
+					esc_html( __( 'Invalid consumer ID', 'rest_oauth1' ) )
+				),
+				'',
+				array( 'response' => (int) $code )
 			);
 		}
 
@@ -458,19 +470,23 @@ class WP_REST_OAuth1_Admin {
 		if ( ! current_user_can( 'edit_post', $id ) ) {
 			$code = is_user_logged_in() ? 403 : 401;
 			wp_die(
-				'<h1>' . __( 'An error has occurred.', 'rest_oauth1' ) . '</h1>' .
-				'<p>' . __( 'You are not allowed to edit this application.', 'rest_oauth1' ) . '</p>',
-				$code
+				sprintf(
+					'<h1>%s</h1><p>%s</p>',
+					esc_html( __( 'An error has occurred.', 'rest_oauth1' ) ),
+					esc_html( __( 'You are not allowed to edit this application.', 'rest_oauth1' ) )
+				),
+				'',
+				array( 'response' => (int) $code )
 			);
 		}
 
 		$client = WP_REST_OAuth1_Client::get( $id );
 		if ( is_wp_error( $client ) ) {
-			wp_die( $client );
+			wp_die( $client ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 		$result = $client->regenerate_secret();
 		if ( is_wp_error( $result ) ) {
-			wp_die( $result );
+			wp_die( $result ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		wp_safe_redirect(

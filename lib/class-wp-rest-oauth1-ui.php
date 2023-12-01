@@ -155,8 +155,8 @@ class WP_REST_OAuth1_UI {
 			login_header( __( 'Access Token', 'rest_oauth1' ) );
 			echo '<p>' . sprintf(
 				/* translators: %s: verifier **/
-				__( 'Your verification token is <code>%s</code>', 'rest_oauth1' ),
-				$verifier
+				wp_kses( __( 'Your verification token is <code>%s</code>', 'rest_oauth1' ), array( 'code' ) ),
+				esc_html( $verifier )
 			) .
 				'</p>';
 			login_footer();
@@ -183,8 +183,7 @@ class WP_REST_OAuth1_UI {
 
 		// Offsite, so skip safety check.
 		wp_redirect( $callback );
-
-		return null;
+		exit;
 	}
 
 	/**

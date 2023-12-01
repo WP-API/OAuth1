@@ -84,7 +84,7 @@ class WP_REST_OAuth1 {
 	 */
 	public function get_authorization_header() {
 		if ( ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
-			return wp_unslash( $_SERVER['HTTP_AUTHORIZATION'] );
+			return sanitize_text_field( wp_unslash( $_SERVER['HTTP_AUTHORIZATION'] ) );
 		}
 
 		if ( function_exists( 'getallheaders' ) ) {
@@ -695,7 +695,7 @@ class WP_REST_OAuth1 {
 
 		$params = array_merge( $params, $oauth_params );
 
-		$request_path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
+		$request_path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ); // phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url
 		$wp_base      = get_home_url( null, '/', 'relative' );
 		if ( substr( $request_path, 0, strlen( $wp_base ) ) === $wp_base ) {
 			$request_path = substr( $request_path, strlen( $wp_base ) );
