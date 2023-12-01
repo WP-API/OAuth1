@@ -4,7 +4,7 @@ Tags: json, rest, api, rest-api
 Requires at least: 4.4
 Requires PHP: 5.4
 Tested up to: 6.4
-Stable tag: {{TAG}}
+Stable tag: 0.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
