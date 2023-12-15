@@ -1,6 +1,19 @@
-# [WP REST API - OAuth 1.0a Server](http://oauth1.wp-api.org/)
+# WP REST API - OAuth 1.0a Server
+
+Contributors: rmccue, rachelbaker, danielbachhuber, joehoyle, spacedmonkey
+Tags: json, rest, api, rest-api
+Requires at least: 4.4
+Requires PHP: 5.4
+Tested up to: 6.4
+Stable tag: 0.4.2
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+
+![](assets/banner-1544x500.png)
 
 Connect applications to your WordPress site without ever giving away your password.
+
+## Description
 
 This plugin uses the OAuth 1.0a protocol to allow delegated authorization; that is, to allow applications to access a site using a set of secondary credentials. This allows server administrators to control which applications can access the site, as well as allowing users to control which applications have access to their data.
 
@@ -8,13 +21,13 @@ This plugin only supports WordPress >= 4.4.
 
 The latest stable version is also available from the [WordPress Plugin Directory](https://wordpress.org/plugins/rest-api-oauth1/).
 
-## New to OAuth
+### New to OAuth
 
 We strongly recommend you use an existing OAuth library. You'll be best off if you understand the authorization process, but leave the actual implementation to well-tested libraries, as there are a lot of edge cases.
 
 Start reading from [the Introduction](docs/introduction/README.md) to get started!
 
-## For OAuth Veterans
+### For OAuth Veterans
 
 If you already know how to use OAuth, here's the lowdown:
 
