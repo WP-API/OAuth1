@@ -41,3 +41,4 @@ jobs:
           SLUG: ${{ secrets.SLUG }}
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          README_NAME: readme.md
