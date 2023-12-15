@@ -16,3 +16,4 @@ jobs:
           ASSETS_DIR: ${{ secrets.ASSETS_DIR }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          README_NAME: readme.md
