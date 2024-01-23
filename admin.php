@@ -101,7 +101,7 @@ function rest_oauth1_profile_save( $user_id ) {
 		return;
 	}
 
-	$key = sanitize_text_field( wp_unslash( $_POST['rest_oauth1_revoke'] ) );
+	$key = wp_unslash( $_POST['rest_oauth1_revoke'] );
 
 	$authenticator = new WP_REST_OAuth1();
 

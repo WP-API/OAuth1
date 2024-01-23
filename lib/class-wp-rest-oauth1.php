@@ -84,7 +84,7 @@ class WP_REST_OAuth1 {
 	 */
 	public function get_authorization_header() {
 		if ( ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
-			return sanitize_text_field( wp_unslash( $_SERVER['HTTP_AUTHORIZATION'] ) );
+			return wp_unslash( $_SERVER['HTTP_AUTHORIZATION'] );
 		}
 
 		if ( function_exists( 'getallheaders' ) ) {
