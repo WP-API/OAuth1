@@ -24,7 +24,7 @@ class WP_REST_OAuth1_Admin {
 		 */
 		include_once __DIR__ . '/class-wp-rest-oauth1-listtable.php';
 
-		$class = get_class();
+		$class = __CLASS__;
 
 		$hook = add_users_page(
 			// Page title.
