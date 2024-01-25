@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP REST API - OAuth 1.0a Server
  * Description: Authenticate with your site via OAuth 1.0a
- * Version: 0.4.3
+ * Version: 0.4.4
  * Requires at least: 4.4
  * Requires PHP: 5.4
  * Author: WP REST API Team
