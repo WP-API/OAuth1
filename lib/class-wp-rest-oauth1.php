@@ -626,6 +626,9 @@ class WP_REST_OAuth1 {
 			'user'     => $token['user'],
 		);
 		$data = apply_filters( 'json_oauth1_access_token_data', $data );
+
+		$this->revoke_old_tokens( $data['user'], $data['consumer'] );
+
 		add_option( 'oauth1_access_' . $key, $data, null, 'no' );
 
 		// Delete the request token.
@@ -878,4 +881,21 @@ class WP_REST_OAuth1 {
 	protected static function urlencode_rfc3986( $value ) {
 		return str_replace( array( '+', '%7E' ), array( ' ', '~' ), rawurlencode( $value ) );
 	}
+
+	protected function revoke_old_tokens( $user, $consumer ) {
+		global $wpdb;
+
+		// Get all the stored access tokens and then filter out any which don't belong to the current user/consumer
+		$results = $wpdb->get_col( "SELECT option_value FROM {$wpdb->options} WHERE option_name LIKE 'oauth1_access_%'", 0 );
+		$results = array_map( 'unserialize', $results );
+		$revocations = array_filter( $results, function ( $row ) use ( $user, $consumer ) {
+			return ( $row['user'] === $user && $row['consumer'] === $consumer );
+		} );
+
+		// Loop through the old tokens - there might be a lot of them
+		foreach ($revocations as $value) {
+			$this->revoke_access_token( $value['key'] );
+		}
+	}
+
 }
