@@ -700,7 +700,7 @@ class WP_REST_OAuth1 {
 		if ( substr( $request_path, 0, strlen( $wp_base ) ) === $wp_base ) {
 			$request_path = substr( $request_path, strlen( $wp_base ) );
 		}
-		$base_request_uri = self::urlencode_rfc3986( get_home_url( null, $request_path ) );
+        $base_request_uri = self::urlencode_rfc3986( apply_filters( 'oauth1_base_request_uri', get_home_url( null, $request_path ) ));
 
 		// get the signature provided by the consumer and remove it from the parameters prior to checking the signature.
 		$consumer_signature = rawurldecode( $params['oauth_signature'] );
